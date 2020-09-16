@@ -496,7 +496,7 @@ export default {
 
       this.$axios
         .get(
-          `/rdt/events/${this.idEvent}/participants-export?format=${format}`,
+          `/rdt/events/${this.idEvent}/participants-export-f1?format=${format}`,
           {
             responseType: 'blob'
           }
