@@ -31,6 +31,6 @@ export const DEFAULT_FILTER = {
 }
 export const DEFAULT_PAGINATION = {
   page: 1,
-  itemsPerPage: 10,
+  itemsPerPage: 50,
   total: 0
 }
