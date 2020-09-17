@@ -149,8 +149,39 @@
         <v-icon class="mr-2" @click="modalEditLabCodeOpen(item.id)">
           mdi-pencil
         </v-icon>
+        <v-icon @click="selectToRemove(item)">
+          mdi-delete
+        </v-icon>
       </template>
     </v-data-table>
+    <v-dialog v-model="deleteModal" max-width="528">
+      <v-card class="text-center">
+        <v-card-title>
+          <span class="col pl-10">Hapus Peserta</span>
+        </v-card-title>
+        <v-card-text>
+          <div>
+            {{ confirmDeleteMsg }}
+          </div>
+          <strong>
+            {{ selectedData ? selectedData.applicant.name : '-' }} </strong
+          >.
+        </v-card-text>
+        <v-card-actions class="pb-6 justify-center">
+          <v-btn
+            color="grey darken-1"
+            outlined
+            class="mr-2 px-2"
+            @click="deleteModal = false"
+          >
+            Tidak
+          </v-btn>
+          <v-btn color="error" class="ml-2 px-2" @click="remove(selectedData)">
+            Ya
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
     <v-dialog v-model="blastNotifModal" max-width="528">
       <v-card class="text-center">
         <v-card-title>
@@ -258,7 +289,10 @@ import {
   SET_LABCODE_SUCCESS,
   SET_LABCODE_FAILED,
   DEFAULT_PAGINATION,
-  DEFAULT_FILTER
+  DEFAULT_FILTER,
+  CONFIRM_DELETE_PARTICIPANTS,
+  SUCCESS_DELETE,
+  FAILED_DELETE
 } from '@/utilities/constant'
 import EventApplicantEditLabCodeDialog from '@/components/EventApplicantEditLabCodeDialog'
 import DialogExportLoader from '@/components/DialogLoader'
@@ -286,7 +320,7 @@ const headers = [
     value: 'notified_result_at',
     width: 200
   },
-  { text: 'Actions', value: 'actions', sortable: false, align: 'center' }
+  { text: 'Actions', value: 'actions', sortable: false, width: 150 }
 ]
 
 export default {
@@ -319,11 +353,16 @@ export default {
       importFile: null,
       modalExportLoader: false,
       modalEditLabCode: false,
-      modalEditLabCodeId: null
+      modalEditLabCodeId: null,
+      deleteModal: false,
+      selectedData: null
     }
   },
 
   computed: {
+    confirmDeleteMsg() {
+      return CONFIRM_DELETE_PARTICIPANTS
+    },
     records() {
       return this.$store.getters['eventParticipants/getList']
     },
@@ -385,6 +424,33 @@ export default {
   },
 
   methods: {
+    selectToRemove(payload) {
+      this.selectedData = payload
+      this.deleteModal = true
+    },
+    async remove(payload) {
+      try {
+        const data = {
+          eventId: this.$route.params.eventId,
+          participantId: payload.rdt_applicant_id
+        }
+        await this.$store.dispatch('eventParticipants/deleteParticipant', data)
+        this.$toast.show({
+          message: SUCCESS_DELETE,
+          type: 'success'
+        })
+        await this.$store.dispatch(
+          'eventParticipants/getList',
+          this.$route.params.eventId
+        )
+        this.deleteModal = false
+      } catch (error) {
+        this.$toast.show({
+          message: error.message || FAILED_DELETE,
+          type: 'error'
+        })
+      }
+    },
     openModalNotif(type) {
       this.modalType = type || this.modalType
       this.blastNotifModal = true
