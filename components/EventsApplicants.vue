@@ -157,15 +157,16 @@
     <v-dialog v-model="deleteModal" max-width="528">
       <v-card class="text-center">
         <v-card-title>
-          <span class="col pl-10">Hapus Peserta</span>
+          <span class="col pl-10">Perhatian!</span>
         </v-card-title>
         <v-card-text>
           <div>
             {{ confirmDeleteMsg }}
           </div>
+          <span>Nama peserta: </span>
           <strong>
-            {{ selectedData ? selectedData.applicant.name : '-' }} </strong
-          >.
+            {{ selectedData ? selectedData.applicant.name : '-' }}
+          </strong>
         </v-card-text>
         <v-card-actions class="pb-6 justify-center">
           <v-btn
