@@ -219,5 +219,19 @@ export const actions = {
     } finally {
       commit('SET_LOADING_IMPORT', false)
     }
+  },
+
+  async deleteParticipant({ commit }, data) {
+    commit('SET_LOADING', true)
+    const id = data.eventId
+    try {
+      await this.$axios.$post(`rdt/events/${id}/participants-remove`, {
+        applicants: [{ rdt_applicant_id: data.participantId }]
+      })
+    } catch (e) {
+      throw new Error(e.response.data.message)
+    } finally {
+      commit('SET_LOADING', false)
+    }
   }
 }
