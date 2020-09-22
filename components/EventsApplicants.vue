@@ -149,6 +149,9 @@
         </v-layout>
       </template>
       <template v-slot:[`item.actions`]="{ item }">
+        <v-icon class="mr-2" @click="viewItem(item)">
+          mdi-card-search
+        </v-icon>
         <v-icon class="mr-2" @click="modalEditLabCodeOpen(item.id)">
           mdi-pencil
         </v-icon>
@@ -278,6 +281,13 @@
       @save="modalEditLabCodeSave"
     />
     <dialog-export-loader :open="modalExportLoader" />
+    <applicant-view-dialog
+      v-if="allow.includes('view-applicants')"
+      :open="viewDialog"
+      :record-id="viewRecordId"
+      :detail-type="'invitation'"
+      @close="viewClose"
+    />
   </div>
 </template>
 
@@ -300,6 +310,7 @@ import {
 } from '@/utilities/constant'
 import EventApplicantEditLabCodeDialog from '@/components/EventApplicantEditLabCodeDialog'
 import DialogExportLoader from '@/components/DialogLoader'
+import ApplicantViewDialog from '@/components/ApplicantViewDialog'
 
 const headers = [
   {
@@ -330,7 +341,8 @@ const headers = [
 export default {
   components: {
     EventApplicantEditLabCodeDialog,
-    DialogExportLoader
+    DialogExportLoader,
+    ApplicantViewDialog
   },
   filters: {
     getChipColor
@@ -359,7 +371,9 @@ export default {
       modalEditLabCode: false,
       modalEditLabCodeId: null,
       deleteModal: false,
-      selectedData: null
+      selectedData: null,
+      viewDialog: false,
+      viewRecordId: null
     }
   },
 
@@ -428,6 +442,14 @@ export default {
   },
 
   methods: {
+    viewItem(payload) {
+      this.viewRecordId = payload.id
+      this.viewDialog = true
+    },
+    viewClose() {
+      this.viewDialog = false
+      this.viewRecordId = null
+    },
     selectToRemove(payload) {
       this.selectedData = payload
       this.deleteModal = true
