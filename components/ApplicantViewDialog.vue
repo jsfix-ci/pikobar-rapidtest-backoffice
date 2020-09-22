@@ -51,6 +51,7 @@
               </v-col>
               <v-col cols="4">
                 <v-text-field
+                  v-if="cityName"
                   v-model="cityName"
                   label="Kota/Kabupaten"
                   filled
@@ -59,6 +60,7 @@
               </v-col>
               <v-col cols="4">
                 <v-text-field
+                  v-if="districtName"
                   v-model="districtName"
                   label="Kecamatan"
                   filled
@@ -67,6 +69,7 @@
               </v-col>
               <v-col cols="4">
                 <v-text-field
+                  v-if="villageName"
                   v-model="villageName"
                   label="Desa/Kelurahan"
                   filled
@@ -244,18 +247,18 @@ export default {
         })
       }
 
-      this.registrationCode = data.registration_code || '-'
-      this.name = data.name || '-'
-      this.address = data.address || '-'
-      this.cityName = data.city ? data.city.name : '-'
-      this.districtName = data.district ? data.district.name : '-'
-      this.villageName = data.village ? data.village.name : '-'
-      this.occupationType = data.occupation_type || '-'
-      this.occupationName = data.occupation_name || '-'
-      this.workplaceName = data.workplace_name || '-'
-      this.phoneNumber = data.phone_number || '-'
-      this.birthDate = data.birth_date || '-'
-      this.invitations = data.invitations || '-'
+      this.registrationCode = data.registration_code
+      this.name = data.name
+      this.address = data.address
+      this.cityName = data.city ? data.city.name : null
+      this.districtName = data.district ? data.district.name : null
+      this.villageName = data.village ? data.village.name : null
+      this.occupationType = data.occupation_type
+      this.occupationName = data.occupation_name
+      this.workplaceName = data.workplace_name
+      this.phoneNumber = data.phone_number
+      this.birthDate = data.birth_date
+      this.invitations = data.invitations
     },
 
     async save() {
