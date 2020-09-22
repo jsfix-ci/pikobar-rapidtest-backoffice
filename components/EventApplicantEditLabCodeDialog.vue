@@ -58,7 +58,7 @@ export default {
 
   data() {
     return {
-      lab_code_sample: null
+      inputLabCodeSample: null
     }
   },
 
@@ -68,7 +68,7 @@ export default {
         return this.labCodeSample
       },
       set(value) {
-        this.lab_code_sample = value
+        this.inputLabCodeSample = value
       }
     }
   },
@@ -76,7 +76,7 @@ export default {
   watch: {
     open(val) {
       if (!val) {
-        this.lab_code_sample = null
+        this.inputLabCodeSample = null
         this.$refs.codeLabResult.reset()
       }
     }
@@ -86,7 +86,7 @@ export default {
     save() {
       this.$emit('save', {
         rdt_invitation_id: this.recordId,
-        lab_code_sample: this.lab_code_sample
+        lab_code_sample: this.inputLabCodeSample
       })
     },
 
