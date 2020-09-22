@@ -12,7 +12,7 @@
           </v-card-title>
           <v-card-text class="pb-0">
             <pkbr-input
-              v-model="lab_code_sample"
+              v-model="codeSample"
               label="Kode Sampel Lab"
               name="Kode Sampel Lab"
               rules="required"
@@ -48,12 +48,28 @@ export default {
     recordId: {
       type: Number,
       default: null
+    },
+
+    labCodeSample: {
+      type: String,
+      default: null
     }
   },
 
   data() {
     return {
       lab_code_sample: null
+    }
+  },
+
+  computed: {
+    codeSample: {
+      get() {
+        return this.labCodeSample
+      },
+      set(value) {
+        this.lab_code_sample = value
+      }
     }
   },
 

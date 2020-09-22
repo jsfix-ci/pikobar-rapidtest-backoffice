@@ -271,6 +271,7 @@
     <event-applicant-edit-lab-code-dialog
       :open="modalEditLabCode"
       :record-id="modalEditLabCodeId"
+      :lab-code-sample="lab_code_sample"
       @close="modalEditLabCodeClose"
       @save="modalEditLabCodeSave"
     />
@@ -356,7 +357,8 @@ export default {
       modalEditLabCode: false,
       modalEditLabCodeId: null,
       deleteModal: false,
-      selectedData: null
+      selectedData: null,
+      lab_code_sample: null
     }
   },
 
@@ -529,6 +531,7 @@ export default {
     modalEditLabCodeOpen(id) {
       this.modalEditLabCodeId = id
       this.modalEditLabCode = true
+      this.getSampleCode(id)
     },
     modalEditLabCodeClose() {
       this.modalEditLabCodeId = null
@@ -557,7 +560,10 @@ export default {
         )
       }
     },
-
+    async getSampleCode(id) {
+      const sample = await this.$axios.$get(`/rdt/invitation/${id}`)
+      this.lab_code_sample = sample.data.lab_code_sample
+    },
     downloadExport(format) {
       this.modalExportLoader = true
 
