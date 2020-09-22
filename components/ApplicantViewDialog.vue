@@ -238,13 +238,11 @@ export default {
       const id = this.recordId
       let data = null
       if (this.detailType === 'invitation') {
-        await this.$axios.$get(`/rdt/invitation/${id}`).then((response) => {
-          data = response.data.applicant
-        })
+        const response = await this.$axios.$get(`/rdt/invitation/${id}`)
+        data = response.data.applicant
       } else {
-        await this.$axios.$get(`/rdt/applicants/${id}`).then((response) => {
-          data = response.data
-        })
+        const response = await this.$axios.$get(`/rdt/applicants/${id}`)
+        data = response.data
       }
 
       this.registrationCode = data.registration_code
