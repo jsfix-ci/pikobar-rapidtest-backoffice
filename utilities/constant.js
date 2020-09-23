@@ -9,6 +9,8 @@ export const SUCCESS_DELETE = 'Data berhasil di hapus'
 export const FAILED_DELETE = 'Maaf, ada kesalahan dalam menghapus data'
 export const CONFIRM_DELETE =
   'Apakah anda yakin akan menghapus data kegiatan dengan ID: '
+export const CONFIRM_DELETE_PARTICIPANTS =
+  'Apakah Anda yakin akan mengeluarkan peserta dari kegiatan ini?'
 export const SUCCESS_ADD_PARTICIPANTS =
   'Peserta berhasil di daftarkan dalam kegiatan'
 export const FAILED_ADD_PARTICIPANTS =
@@ -31,6 +33,6 @@ export const DEFAULT_FILTER = {
 }
 export const DEFAULT_PAGINATION = {
   page: 1,
-  itemsPerPage: 10,
+  itemsPerPage: 50,
   total: 0
 }

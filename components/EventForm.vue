@@ -1,8 +1,11 @@
 <template>
   <v-card>
     <v-card-title>
-      <p class="text-h6 text--primary">
+      <p v-if="type === 'create'" class="text-h6 text--primary">
         Tambah Kegiatan
+      </p>
+      <p v-else class="text-h6 text--primary">
+        Edit Kegiatan
       </p>
     </v-card-title>
     <v-divider></v-divider>
