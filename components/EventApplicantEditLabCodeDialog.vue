@@ -12,7 +12,7 @@
           </v-card-title>
           <v-card-text class="pb-0">
             <pkbr-input
-              v-model="lab_code_sample"
+              v-model="codeSample"
               label="Kode Sampel Lab"
               name="Kode Sampel Lab"
               rules="required"
@@ -48,19 +48,35 @@ export default {
     recordId: {
       type: Number,
       default: null
+    },
+
+    labCodeSample: {
+      type: String,
+      default: null
     }
   },
 
   data() {
     return {
-      lab_code_sample: null
+      inputLabCodeSample: null
+    }
+  },
+
+  computed: {
+    codeSample: {
+      get() {
+        return this.labCodeSample
+      },
+      set(value) {
+        this.inputLabCodeSample = value
+      }
     }
   },
 
   watch: {
     open(val) {
       if (!val) {
-        this.lab_code_sample = null
+        this.inputLabCodeSample = null
         this.$refs.codeLabResult.reset()
       }
     }
@@ -70,7 +86,7 @@ export default {
     save() {
       this.$emit('save', {
         rdt_invitation_id: this.recordId,
-        lab_code_sample: this.lab_code_sample
+        lab_code_sample: this.inputLabCodeSample
       })
     },
 
