@@ -374,7 +374,7 @@ export default {
       deleteModal: false,
       selectedData: null,
       viewDialog: false,
-      viewRecordId: null
+      viewRecordId: null,
       labCodeSample: null
     }
   },
