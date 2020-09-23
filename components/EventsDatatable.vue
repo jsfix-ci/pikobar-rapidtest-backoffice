@@ -12,6 +12,9 @@
       :header-props="{
         class: 'blue-grey lighten-3'
       }"
+      :footer-props="{
+        'items-per-page-options': [50, 100, 500]
+      }"
     >
       <template slot="top">
         <div class="d-flex">
