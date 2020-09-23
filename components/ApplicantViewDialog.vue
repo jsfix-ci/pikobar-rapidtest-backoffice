@@ -51,6 +51,7 @@
               </v-col>
               <v-col cols="4">
                 <v-text-field
+                  v-if="cityName"
                   v-model="cityName"
                   label="Kota/Kabupaten"
                   filled
@@ -59,6 +60,7 @@
               </v-col>
               <v-col cols="4">
                 <v-text-field
+                  v-if="districtName"
                   v-model="districtName"
                   label="Kecamatan"
                   filled
@@ -67,6 +69,7 @@
               </v-col>
               <v-col cols="4">
                 <v-text-field
+                  v-if="villageName"
                   v-model="villageName"
                   label="Desa/Kelurahan"
                   filled
@@ -97,7 +100,10 @@
                   readonly
                 />
               </v-col>
-              <v-col v-if="invitations.length > 0" cols="12">
+              <v-col
+                v-if="detailType === 'applicant' && invitations.length > 0"
+                cols="12"
+              >
                 <h3>Riwayat Undangan / Hasil Tes</h3>
                 <v-simple-table>
                   <template v-slot:default>
@@ -118,9 +124,7 @@
                       >
                         <td>
                           {{
-                            invitation.event
-                              ? invitation.event.event_name
-                              : 'N/A'
+                            invitation.event ? invitation.event.event_name : '-'
                           }}
                         </td>
                         <td>
@@ -130,7 +134,7 @@
                                   new Date(invitation.event.start_at),
                                   'dd MMMM yyyy'
                                 )
-                              : 'N/A'
+                              : '-'
                           }}
                         </td>
                         <td>
@@ -140,12 +144,12 @@
                                   new Date(invitation.attended_at),
                                   'dd MMMM yyyy HH:mm'
                                 )
-                              : 'N/A'
+                              : '-'
                           }}
                         </td>
                         <td>
                           {{
-                            invitation.test_type ? invitation.test_type : 'N/A'
+                            invitation.test_type ? invitation.test_type : '-'
                           }}
                         </td>
                         <td>
@@ -155,14 +159,14 @@
                                   new Date(invitation.result_at),
                                   'dd MMMM yyyy'
                                 )
-                              : 'N/A'
+                              : '-'
                           }}
                         </td>
                         <td>
                           {{
                             invitation.lab_result_type
                               ? invitation.lab_result_type
-                              : 'N/A'
+                              : '-'
                           }}
                         </td>
                       </tr>
@@ -196,6 +200,11 @@ export default {
     recordId: {
       type: Number,
       default: null
+    },
+
+    detailType: {
+      type: String,
+      default: 'applicant'
     }
   },
 
@@ -227,14 +236,21 @@ export default {
   methods: {
     async fetchRecord() {
       const id = this.recordId
-      const { data } = await this.$axios.$get(`/rdt/applicants/${id}`)
+      let data = null
+      if (this.detailType === 'invitation') {
+        const response = await this.$axios.$get(`/rdt/invitation/${id}`)
+        data = response.data.applicant
+      } else {
+        const response = await this.$axios.$get(`/rdt/applicants/${id}`)
+        data = response.data
+      }
 
       this.registrationCode = data.registration_code
       this.name = data.name
       this.address = data.address
-      this.cityName = data.city ? data.city.name : ''
-      this.districtName = data.district ? data.district.name : ''
-      this.villageName = data.village ? data.village.name : ''
+      this.cityName = data.city ? data.city.name : null
+      this.districtName = data.district ? data.district.name : null
+      this.villageName = data.village ? data.village.name : null
       this.occupationType = data.occupation_type
       this.occupationName = data.occupation_name
       this.workplaceName = data.workplace_name
