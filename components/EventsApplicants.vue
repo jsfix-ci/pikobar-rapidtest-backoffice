@@ -52,11 +52,11 @@
           <v-list>
             <v-list-item
               v-for="(item, i) in [
-                { icon: 'table', format: 'xls', text: 'Excel' },
-                { icon: 'pdf-box', format: 'pdf', text: 'PDF' }
+                { icon: 'table', format: 'xls', text: 'Excel F1' },
+                { icon: 'table', format: 'xls', text: 'Excel Raw' }
               ]"
               :key="i"
-              @click="downloadExport(item.format)"
+              @click="downloadExport(item)"
             >
               <v-list-item-title>
                 <v-icon class="mr-1">mdi-{{ item.icon }}</v-icon>
@@ -589,16 +589,17 @@ export default {
       const sample = await this.$axios.$get(`/rdt/invitation/${id}`)
       this.labCodeSample = sample.data.lab_code_sample
     },
-    downloadExport(format) {
+    downloadExport(param) {
       this.modalExportLoader = true
+      const exportFormatF1 = `/rdt/events/${this.idEvent}/participants-export-f1?format=${param.format}`
+      const exportFormatRaw = `/rdt/events/${this.idEvent}/participants-export?format=${param.format}`
+      const exportType =
+        param.text === 'Excel F1' ? exportFormatF1 : exportFormatRaw
 
       this.$axios
-        .get(
-          `/rdt/events/${this.idEvent}/participants-export?format=${format}`,
-          {
-            responseType: 'blob'
-          }
-        )
+        .get(exportType, {
+          responseType: 'blob'
+        })
         .then((response) => {
           // @TODO hacky solution
           // eslint-disable-next-line no-new
