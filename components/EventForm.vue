@@ -1,7 +1,7 @@
 <template>
   <v-card>
     <v-card-title>
-      <p v-if="type === 'create'" class="text-h6 text--primary">
+      <p v-if="formType === 'create'" class="text-h6 text--primary">
         Tambah Kegiatan
       </p>
       <p v-else class="text-h6 text--primary">
@@ -15,7 +15,7 @@
       class="v-card__text"
     >
       <form class="row justify-end" @submit.prevent="handleSubmit(doStore)">
-        <v-col v-if="type === 'edit'" cols="12" class="text-right">
+        <v-col v-if="formType === 'edit'" cols="12" class="text-right">
           Status:
           <v-btn-toggle v-model="status" mandatory color="primary" class="pl-2">
             <v-btn small value="DRAFT">
@@ -33,6 +33,18 @@
             label="Nama Kegiatan"
             placeholder="Masukan Nama Kegiatan"
             rules="required"
+          />
+        </v-col>
+        <v-col cols="6">
+          <pkbr-select
+            v-model="type"
+            :items="typeOptions"
+            label="Jenis Penyelenggara"
+            name="Jenis Penyelenggara"
+            placeholder="Jenis Penyelenggara"
+            rules="required"
+            item-text="name"
+            item-value="code"
           />
         </v-col>
         <v-col cols="6">
@@ -62,7 +74,7 @@
             placeholder="Pilih Kab./Kota"
             rules="required"
             item-text="name"
-            item-value="code"
+            item-value="value"
           />
         </v-col>
         <v-col cols="6">
@@ -84,7 +96,7 @@
             placeholder="Masukan Jam Kloter"
             rules="required|time_range"
           >
-            <template v-if="type === 'create'" v-slot:append-outer>
+            <template v-if="formType === 'create'" v-slot:append-outer>
               <v-btn small icon color="success" @click="addKloter">
                 <v-icon>mdi-plus</v-icon>
               </v-btn>
@@ -100,7 +112,7 @@
             </template>
           </pkbr-input-time>
         </v-col>
-        <v-col cols="auto">
+        <v-col cols="6">
           <v-btn color="success" :disabled="!valid" type="submit">
             Simpan
           </v-btn>
@@ -121,7 +133,7 @@ export default {
       type: Object,
       default: null
     },
-    type: {
+    formType: {
       type: String,
       default: 'create'
     }
@@ -129,13 +141,19 @@ export default {
 
   data() {
     return {
+      type: null,
       event_name: null,
       host_name: null,
       event_location: null,
       city_code: null,
       status: 'DRAFT',
       tanggal: null,
-      kloter: [null]
+      kloter: [null],
+      typeOptions: [
+        { name: 'Rumah Sakit', value: 'rumah_sakit' },
+        { name: 'Puskesmas', value: 'puskesmas' },
+        { name: 'Dinkes', value: 'dinkes' }
+      ]
     }
   },
 
