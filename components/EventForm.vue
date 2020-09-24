@@ -50,7 +50,7 @@
         <v-col cols="6">
           <v-autocomplete
             v-model="host_name"
-            :items="items"
+            :items="getFasyankesListOptions"
             outlined
             dense
             clearable
@@ -153,7 +153,6 @@ export default {
       status: 'DRAFT',
       tanggal: null,
       kloter: [null],
-      items: null,
       typeOptions: [
         { name: 'Rumah Sakit', value: 'rumah_sakit' },
         { name: 'Puskesmas', value: 'puskesmas' },
@@ -163,7 +162,8 @@ export default {
   },
 
   computed: {
-    ...mapGetters('area', ['getKabkot'])
+    ...mapGetters('area', ['getKabkot']),
+    ...mapGetters('events', ['getFasyankesListOptions'])
   },
 
   watch: {
@@ -197,16 +197,11 @@ export default {
   },
 
   created() {
-    this.getItems()
+    this.getFasyankes()
   },
   methods: {
-    async getItems() {
-      const response = await this.$axios.$get('master/fasyankes', {
-        headers: {
-          Authorization: null
-        }
-      })
-      this.items = response.data
+    async getFasyankes() {
+      await this.$store.dispatch('events/getFasyankes')
     },
     addKloter() {
       this.kloter.push(null)

@@ -8,7 +8,8 @@ export const state = () => ({
   data: [],
   current: null,
   pagination: { ...DEFAULT_PAGINATION },
-  filter: { ...DEFAULT_FILTER }
+  filter: { ...DEFAULT_FILTER },
+  fasyankesListOptions: []
 })
 
 export const mutations = {
@@ -57,6 +58,10 @@ export const mutations = {
       page: payload.page,
       total: payload.total
     }
+  },
+  SET_FASYANKES(state, payload) {
+    const s = state
+    s.fasyankesListOptions = payload
   }
 }
 
@@ -88,6 +93,10 @@ export const getters = {
   getTotalData(state) {
     const s = state
     return s.pagination.total
+  },
+  getFasyankesListOptions(state) {
+    const s = state
+    return s.fasyankesListOptions
   }
 }
 
@@ -201,6 +210,21 @@ export const actions = {
     commit('SET_LOADING', true)
     try {
       await this.$axios.$delete(`/rdt/events/${id}`)
+    } catch (error) {
+      throw new Error(error)
+    } finally {
+      commit('SET_LOADING', false)
+    }
+  },
+  async getFasyankes({ commit }) {
+    commit('SET_LOADING', true)
+    try {
+      const { data } = await this.$axios.$get('master/fasyankes', {
+        headers: {
+          Authorization: null
+        }
+      })
+      commit('SET_FASYANKES', data)
     } catch (error) {
       throw new Error(error)
     } finally {
