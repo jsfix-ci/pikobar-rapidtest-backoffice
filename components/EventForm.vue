@@ -48,13 +48,17 @@
           />
         </v-col>
         <v-col cols="6">
-          <pkbr-input
+          <v-autocomplete
             v-model="host_name"
-            name="Penyelenggara"
+            :items="items"
+            outlined
+            dense
+            clearable
+            item-text="name"
+            item-value="name"
             label="Penyelenggara"
             placeholder="Masukan Instansi Penyelenggara"
-            rules="required"
-          />
+          ></v-autocomplete>
         </v-col>
         <v-col cols="6">
           <pkbr-input
@@ -149,6 +153,7 @@ export default {
       status: 'DRAFT',
       tanggal: null,
       kloter: [null],
+      items: null,
       typeOptions: [
         { name: 'Rumah Sakit', value: 'rumah_sakit' },
         { name: 'Puskesmas', value: 'puskesmas' },
@@ -175,6 +180,7 @@ export default {
           return `${inputScheduleStart}-${inputScheduleEnd}`
         })
       }
+      this.type = val ? val.type : null
       this.event_name = val ? val.event_name : null
       this.status = val ? val.status : null
       this.host_name = val ? val.host_name : null
@@ -190,7 +196,18 @@ export default {
     }
   },
 
+  created() {
+    this.getItems()
+  },
   methods: {
+    async getItems() {
+      const response = await this.$axios.$get('master/fasyankes', {
+        headers: {
+          Authorization: null
+        }
+      })
+      this.items = response.data
+    },
     addKloter() {
       this.kloter.push(null)
     },
@@ -234,6 +251,7 @@ export default {
         event_location: this.event_location,
         city_code: this.city_code,
         status: this.status,
+        type: this.type,
         start_at,
         end_at,
         schedules
