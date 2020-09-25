@@ -1,5 +1,5 @@
 <template>
-  <EventForm :form-data="getCurrent" type="edit" @onStore="doStore" />
+  <EventForm :form-data="getCurrent" form-type="edit" @onStore="doStore" />
 </template>
 
 <script>
