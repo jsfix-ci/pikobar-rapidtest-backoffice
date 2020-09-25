@@ -48,17 +48,18 @@
           />
         </v-col>
         <v-col cols="6">
-          <v-autocomplete
+          <pkbr-autocomplete
             v-model="host_name"
             :items="getFasyankesListOptions"
-            outlined
-            dense
-            clearable
+            label="Penyelenggara"
+            name="Penyelenggara"
+            placeholder="Masukan Instansi Penyelenggara"
+            rules="required"
             item-text="name"
             item-value="name"
-            label="Penyelenggara"
-            placeholder="Masukan Instansi Penyelenggara"
-          ></v-autocomplete>
+            outlined
+            dense
+          />
         </v-col>
         <v-col cols="6">
           <pkbr-input
@@ -78,7 +79,7 @@
             placeholder="Pilih Kab./Kota"
             rules="required"
             item-text="name"
-            item-value="value"
+            item-value="code"
           />
         </v-col>
         <v-col cols="6">
