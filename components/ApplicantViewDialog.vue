@@ -49,36 +49,34 @@
                   readonly
                 />
               </v-col>
-              <v-col cols="4">
+              <v-col v-if="cityName" cols="4">
                 <v-text-field
-                  v-if="cityName"
                   v-model="cityName"
                   label="Kota/Kabupaten"
                   filled
                   readonly
                 />
               </v-col>
-              <v-col cols="4">
+              <v-col v-if="districtName" cols="4">
                 <v-text-field
-                  v-if="districtName"
                   v-model="districtName"
                   label="Kecamatan"
                   filled
                   readonly
                 />
               </v-col>
-              <v-col cols="4">
+              <v-col v-if="villageName" cols="4">
                 <v-text-field
-                  v-if="villageName"
                   v-model="villageName"
                   label="Desa/Kelurahan"
                   filled
                   readonly
                 />
               </v-col>
-              <v-col cols="12">
+              <v-col v-if="occupationType" cols="12">
                 <v-text-field
                   v-model="occupationType"
+                  value="kosong"
                   label="Jenis Pekerjaan"
                   filled
                   readonly
