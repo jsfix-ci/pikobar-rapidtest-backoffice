@@ -49,36 +49,34 @@
                   readonly
                 />
               </v-col>
-              <v-col cols="4">
+              <v-col v-if="cityName" cols="4">
                 <v-text-field
-                  v-if="cityName"
                   v-model="cityName"
                   label="Kota/Kabupaten"
                   filled
                   readonly
                 />
               </v-col>
-              <v-col cols="4">
+              <v-col v-if="districtName" cols="4">
                 <v-text-field
-                  v-if="districtName"
                   v-model="districtName"
                   label="Kecamatan"
                   filled
                   readonly
                 />
               </v-col>
-              <v-col cols="4">
+              <v-col v-if="villageName" cols="4">
                 <v-text-field
-                  v-if="villageName"
                   v-model="villageName"
                   label="Desa/Kelurahan"
                   filled
                   readonly
                 />
               </v-col>
-              <v-col cols="12">
+              <v-col v-if="occupationType" cols="12">
                 <v-text-field
                   v-model="occupationType"
+                  value="kosong"
                   label="Jenis Pekerjaan"
                   filled
                   readonly
@@ -251,7 +249,7 @@ export default {
       this.cityName = data.city ? data.city.name : null
       this.districtName = data.district ? data.district.name : null
       this.villageName = data.village ? data.village.name : null
-      this.occupationType = data.occupation_type
+      this.occupationType = data.occupation_type_name
       this.occupationName = data.occupation_name
       this.workplaceName = data.workplace_name
       this.phoneNumber = data.phone_number
