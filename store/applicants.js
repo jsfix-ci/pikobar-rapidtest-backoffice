@@ -196,5 +196,15 @@ export const actions = {
     } finally {
       commit('SET_LOADING', false)
     }
+  },
+  async delete({ commit }, id) {
+    commit('SET_LOADING', true)
+    try {
+      await this.$axios.$delete(`/rdt/applicants/${id}`)
+    } catch (error) {
+      throw new Error(error)
+    } finally {
+      commit('SET_LOADING', false)
+    }
   }
 }
