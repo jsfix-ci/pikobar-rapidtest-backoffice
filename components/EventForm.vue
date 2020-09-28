@@ -1,8 +1,11 @@
 <template>
   <v-card>
     <v-card-title>
-      <p class="text-h6 text--primary">
+      <p v-if="formType === 'create'" class="text-h6 text--primary">
         Tambah Kegiatan
+      </p>
+      <p v-else class="text-h6 text--primary">
+        Edit Kegiatan
       </p>
     </v-card-title>
     <v-divider></v-divider>
@@ -12,7 +15,7 @@
       class="v-card__text"
     >
       <form class="row justify-end" @submit.prevent="handleSubmit(doStore)">
-        <v-col v-if="type === 'edit'" cols="12" class="text-right">
+        <v-col v-if="formType === 'edit'" cols="12" class="text-right">
           Status:
           <v-btn-toggle v-model="status" mandatory color="primary" class="pl-2">
             <v-btn small value="DRAFT">
@@ -33,12 +36,29 @@
           />
         </v-col>
         <v-col cols="6">
-          <pkbr-input
+          <pkbr-select
+            v-model="host_type"
+            :items="typeOptions"
+            label="Jenis Penyelenggara"
+            name="Jenis Penyelenggara"
+            placeholder="Jenis Penyelenggara"
+            rules="required"
+            item-text="name"
+            item-value="code"
+          />
+        </v-col>
+        <v-col cols="6">
+          <pkbr-autocomplete
             v-model="host_name"
-            name="Penyelenggara"
+            :items="getFasyankesListOptions"
             label="Penyelenggara"
+            name="Penyelenggara"
             placeholder="Masukan Instansi Penyelenggara"
             rules="required"
+            item-text="name"
+            item-value="name"
+            outlined
+            dense
           />
         </v-col>
         <v-col cols="6">
@@ -81,7 +101,7 @@
             placeholder="Masukan Jam Kloter"
             rules="required|time_range"
           >
-            <template v-if="type === 'create'" v-slot:append-outer>
+            <template v-if="formType === 'create'" v-slot:append-outer>
               <v-btn small icon color="success" @click="addKloter">
                 <v-icon>mdi-plus</v-icon>
               </v-btn>
@@ -97,7 +117,7 @@
             </template>
           </pkbr-input-time>
         </v-col>
-        <v-col cols="auto">
+        <v-col cols="6">
           <v-btn color="success" :disabled="!valid" type="submit">
             Simpan
           </v-btn>
@@ -118,7 +138,7 @@ export default {
       type: Object,
       default: null
     },
-    type: {
+    formType: {
       type: String,
       default: 'create'
     }
@@ -126,18 +146,25 @@ export default {
 
   data() {
     return {
+      host_type: null,
       event_name: null,
       host_name: null,
       event_location: null,
       city_code: null,
       status: 'DRAFT',
       tanggal: null,
-      kloter: [null]
+      kloter: [null],
+      typeOptions: [
+        { name: 'Rumah Sakit', value: 'rumah_sakit' },
+        { name: 'Puskesmas', value: 'puskesmas' },
+        { name: 'Dinkes', value: 'dinkes' }
+      ]
     }
   },
 
   computed: {
-    ...mapGetters('area', ['getKabkot'])
+    ...mapGetters('area', ['getKabkot']),
+    ...mapGetters('events', ['getFasyankesListOptions'])
   },
 
   watch: {
@@ -154,6 +181,7 @@ export default {
           return `${inputScheduleStart}-${inputScheduleEnd}`
         })
       }
+      this.host_type = val ? val.host_type : null
       this.event_name = val ? val.event_name : null
       this.status = val ? val.status : null
       this.host_name = val ? val.host_name : null
@@ -169,7 +197,13 @@ export default {
     }
   },
 
+  created() {
+    this.getFasyankes()
+  },
   methods: {
+    async getFasyankes() {
+      await this.$store.dispatch('events/getFasyankes')
+    },
     addKloter() {
       this.kloter.push(null)
     },
@@ -213,6 +247,7 @@ export default {
         event_location: this.event_location,
         city_code: this.city_code,
         status: this.status,
+        host_type: this.host_type,
         start_at,
         end_at,
         schedules

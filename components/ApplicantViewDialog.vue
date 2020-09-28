@@ -49,7 +49,7 @@
                   readonly
                 />
               </v-col>
-              <v-col cols="4">
+              <v-col v-if="cityName" cols="4">
                 <v-text-field
                   v-model="cityName"
                   label="Kota/Kabupaten"
@@ -57,7 +57,7 @@
                   readonly
                 />
               </v-col>
-              <v-col cols="4">
+              <v-col v-if="districtName" cols="4">
                 <v-text-field
                   v-model="districtName"
                   label="Kecamatan"
@@ -65,7 +65,7 @@
                   readonly
                 />
               </v-col>
-              <v-col cols="4">
+              <v-col v-if="villageName" cols="4">
                 <v-text-field
                   v-model="villageName"
                   label="Desa/Kelurahan"
@@ -73,9 +73,10 @@
                   readonly
                 />
               </v-col>
-              <v-col cols="12">
+              <v-col v-if="occupationType" cols="12">
                 <v-text-field
                   v-model="occupationType"
+                  value="kosong"
                   label="Jenis Pekerjaan"
                   filled
                   readonly
@@ -97,7 +98,10 @@
                   readonly
                 />
               </v-col>
-              <v-col v-if="invitations.length > 0" cols="12">
+              <v-col
+                v-if="detailType === 'applicant' && invitations.length > 0"
+                cols="12"
+              >
                 <h3>Riwayat Undangan / Hasil Tes</h3>
                 <v-simple-table>
                   <template v-slot:default>
@@ -118,9 +122,7 @@
                       >
                         <td>
                           {{
-                            invitation.event
-                              ? invitation.event.event_name
-                              : 'N/A'
+                            invitation.event ? invitation.event.event_name : '-'
                           }}
                         </td>
                         <td>
@@ -130,7 +132,7 @@
                                   new Date(invitation.event.start_at),
                                   'dd MMMM yyyy'
                                 )
-                              : 'N/A'
+                              : '-'
                           }}
                         </td>
                         <td>
@@ -140,12 +142,12 @@
                                   new Date(invitation.attended_at),
                                   'dd MMMM yyyy HH:mm'
                                 )
-                              : 'N/A'
+                              : '-'
                           }}
                         </td>
                         <td>
                           {{
-                            invitation.test_type ? invitation.test_type : 'N/A'
+                            invitation.test_type ? invitation.test_type : '-'
                           }}
                         </td>
                         <td>
@@ -155,14 +157,14 @@
                                   new Date(invitation.result_at),
                                   'dd MMMM yyyy'
                                 )
-                              : 'N/A'
+                              : '-'
                           }}
                         </td>
                         <td>
                           {{
                             invitation.lab_result_type
                               ? invitation.lab_result_type
-                              : 'N/A'
+                              : '-'
                           }}
                         </td>
                       </tr>
@@ -196,6 +198,11 @@ export default {
     recordId: {
       type: Number,
       default: null
+    },
+
+    detailType: {
+      type: String,
+      default: 'applicant'
     }
   },
 
@@ -227,15 +234,22 @@ export default {
   methods: {
     async fetchRecord() {
       const id = this.recordId
-      const { data } = await this.$axios.$get(`/rdt/applicants/${id}`)
+      let data = null
+      if (this.detailType === 'invitation') {
+        const response = await this.$axios.$get(`/rdt/invitation/${id}`)
+        data = response.data.applicant
+      } else {
+        const response = await this.$axios.$get(`/rdt/applicants/${id}`)
+        data = response.data
+      }
 
       this.registrationCode = data.registration_code
       this.name = data.name
       this.address = data.address
-      this.cityName = data.city ? data.city.name : ''
-      this.districtName = data.district ? data.district.name : ''
-      this.villageName = data.village ? data.village.name : ''
-      this.occupationType = data.occupation_type
+      this.cityName = data.city ? data.city.name : null
+      this.districtName = data.district ? data.district.name : null
+      this.villageName = data.village ? data.village.name : null
+      this.occupationType = data.occupation_type_name
       this.occupationName = data.occupation_name
       this.workplaceName = data.workplace_name
       this.phoneNumber = data.phone_number

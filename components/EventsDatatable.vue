@@ -32,7 +32,7 @@
             <pkbr-select
               v-model="stat"
               :items="[
-                { text: 'Semua', value: null },
+                { text: 'Semua', value: 'all' },
                 { text: 'Draft', value: 'draft' },
                 { text: 'Published', value: 'published' }
               ]"
