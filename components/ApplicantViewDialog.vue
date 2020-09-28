@@ -251,7 +251,7 @@ export default {
       this.cityName = data.city ? data.city.name : null
       this.districtName = data.district ? data.district.name : null
       this.villageName = data.village ? data.village.name : null
-      this.occupationType = data.occupation_type
+      this.occupationType = data.occupation_type_name
       this.occupationName = data.occupation_name
       this.workplaceName = data.workplace_name
       this.phoneNumber = data.phone_number

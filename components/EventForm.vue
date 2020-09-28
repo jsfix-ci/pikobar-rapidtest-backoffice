@@ -37,7 +37,7 @@
         </v-col>
         <v-col cols="6">
           <pkbr-select
-            v-model="type"
+            v-model="host_type"
             :items="typeOptions"
             label="Jenis Penyelenggara"
             name="Jenis Penyelenggara"
@@ -146,7 +146,7 @@ export default {
 
   data() {
     return {
-      type: null,
+      host_type: null,
       event_name: null,
       host_name: null,
       event_location: null,
@@ -181,7 +181,7 @@ export default {
           return `${inputScheduleStart}-${inputScheduleEnd}`
         })
       }
-      this.type = val ? val.type : null
+      this.host_type = val ? val.host_type : null
       this.event_name = val ? val.event_name : null
       this.status = val ? val.status : null
       this.host_name = val ? val.host_name : null
@@ -247,7 +247,7 @@ export default {
         event_location: this.event_location,
         city_code: this.city_code,
         status: this.status,
-        type: this.type,
+        host_type: this.host_type,
         start_at,
         end_at,
         schedules
