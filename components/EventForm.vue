@@ -48,7 +48,7 @@
           />
         </v-col>
         <v-col cols="6">
-          <pkbr-autocomplete
+          <pkbr-combobox
             v-model="host_name"
             :items="getFasyankesListOptions"
             label="Penyelenggara"
