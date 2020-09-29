@@ -157,6 +157,36 @@
       @close="editClose"
       @save="editSave"
     />
+
+    <v-dialog v-model="deleteModal" max-width="528">
+      <v-card class="text-center">
+        <v-card-title>
+          <span class="col pl-10">Perhatian!</span>
+        </v-card-title>
+        <v-card-text>
+          <div>
+            {{ confirmDeleteMsg }}
+          </div>
+          <span>Nama peserta: </span>
+          <strong>
+            {{ selectedData ? selectedData.name : '-' }}
+          </strong>
+        </v-card-text>
+        <v-card-actions class="pb-6 justify-center">
+          <v-btn
+            color="grey darken-1"
+            outlined
+            class="mr-2 px-2"
+            @click="deleteModal = false"
+          >
+            Tidak
+          </v-btn>
+          <v-btn color="error" class="ml-2 px-2" @click="remove(selectedData)">
+            Ya
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -166,12 +196,11 @@ import { mapGetters } from 'vuex'
 import ApplicantCreateDialog from '@/components/ApplicantCreateDialog'
 import ApplicantEditDialog from '@/components/ApplicantEditDialog'
 import ApplicantViewDialog from '@/components/ApplicantViewDialog'
-// import {
-//   SUCCESS_DELETE,
-//   FAILED_DELETE,
-//   CONFIRM_DELETE
-// } from '@/utilities/constant'
-// import { getChipColor } from '@/utilities/formater'
+import {
+  SUCCESS_DELETE,
+  FAILED_DELETE,
+  CONFIRM_DELETE_PARTICIPANTS
+} from '@/utilities/constant'
 
 const headers = [
   { text: 'ID', value: 'id', width: 80 },
@@ -248,6 +277,8 @@ export default {
       viewDialog: false,
       viewRecordId: null,
       filterSearch: null,
+      deleteModal: false,
+      selectedData: null,
       headers: this.noActions
         ? headers.filter((head) => head.value !== 'actions')
         : headers
@@ -314,6 +345,9 @@ export default {
       get() {
         return this.$route.query.sessionId
       }
+    },
+    confirmDeleteMsg() {
+      return CONFIRM_DELETE_PARTICIPANTS
     }
   },
 
@@ -393,7 +427,25 @@ export default {
     },
 
     deleteItem(item) {
-      //
+      this.deleteModal = true
+      this.selectedData = item
+    },
+
+    async remove(payload) {
+      try {
+        this.deleteModal = false
+        await this.$store.dispatch('applicants/delete', payload.id)
+        this.$toast.show({
+          message: SUCCESS_DELETE,
+          type: 'success'
+        })
+        await this.$store.dispatch('applicants/getList')
+      } catch (error) {
+        this.$toast.show({
+          message: error.message || FAILED_DELETE,
+          type: 'error'
+        })
+      }
     },
 
     editClose() {

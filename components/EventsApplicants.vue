@@ -305,7 +305,7 @@ import {
   SET_LABCODE_FAILED,
   DEFAULT_PAGINATION,
   DEFAULT_FILTER,
-  CONFIRM_DELETE_PARTICIPANTS,
+  CONFIRM_DELETE_PARTICIPANTS_EVENT,
   SUCCESS_DELETE,
   FAILED_DELETE
 } from '@/utilities/constant'
@@ -381,7 +381,7 @@ export default {
 
   computed: {
     confirmDeleteMsg() {
-      return CONFIRM_DELETE_PARTICIPANTS
+      return CONFIRM_DELETE_PARTICIPANTS_EVENT
     },
     records() {
       return this.$store.getters['eventParticipants/getList']
