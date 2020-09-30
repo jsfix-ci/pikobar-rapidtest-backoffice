@@ -57,6 +57,7 @@
             rules="required"
             item-text="name"
             item-value="name"
+            :return-object="false"
             outlined
             dense
           />
