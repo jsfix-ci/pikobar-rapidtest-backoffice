@@ -7,6 +7,7 @@
       :items="list"
       :item-text="itemText"
       :item-value="itemValue"
+      :return-object="returnObject"
       outlined
       dense
     >
@@ -60,6 +61,10 @@ export default {
       default: () => []
     },
     hideDetails: {
+      type: Boolean,
+      default: false
+    },
+    returnObject: {
       type: Boolean,
       default: false
     }
