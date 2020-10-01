@@ -8,12 +8,25 @@
       :item-text="itemText"
       :item-value="itemValue"
       :return-object="returnObject"
+      :search-input.sync="search"
       outlined
       dense
     >
       <template v-slot:label>
         {{ label }}
         <span v-if="isRequired" class="red--text">*</span>
+      </template>
+      <template v-slot:no-data>
+        <v-list-item>
+          <v-list-item-content>
+            <v-list-item-title>
+              Data "<strong>{{ search }}</strong
+              >" tidak ditemukan. Tekan <kbd>tab</kbd> untuk menambahkan
+              "<strong>{{ search }}</strong
+              >".
+            </v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
       </template>
     </v-combobox>
   </validation-provider>
@@ -71,7 +84,8 @@ export default {
   },
   data() {
     return {
-      tempValue: this.value
+      tempValue: this.value,
+      search: null
     }
   },
   computed: {
