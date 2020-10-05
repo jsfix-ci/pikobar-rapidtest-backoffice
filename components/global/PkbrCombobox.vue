@@ -20,8 +20,7 @@
         <v-list-item>
           <v-list-item-content>
             <v-list-item-title>
-              Data "<strong>{{ search }}</strong>" tidak ditemukan. Tekan <kbd>tab</kbd> untuk menambahkan
-              "<strong>{{ search }}</strong>".
+              Data "<strong>{{ search }}</strong>" tidak ditemukan. Tekan <kbd>tab</kbd> untuk menambahkan "<strong>{{ search }}</strong>".
             </v-list-item-title>
           </v-list-item-content>
         </v-list-item>
