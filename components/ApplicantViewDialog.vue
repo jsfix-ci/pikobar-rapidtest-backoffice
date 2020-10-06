@@ -73,6 +73,14 @@
                   readonly
                 />
               </v-col>
+              <v-col cols="12">
+                <v-text-field
+                  v-model="personStatus"
+                  label="Status Kesehatan"
+                  filled
+                  readonly
+                />
+              </v-col>
               <v-col v-if="occupationType" cols="12">
                 <v-text-field
                   v-model="occupationType"
@@ -219,6 +227,7 @@ export default {
       workplaceName: null,
       phoneNumber: null,
       birthDate: null,
+      personStatus: null,
       invitations: []
     }
   },
@@ -255,6 +264,7 @@ export default {
       this.phoneNumber = data.phone_number
       this.birthDate = data.birth_date
       this.invitations = data.invitations
+      this.personStatus = this.getPersonStatusText(data.person_status)
     },
 
     async save() {
@@ -273,6 +283,46 @@ export default {
 
     close() {
       this.$emit('close')
+    },
+
+    getPersonStatusText(value) {
+      if (value === 'ODP') {
+        return 'ODP'
+      }
+
+      if (value === 'PDP') {
+        return 'PDP'
+      }
+
+      if (value === 'OTG') {
+        return 'OTG'
+      }
+
+      if (value === 'CONFIRMED') {
+        return 'Konfirmasi'
+      }
+
+      if (value === 'SUSPECT') {
+        return 'Suspek'
+      }
+
+      if (value === 'PROBABLE') {
+        return 'Probable'
+      }
+
+      if (value === 'CLOSE_CONTACT') {
+        return 'Kontak Erat'
+      }
+
+      if (value === 'NOT_ALL') {
+        return 'Bukan Semuanya'
+      }
+
+      if (value === 'UNKNOWN') {
+        return 'Tidak Tahu'
+      }
+
+      return value
     }
   }
 }
