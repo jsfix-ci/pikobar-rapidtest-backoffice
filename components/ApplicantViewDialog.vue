@@ -73,6 +73,14 @@
                   readonly
                 />
               </v-col>
+              <v-col cols="12">
+                <v-text-field
+                  v-model="personStatus"
+                  label="Status Kesehatan"
+                  filled
+                  readonly
+                />
+              </v-col>
               <v-col v-if="occupationType" cols="12">
                 <v-text-field
                   v-model="occupationType"
@@ -188,6 +196,7 @@
 </template>
 
 <script>
+import { getPersonStatusText } from '@/utilities/personStatus'
 export default {
   props: {
     open: {
@@ -219,6 +228,7 @@ export default {
       workplaceName: null,
       phoneNumber: null,
       birthDate: null,
+      personStatus: null,
       invitations: []
     }
   },
@@ -232,6 +242,7 @@ export default {
   },
 
   methods: {
+    getPersonStatusText,
     async fetchRecord() {
       const id = this.recordId
       let data = null
@@ -255,6 +266,7 @@ export default {
       this.phoneNumber = data.phone_number
       this.birthDate = data.birth_date
       this.invitations = data.invitations
+      this.personStatus = this.getPersonStatusText(data.person_status)
     },
 
     async save() {
