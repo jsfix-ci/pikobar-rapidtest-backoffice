@@ -4,6 +4,7 @@
       status="new"
       :allow="permissions"
       sticky-actions
+      list-type="applicant"
       @optionChanged="onOptionChange"
     />
   </v-layout>

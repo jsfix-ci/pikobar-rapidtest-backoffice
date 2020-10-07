@@ -46,7 +46,7 @@
               allow-null
             />
           </v-col>
-          <v-col cols="auto">
+          <v-col v-if="listType === 'participant'" cols="auto">
             <v-text-field
               v-model="sessionId"
               label="Session ID"
@@ -57,7 +57,7 @@
             />
           </v-col>
           <v-spacer></v-spacer>
-          <v-col cols="auto">
+          <v-col v-if="listType === 'participant'" cols="auto">
             <v-btn
               v-if="allow.includes('create-applicants')"
               color="primary"
@@ -105,12 +105,12 @@
         </v-layout>
       </template>
       <template v-slot:[`item.age`]="{ item }">
-        <v-layout justify-end>
+        <v-layout justify-center>
           {{ item.age }}
         </v-layout>
       </template>
       <template v-slot:[`item.created_at`]="{ item }">
-        <v-layout justify-end>
+        <v-layout justify-start>
           {{ $dateFns.format(new Date(item.created_at), 'dd MMMM yyyy HH:mm') }}
         </v-layout>
       </template>
@@ -215,22 +215,33 @@ const headers = [
   { text: 'Nama Peserta', value: 'name', width: 250 },
   { text: 'Status Kesehatan', value: 'person_status', width: 150 },
   { text: 'Jenis Kelamin', value: 'gender', width: 150 },
-  { text: 'Usia (Thn)', value: 'age', width: 120 },
+  {
+    text: 'Usia (Thn)',
+    value: 'age',
+    width: 120,
+    align: 'center'
+  },
   { text: 'Kota/Kab', value: 'city.name', sortable: false, width: 200 },
-  { text: 'Jenis Pekerjaan', value: 'occupation_type', width: 150 },
+  { text: 'Jenis Pekerjaan', value: 'occupation_type_name', width: 150 },
   { text: 'Nama Profesi', value: 'occupation_name', width: 250 },
   { text: 'Tempat Kerja', value: 'workplace_name', width: 250 },
-  { text: 'Riwayat Kontak', value: 'symptoms_interaction', width: 150 },
+  {
+    text: 'Riwayat Kontak',
+    value: 'symptoms_interaction',
+    width: 150,
+    align: 'center'
+  },
   { text: 'Gejala', value: 'symptoms_notes', sortable: false, width: 300 },
   {
     text: 'Riwayat Undangan',
     value: 'invitations',
     sortable: false,
-    width: 300
+    width: 150
   },
-  { text: 'Tanggal Terdaftar', value: 'created_at', width: 180 },
+  { text: 'Tanggal Terdaftar', value: 'created_at', width: 200 },
   { text: 'Actions', value: 'actions', sortable: false, width: 150 }
 ]
+
 export default {
   components: {
     ApplicantCreateDialog,
@@ -266,6 +277,10 @@ export default {
     stickyActions: {
       type: Boolean,
       default: false
+    },
+    listType: {
+      type: String,
+      default: 'participant'
     }
   },
 
@@ -282,6 +297,8 @@ export default {
       selectedData: null,
       headers: this.noActions
         ? headers.filter((head) => head.value !== 'actions')
+        : this.listType === 'applicant'
+        ? headers.filter((head) => head.value !== 'pikobar_session_id')
         : headers
     }
   },
