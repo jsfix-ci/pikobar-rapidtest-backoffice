@@ -222,7 +222,7 @@ const headers = [
     align: 'center'
   },
   { text: 'Kota/Kab', value: 'city.name', sortable: false, width: 200 },
-  { text: 'Jenis Pekerjaan', value: 'occupation_type', width: 150 },
+  { text: 'Jenis Pekerjaan', value: 'occupation_type_name', width: 150 },
   { text: 'Nama Profesi', value: 'occupation_name', width: 250 },
   { text: 'Tempat Kerja', value: 'workplace_name', width: 250 },
   {
