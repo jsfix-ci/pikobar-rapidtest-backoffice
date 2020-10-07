@@ -297,7 +297,7 @@ export default {
       selectedData: null,
       headers: this.noActions
         ? headers.filter((head) => head.value !== 'actions')
-        : this.listType === 'candidate'
+        : this.listType === 'applicant'
         ? headers.filter((head) => head.value !== 'pikobar_session_id')
         : headers
     }
