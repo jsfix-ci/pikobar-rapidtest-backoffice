@@ -46,7 +46,7 @@
               allow-null
             />
           </v-col>
-          <v-col cols="auto">
+          <v-col v-if="listType === 'participant'" cols="auto">
             <v-text-field
               v-model="sessionId"
               label="Session ID"
@@ -57,7 +57,7 @@
             />
           </v-col>
           <v-spacer></v-spacer>
-          <v-col cols="auto">
+          <v-col v-if="listType === 'participant'" cols="auto">
             <v-btn
               v-if="allow.includes('create-applicants')"
               color="primary"
@@ -105,12 +105,12 @@
         </v-layout>
       </template>
       <template v-slot:[`item.age`]="{ item }">
-        <v-layout justify-end>
+        <v-layout justify-center>
           {{ item.age }}
         </v-layout>
       </template>
       <template v-slot:[`item.created_at`]="{ item }">
-        <v-layout justify-end>
+        <v-layout justify-start>
           {{ $dateFns.format(new Date(item.created_at), 'dd MMMM yyyy HH:mm') }}
         </v-layout>
       </template>
@@ -157,21 +157,51 @@
       @close="editClose"
       @save="editSave"
     />
+
+    <v-dialog v-model="deleteModal" max-width="528">
+      <v-card class="text-center">
+        <v-card-title>
+          <span class="col pl-10">Perhatian!</span>
+        </v-card-title>
+        <v-card-text>
+          <div>
+            {{ confirmDeleteMsg }}
+          </div>
+          <span>Nama peserta: </span>
+          <strong>
+            {{ selectedData ? selectedData.name : '-' }}
+          </strong>
+        </v-card-text>
+        <v-card-actions class="pb-6 justify-center">
+          <v-btn
+            color="grey darken-1"
+            outlined
+            class="mr-2 px-2"
+            @click="deleteModal = false"
+          >
+            Tidak
+          </v-btn>
+          <v-btn color="error" class="ml-2 px-2" @click="remove(selectedData)">
+            Ya
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
 <script>
 import { isEqual } from 'lodash'
 import { mapGetters } from 'vuex'
+import { getPersonStatusText } from '@/utilities/personStatus'
 import ApplicantCreateDialog from '@/components/ApplicantCreateDialog'
 import ApplicantEditDialog from '@/components/ApplicantEditDialog'
 import ApplicantViewDialog from '@/components/ApplicantViewDialog'
-// import {
-//   SUCCESS_DELETE,
-//   FAILED_DELETE,
-//   CONFIRM_DELETE
-// } from '@/utilities/constant'
-// import { getChipColor } from '@/utilities/formater'
+import {
+  SUCCESS_DELETE,
+  FAILED_DELETE,
+  CONFIRM_DELETE_PARTICIPANTS
+} from '@/utilities/constant'
 
 const headers = [
   { text: 'ID', value: 'id', width: 80 },
@@ -185,22 +215,33 @@ const headers = [
   { text: 'Nama Peserta', value: 'name', width: 250 },
   { text: 'Status Kesehatan', value: 'person_status', width: 150 },
   { text: 'Jenis Kelamin', value: 'gender', width: 150 },
-  { text: 'Usia (Thn)', value: 'age', width: 120 },
+  {
+    text: 'Usia (Thn)',
+    value: 'age',
+    width: 120,
+    align: 'center'
+  },
   { text: 'Kota/Kab', value: 'city.name', sortable: false, width: 200 },
-  { text: 'Jenis Pekerjaan', value: 'occupation_type', width: 150 },
+  { text: 'Jenis Pekerjaan', value: 'occupation_type_name', width: 150 },
   { text: 'Nama Profesi', value: 'occupation_name', width: 250 },
   { text: 'Tempat Kerja', value: 'workplace_name', width: 250 },
-  { text: 'Riwayat Kontak', value: 'symptoms_interaction', width: 150 },
+  {
+    text: 'Riwayat Kontak',
+    value: 'symptoms_interaction',
+    width: 150,
+    align: 'center'
+  },
   { text: 'Gejala', value: 'symptoms_notes', sortable: false, width: 300 },
   {
     text: 'Riwayat Undangan',
     value: 'invitations',
     sortable: false,
-    width: 300
+    width: 150
   },
-  { text: 'Tanggal Terdaftar', value: 'created_at', width: 180 },
+  { text: 'Tanggal Terdaftar', value: 'created_at', width: 200 },
   { text: 'Actions', value: 'actions', sortable: false, width: 150 }
 ]
+
 export default {
   components: {
     ApplicantCreateDialog,
@@ -236,6 +277,10 @@ export default {
     stickyActions: {
       type: Boolean,
       default: false
+    },
+    listType: {
+      type: String,
+      default: 'participant'
     }
   },
 
@@ -248,8 +293,12 @@ export default {
       viewDialog: false,
       viewRecordId: null,
       filterSearch: null,
+      deleteModal: false,
+      selectedData: null,
       headers: this.noActions
         ? headers.filter((head) => head.value !== 'actions')
+        : this.listType === 'applicant'
+        ? headers.filter((head) => head.value !== 'pikobar_session_id')
         : headers
     }
   },
@@ -314,6 +363,9 @@ export default {
       get() {
         return this.$route.query.sessionId
       }
+    },
+    confirmDeleteMsg() {
+      return CONFIRM_DELETE_PARTICIPANTS
     }
   },
 
@@ -359,6 +411,7 @@ export default {
   },
 
   methods: {
+    getPersonStatusText,
     doFilterReset() {
       this.filterSearch = null
       this.doFilter()
@@ -393,7 +446,25 @@ export default {
     },
 
     deleteItem(item) {
-      //
+      this.deleteModal = true
+      this.selectedData = item
+    },
+
+    async remove(payload) {
+      try {
+        this.deleteModal = false
+        await this.$store.dispatch('applicants/delete', payload.id)
+        this.$toast.show({
+          message: SUCCESS_DELETE,
+          type: 'success'
+        })
+        await this.$store.dispatch('applicants/getList')
+      } catch (error) {
+        this.$toast.show({
+          message: error.message || FAILED_DELETE,
+          type: 'error'
+        })
+      }
     },
 
     editClose() {
@@ -418,46 +489,6 @@ export default {
       }
 
       return 'Belum Pernah'
-    },
-
-    getPersonStatusText(value) {
-      if (value === 'ODP') {
-        return 'ODP'
-      }
-
-      if (value === 'PDP') {
-        return 'PDP'
-      }
-
-      if (value === 'OTG') {
-        return 'OTG'
-      }
-
-      if (value === 'CONFIRMED') {
-        return 'Konfirmasi'
-      }
-
-      if (value === 'SUSPECT') {
-        return 'Suspek'
-      }
-
-      if (value === 'PROBABLE') {
-        return 'Probable'
-      }
-
-      if (value === 'CLOSE_CONTACT') {
-        return 'Kontak Erat'
-      }
-
-      if (value === 'NOT_ALL') {
-        return 'Bukan Semuanya'
-      }
-
-      if (value === 'UNKNOWN') {
-        return 'Tidak Tahu'
-      }
-
-      return value
     }
   }
 }
