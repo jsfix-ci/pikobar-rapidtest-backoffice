@@ -93,6 +93,22 @@
           />
         </v-col>
         <v-col cols="6">
+          <pkbr-checkbox
+            v-model="isDateRange"
+            color="success"
+            label="Lebih dari 1 Hari"
+          />
+        </v-col>
+        <v-col cols="6">
+          <pkbr-input-date
+            v-if="isDateRange"
+            v-model="tanggal"
+            name="Tanggal"
+            placeholder="Masukan Tanggal Kegiatan"
+            rules="required"
+          />
+        </v-col>
+        <v-col cols="6">
           <pkbr-input-time
             v-for="(waktu, i) in kloter"
             :key="i"
@@ -102,7 +118,10 @@
             placeholder="Masukan Jam Kloter"
             rules="required|time_range"
           >
-            <template v-if="formType === 'create'" v-slot:append-outer>
+            <template
+              v-if="formType === 'create' && !isDateRange"
+              v-slot:append-outer
+            >
               <v-btn small icon color="success" @click="addKloter">
                 <v-icon>mdi-plus</v-icon>
               </v-btn>
@@ -154,6 +173,7 @@ export default {
       city_code: null,
       status: 'DRAFT',
       tanggal: null,
+      isDateRange: false,
       kloter: [null],
       typeOptions: [
         { name: 'Rumah Sakit', value: 'rumah_sakit' },
