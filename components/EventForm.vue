@@ -227,6 +227,7 @@ export default {
 
   created() {
     this.getFasyankes()
+    if (this.formType === 'edit') this.isDateRange = true
   },
   methods: {
     async getFasyankes() {
