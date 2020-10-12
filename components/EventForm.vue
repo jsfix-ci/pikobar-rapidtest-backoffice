@@ -106,6 +106,7 @@
             name="Tanggal"
             placeholder="Masukan Tanggal Kegiatan"
             rules="required"
+            :min-date="startDate"
           />
         </v-col>
         <v-col cols="6">
