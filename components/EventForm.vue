@@ -106,6 +106,7 @@
             name="Tanggal"
             placeholder="Masukan Tanggal Kegiatan"
             rules="required"
+            :min-date="startDate"
           />
         </v-col>
         <v-col cols="6">
@@ -227,6 +228,7 @@ export default {
 
   created() {
     this.getFasyankes()
+    if (this.formType === 'edit') this.isDateRange = true
   },
   methods: {
     async getFasyankes() {
