@@ -201,28 +201,26 @@
           <div>
             Apakah anda akan mengirimkan notifikasi {{ modalType }} kepada
           </div>
-          <strong>Peserta Terpilih</strong> atau <strong>Semua Peserta</strong>.
+          <div v-if="pesertaSelected.length > 0">
+            <strong>{{ pesertaSelected.length }} Peserta Terpilih?</strong>
+          </div>
+          <div v-else><strong>Semua Peserta?</strong></div>
         </v-card-text>
         <v-card-actions class="pb-6 justify-center">
           <v-btn
             color="grey darken-1"
             outlined
             class="mr-2 px-2"
-            @click="blastNotify(null, `send${modalType.split(' ').join('')}`)"
+            @click="blastNotifModal = false"
           >
-            Semua
+            Batal
           </v-btn>
           <v-btn
             color="primary"
             class="ml-2 px-2"
-            @click="
-              blastNotify(
-                pesertaSelected,
-                `send${modalType.split(' ').join('')}`
-              )
-            "
+            @click="sendNotif(pesertaSelected.length, modalType)"
           >
-            Terpilih
+            Ya
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -485,6 +483,16 @@ export default {
     },
     openModalImportHasil() {
       this.ImportModalTest = true
+    },
+    sendNotif(participant, modalType) {
+      if (participant === 0) {
+        this.blastNotify(null, `send${modalType.split(' ').join('')}`)
+      } else {
+        this.blastNotify(
+          this.pesertaSelected,
+          `send${modalType.split(' ').join('')}`
+        )
+      }
     },
     async doImport() {
       const formData = new FormData()
