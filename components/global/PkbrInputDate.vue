@@ -30,7 +30,7 @@
         >
       </validation-provider>
     </template>
-    <v-date-picker no-title @input="doCalendarClick" />
+    <v-date-picker :min="minDate" no-title @input="doCalendarClick" />
   </v-menu>
 </template>
 
@@ -56,6 +56,10 @@ export default {
     rules: {
       type: String,
       default: ''
+    },
+    minDate: {
+      type: String,
+      default: null
     }
   },
   data() {

@@ -85,11 +85,28 @@
         </v-col>
         <v-col cols="6">
           <pkbr-input-date
-            v-model="tanggal"
+            v-model="startDate"
             label="Tanggal"
             name="Tanggal"
             placeholder="Masukan Tanggal Kegiatan"
             rules="required"
+          />
+        </v-col>
+        <v-col cols="6">
+          <pkbr-checkbox
+            v-model="isDateRange"
+            color="success"
+            label="Lebih dari 1 Hari"
+          />
+        </v-col>
+        <v-col cols="6">
+          <pkbr-input-date
+            v-if="isDateRange"
+            v-model="endDate"
+            name="Tanggal"
+            placeholder="Masukan Tanggal Kegiatan"
+            rules="required"
+            :min-date="startDate"
           />
         </v-col>
         <v-col cols="6">
@@ -102,7 +119,10 @@
             placeholder="Masukan Jam Kloter"
             rules="required|time_range"
           >
-            <template v-if="formType === 'create'" v-slot:append-outer>
+            <template
+              v-if="formType === 'create' && !isDateRange"
+              v-slot:append-outer
+            >
               <v-btn small icon color="success" @click="addKloter">
                 <v-icon>mdi-plus</v-icon>
               </v-btn>
@@ -153,7 +173,9 @@ export default {
       event_location: null,
       city_code: null,
       status: 'DRAFT',
-      tanggal: null,
+      startDate: null,
+      endDate: null,
+      isDateRange: false,
       kloter: [null],
       typeOptions: [
         { name: 'Rumah Sakit', value: 'rumah_sakit' },
@@ -188,9 +210,15 @@ export default {
       this.host_name = val ? val.host_name : null
       this.event_location = val ? val.event_location : null
       this.city_code = val && val.city ? val.city.code : null
-      this.tanggal = val
+      this.startDate = val
         ? this.$dateFns.format(
             val.start_at.split(':')[0],
+            "yyyy-MM-dd'T'HH:mm:ssxxx"
+          )
+        : null
+      this.endDate = val
+        ? this.$dateFns.format(
+            val.end_at.split(':')[0],
             "yyyy-MM-dd'T'HH:mm:ssxxx"
           )
         : null
@@ -200,6 +228,7 @@ export default {
 
   created() {
     this.getFasyankes()
+    if (this.formType === 'edit') this.isDateRange = true
   },
   methods: {
     async getFasyankes() {
@@ -219,12 +248,15 @@ export default {
         const { setHours, setMinutes } = this.$dateFns
 
         start_atSch = setHours(
-          setMinutes(new Date(this.tanggal), start_atSch.split(':')[1]),
+          setMinutes(new Date(this.startDate), start_atSch.split(':')[1]),
           start_atSch.split(':')[0]
         )
 
         end_atSch = setHours(
-          setMinutes(new Date(this.tanggal), end_atSch.split(':')[1]),
+          setMinutes(
+            new Date(this.isDateRange ? this.endDate : this.startDate),
+            end_atSch.split(':')[1]
+          ),
           end_atSch.split(':')[0]
         )
 
