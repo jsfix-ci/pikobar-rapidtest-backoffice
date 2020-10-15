@@ -280,6 +280,11 @@
       @save="modalEditLabCodeSave"
     />
     <dialog-export-loader :open="modalExportLoader" />
+    <dialog-warning-test-result
+      :open="blastNotifModalWarning"
+      :item="uncompleteResultTest"
+      @close="closeDialogWarning"
+    />
     <applicant-view-dialog
       v-if="allow.includes('view-applicants')"
       :open="viewDialog"
@@ -309,6 +314,7 @@ import {
 } from '@/utilities/constant'
 import EventApplicantEditLabCodeDialog from '@/components/EventApplicantEditLabCodeDialog'
 import DialogExportLoader from '@/components/DialogLoader'
+import DialogWarningTestResult from '@/components/DialogWarningTestResult'
 import ApplicantViewDialog from '@/components/ApplicantViewDialog'
 
 const headers = [
@@ -341,7 +347,8 @@ export default {
   components: {
     EventApplicantEditLabCodeDialog,
     DialogExportLoader,
-    ApplicantViewDialog
+    ApplicantViewDialog,
+    DialogWarningTestResult
   },
   filters: {
     getChipColor
@@ -373,7 +380,9 @@ export default {
       selectedData: null,
       viewDialog: false,
       viewRecordId: null,
-      labCodeSample: null
+      labCodeSample: null,
+      blastNotifModalWarning: false,
+      uncompleteResultTest: []
     }
   },
 
@@ -477,9 +486,26 @@ export default {
         })
       }
     },
+    closeDialogWarning() {
+      this.blastNotifModalWarning = false
+    },
     openModalNotif(type) {
-      this.modalType = type || this.modalType
-      this.blastNotifModal = true
+      if (type === 'Undangan') {
+        this.modalType = type || this.modalType
+        this.blastNotifModal = true
+      } else {
+        const data =
+          this.pesertaSelected.length > 0 ? this.pesertaSelected : this.records
+
+        const find = data.filter((item) => item.lab_result_type === null)
+        if (find.length === 0) {
+          this.modalType = type || this.modalType
+          this.blastNotifModal = true
+        } else {
+          this.blastNotifModalWarning = true
+          this.uncompleteResultTest = find
+        }
+      }
     },
     openModalImportHasil() {
       this.ImportModalTest = true
