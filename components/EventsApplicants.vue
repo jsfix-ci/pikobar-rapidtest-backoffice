@@ -123,7 +123,48 @@
         }}
       </template>
       <template v-slot:[`item.lab_result_type`]="{ value }">
-        {{ value }}
+        <v-layout justify-center>
+          <v-card-actions>
+            <v-menu
+              :close-on-content-click="false"
+              :nudge-width="0"
+              :nudge-left="0"
+              :nudge-top="0"
+              offset-y
+            >
+              <template v-slot:activator="{ on }">
+                <v-btn
+                  class="ma-1"
+                  color="#828282"
+                  style="text-transform: none; height: 30px; min-width: 50px;"
+                  outlined
+                  v-on="on"
+                >
+                  <span v-if="value">{{ value }}</span>
+                  <span v-else>Pilih hasil test</span>
+                  <v-icon style="color: #009d57; font-size: 2rem;" right
+                    >mdi-menu-down</v-icon
+                  >
+                </v-btn>
+              </template>
+              <v-card>
+                <v-list-item
+                  v-for="item in TEST_RESULT_OPTIONS"
+                  :key="item.value"
+                >
+                  <v-btn
+                    text
+                    small
+                    color="normal"
+                    @click="setTestResult(item.value)"
+                  >
+                    {{ item.label }}
+                  </v-btn>
+                </v-list-item>
+              </v-card>
+            </v-menu>
+          </v-card-actions>
+        </v-layout>
       </template>
       <template v-slot:[`item.applicant.status`]="{ value }">
         <v-chip small class="ma-2" :color="value | getChipColor">
@@ -310,7 +351,8 @@ import {
   DEFAULT_FILTER,
   CONFIRM_DELETE_PARTICIPANTS_EVENT,
   SUCCESS_DELETE,
-  FAILED_DELETE
+  FAILED_DELETE,
+  TEST_RESULT_OPTIONS
 } from '@/utilities/constant'
 import EventApplicantEditLabCodeDialog from '@/components/EventApplicantEditLabCodeDialog'
 import DialogExportLoader from '@/components/DialogLoader'
@@ -333,7 +375,7 @@ const headers = [
   { text: 'Checkin', value: 'attended_at', width: 200 },
   { text: 'Kode Sampel', value: 'lab_code_sample', width: 150 },
   { text: 'Tanggal Hasil Test', value: 'result_at', width: 200 },
-  { text: 'Hasil Test', value: 'lab_result_type', width: 150 },
+  { text: 'Hasil Test', value: 'lab_result_type', width: 150, align: 'center' },
   { text: 'Kirim Undangan', value: 'notified_at', width: 200 },
   {
     text: 'Kirim Hasil',
@@ -382,7 +424,8 @@ export default {
       viewRecordId: null,
       labCodeSample: null,
       blastNotifModalWarning: false,
-      incompleteResultTest: []
+      incompleteResultTest: [],
+      TEST_RESULT_OPTIONS
     }
   },
 
@@ -451,6 +494,9 @@ export default {
   },
 
   methods: {
+    setTestResult(payload) {
+      console.log(payload)
+    },
     viewItem(payload) {
       this.viewRecordId = payload.id
       this.viewDialog = true
