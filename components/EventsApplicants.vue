@@ -282,7 +282,7 @@
     <dialog-export-loader :open="modalExportLoader" />
     <dialog-warning-test-result
       :open="blastNotifModalWarning"
-      :item="uncompleteResultTest"
+      :items="incompleteResultTest"
       @close="closeDialogWarning"
     />
     <applicant-view-dialog
@@ -382,7 +382,7 @@ export default {
       viewRecordId: null,
       labCodeSample: null,
       blastNotifModalWarning: false,
-      uncompleteResultTest: []
+      incompleteResultTest: []
     }
   },
 
@@ -497,13 +497,15 @@ export default {
         const data =
           this.pesertaSelected.length > 0 ? this.pesertaSelected : this.records
 
-        const find = data.filter((item) => item.lab_result_type === null)
-        if (find.length === 0) {
+        const incompleteData = data.filter(
+          (item) => item.lab_result_type === null
+        )
+        if (incompleteData.length === 0) {
           this.modalType = type || this.modalType
           this.blastNotifModal = true
         } else {
           this.blastNotifModalWarning = true
-          this.uncompleteResultTest = find
+          this.incompleteResultTest = incompleteData
         }
       }
     },

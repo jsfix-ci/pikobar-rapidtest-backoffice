@@ -26,7 +26,7 @@
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="data in item" :key="data.id">
+                <tr v-for="data in items" :key="data.id">
                   <td>{{ data.applicant.registration_code }}</td>
                   <td>{{ data.applicant.name }}</td>
                 </tr>
@@ -51,7 +51,7 @@ export default {
       type: Boolean,
       default: false
     },
-    item: {
+    items: {
       type: Array,
       default: null
     }
