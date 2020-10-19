@@ -471,7 +471,6 @@ export default {
       blastNotifModalWarning: false,
       updateModal: false,
       updatePayload: null,
-      isCardUpdateOpen: false,
       incompleteResultTest: [],
       TEST_RESULT_OPTIONS
     }
