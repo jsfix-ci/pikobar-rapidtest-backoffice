@@ -151,7 +151,7 @@
               </template>
               <v-card>
                 <v-list-item
-                  v-for="data in TEST_RESULT_OPTIONS"
+                  v-for="data in testResultOptions"
                   :key="data.value"
                 >
                   <v-btn
@@ -477,6 +477,9 @@ export default {
   },
 
   computed: {
+    testResultOptions() {
+      return TEST_RESULT_OPTIONS
+    },
     confirmDeleteMsg() {
       return CONFIRM_DELETE_PARTICIPANTS_EVENT
     },
