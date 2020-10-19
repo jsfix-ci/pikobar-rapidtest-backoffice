@@ -471,8 +471,7 @@ export default {
       blastNotifModalWarning: false,
       updateModal: false,
       updatePayload: null,
-      incompleteResultTest: [],
-      TEST_RESULT_OPTIONS
+      incompleteResultTest: []
     }
   },
 
