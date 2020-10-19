@@ -233,5 +233,19 @@ export const actions = {
     } finally {
       commit('SET_LOADING', false)
     }
+  },
+
+  async updateTestResult({ commit }, data) {
+    commit('SET_LOADING', true)
+    const id = data.id
+    try {
+      await this.$axios.$put(`rdt/invitation/${id}`, {
+        lab_result_type: data.payload
+      })
+    } catch (e) {
+      throw new Error(e.response.data.message)
+    } finally {
+      commit('SET_LOADING', false)
+    }
   }
 }

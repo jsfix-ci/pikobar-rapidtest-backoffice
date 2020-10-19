@@ -5,6 +5,9 @@ export const FAILED_IMPORT = 'Import data gagal'
 export const EVENT_BLAST_EMPTY = 'Anda Belum Memilih Peserta'
 export const EVENT_PARTICIPANTS_EMPTY = 'Peserta Kegiatan kosong'
 export const EVENT_BLAST_SUCCESS = 'Notifikasi berhasil di kirim'
+export const SUCCESS_UPDATE_TEST_RESULT = 'Hasil test berhasil diubah'
+export const FAILED_UPDATE_TEST_RESULT =
+  'Maaf, ada kesalahan dalam mengubah data hasil tes'
 export const SUCCESS_DELETE = 'Data berhasil di hapus'
 export const FAILED_DELETE = 'Maaf, ada kesalahan dalam menghapus data'
 export const CONFIRM_DELETE =

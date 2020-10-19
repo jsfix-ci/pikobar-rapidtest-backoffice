@@ -122,7 +122,7 @@
           !!value ? $dateFns.format(new Date(value), 'dd MMMM yyyy HH:mm') : ''
         }}
       </template>
-      <template v-slot:[`item.lab_result_type`]="{ value }">
+      <template v-slot:[`item.lab_result_type`]="{ item }">
         <v-layout justify-center>
           <v-card-actions>
             <v-menu
@@ -140,7 +140,9 @@
                   outlined
                   v-on="on"
                 >
-                  <span v-if="value">{{ value }}</span>
+                  <span v-if="item.lab_result_type">{{
+                    item.lab_result_type
+                  }}</span>
                   <span v-else>Pilih hasil test</span>
                   <v-icon style="color: #009d57; font-size: 2rem;" right
                     >mdi-menu-down</v-icon
@@ -149,16 +151,16 @@
               </template>
               <v-card>
                 <v-list-item
-                  v-for="item in TEST_RESULT_OPTIONS"
-                  :key="item.value"
+                  v-for="data in TEST_RESULT_OPTIONS"
+                  :key="data.value"
                 >
                   <v-btn
                     text
                     small
                     color="normal"
-                    @click="setTestResult(item.value)"
+                    @click="openUpdateDialog(item, data.value)"
                   >
-                    {{ item.label }}
+                    {{ data.label }}
                   </v-btn>
                 </v-list-item>
               </v-card>
@@ -201,6 +203,47 @@
         </v-icon>
       </template>
     </v-data-table>
+    <v-dialog v-model="updateModal" max-width="528">
+      <v-card class="text-center">
+        <v-card-title>
+          <span class="col pl-10">Perhatian!</span>
+        </v-card-title>
+        <v-card-text>
+          <div>
+            Apakah Anda akan mengubah hasil test peserta bernama
+            <strong>
+              {{ selectedData ? selectedData.applicant.name : '-' }}
+            </strong>
+            <span>
+              Menjadi
+            </span>
+            <strong>
+              {{ updatePayload }}
+            </strong>
+            <span>
+              ?
+            </span>
+          </div>
+        </v-card-text>
+        <v-card-actions class="pb-6 justify-center">
+          <v-btn
+            color="grey darken-1"
+            outlined
+            class="mr-2 px-2"
+            @click="updateModal = false"
+          >
+            Tidak
+          </v-btn>
+          <v-btn
+            color="error"
+            class="ml-2 px-2"
+            @click="setTestResult(selectedData.id, updatePayload)"
+          >
+            Ya
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
     <v-dialog v-model="deleteModal" max-width="528">
       <v-card class="text-center">
         <v-card-title>
@@ -352,7 +395,9 @@ import {
   CONFIRM_DELETE_PARTICIPANTS_EVENT,
   SUCCESS_DELETE,
   FAILED_DELETE,
-  TEST_RESULT_OPTIONS
+  TEST_RESULT_OPTIONS,
+  SUCCESS_UPDATE_TEST_RESULT,
+  FAILED_UPDATE_TEST_RESULT
 } from '@/utilities/constant'
 import EventApplicantEditLabCodeDialog from '@/components/EventApplicantEditLabCodeDialog'
 import DialogExportLoader from '@/components/DialogLoader'
@@ -424,6 +469,9 @@ export default {
       viewRecordId: null,
       labCodeSample: null,
       blastNotifModalWarning: false,
+      updateModal: false,
+      updatePayload: null,
+      isCardUpdateOpen: false,
       incompleteResultTest: [],
       TEST_RESULT_OPTIONS
     }
@@ -494,8 +542,31 @@ export default {
   },
 
   methods: {
-    setTestResult(payload) {
-      console.log(payload)
+    openUpdateDialog(item, payload) {
+      this.selectedData = item
+      this.updatePayload = payload
+      this.updateModal = true
+    },
+    async setTestResult(id, payload) {
+      const data = { id, payload }
+      try {
+        await this.$store.dispatch('eventParticipants/updateTestResult', data)
+        this.$toast.show({
+          message: SUCCESS_UPDATE_TEST_RESULT,
+          type: 'success'
+        })
+        await this.$store.dispatch(
+          'eventParticipants/getList',
+          this.$route.params.eventId
+        )
+      } catch (error) {
+        this.$toast.show({
+          message: error.message || FAILED_UPDATE_TEST_RESULT,
+          type: 'error'
+        })
+      } finally {
+        this.updateModal = false
+      }
     },
     viewItem(payload) {
       this.viewRecordId = payload.id
