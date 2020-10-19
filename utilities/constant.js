@@ -38,3 +38,10 @@ export const DEFAULT_PAGINATION = {
   itemsPerPage: 50,
   total: 0
 }
+export const TEST_RESULT_OPTIONS = [
+  { value: 'POSITIVE', label: 'Positif' },
+  { value: 'NEGATIVE', label: 'Negatif' },
+  { value: 'REACTIVE', label: 'Reaktif' },
+  { value: 'NONREACTIVE', label: 'Non Reaktif' },
+  { value: 'INCONCLUSIVE', label: 'Inklusif' }
+]
