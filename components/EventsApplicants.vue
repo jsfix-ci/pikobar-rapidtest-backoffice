@@ -218,7 +218,7 @@
               Menjadi
             </span>
             <strong>
-              {{ updatePayload }}
+              {{ checkResultLabel(updatePayload).toUpperCase() }}
             </strong>
             <span>
               ?
