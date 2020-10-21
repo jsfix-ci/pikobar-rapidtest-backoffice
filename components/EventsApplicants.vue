@@ -218,7 +218,11 @@
               Menjadi
             </span>
             <strong>
-              {{ checkResultLabel(updatePayload).toUpperCase() }}
+              {{
+                updatePayload
+                  ? checkResultLabel(updatePayload).toUpperCase()
+                  : updatePayload
+              }}
             </strong>
             <span>
               ?
