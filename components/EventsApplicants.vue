@@ -31,6 +31,10 @@
           <v-icon class="mr-1">mdi-file-send-outline</v-icon>
           Kirim Hasil Test
         </v-btn>
+        <v-btn color="warning" @click="openModalIntegratingData">
+          <v-icon class="mr-1">mdi-file-send-outline</v-icon>
+          Kirim data
+        </v-btn>
       </v-col>
       <v-spacer></v-spacer>
       <v-col cols="auto">
@@ -620,6 +624,11 @@ export default {
     },
     closeDialogWarning() {
       this.blastNotifModalWarning = false
+    },
+    openModalIntegratingData() {
+      this.blastNotifModalWarning = true
+      const data = this.records.filter((item) => item.lab_code_sample !== null)
+      this.incompleteResultTest = data
     },
     openModalNotif(type) {
       if (type === 'Undangan') {
