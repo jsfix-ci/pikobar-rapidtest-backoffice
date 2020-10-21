@@ -46,5 +46,6 @@ export const TEST_RESULT_OPTIONS = [
   { value: 'NEGATIVE', label: 'Negatif' },
   { value: 'REACTIVE', label: 'Reaktif' },
   { value: 'NONREACTIVE', label: 'Non Reaktif' },
-  { value: 'INCONCLUSIVE', label: 'Inklusif' }
+  { value: 'INCONCLUSIVE', label: 'Inkonklusif' },
+  { value: 'INVALID', label: 'Invalid' }
 ]
