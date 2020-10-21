@@ -140,9 +140,9 @@
                   outlined
                   v-on="on"
                 >
-                  <span v-if="item.lab_result_type">{{
-                    item.lab_result_type
-                  }}</span>
+                  <span v-if="item.lab_result_type">
+                    {{ checkResultLabel(item.lab_result_type) }}
+                  </span>
                   <span v-else>Pilih hasil test</span>
                   <v-icon style="color: #009d57; font-size: 2rem;" right
                     >mdi-menu-down</v-icon
@@ -543,6 +543,16 @@ export default {
   },
 
   methods: {
+    checkResultLabel(payload) {
+      let testResultLabel = null
+      const testResultFilter = this.testResultOptions.filter(
+        (item) => item.value === payload
+      )
+      testResultFilter.forEach((element) => {
+        testResultLabel = element.label
+      })
+      return testResultLabel
+    },
     openUpdateDialog(item, payload) {
       this.selectedData = item
       this.updatePayload = payload
