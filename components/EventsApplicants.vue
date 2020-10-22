@@ -384,6 +384,11 @@
       :detail-type="'invitation'"
       @close="viewClose"
     />
+    <dialog-integrating-data
+      :open="integratingModal"
+      :items="incompleteResultTest"
+      @close="closeDialogIntegratingData"
+    />
   </div>
 </template>
 
@@ -410,6 +415,7 @@ import {
 import EventApplicantEditLabCodeDialog from '@/components/EventApplicantEditLabCodeDialog'
 import DialogExportLoader from '@/components/DialogLoader'
 import DialogWarningTestResult from '@/components/DialogWarningTestResult'
+import DialogIntegratingData from '@/components/DialogIntegratingData'
 import ApplicantViewDialog from '@/components/ApplicantViewDialog'
 
 const headers = [
@@ -443,7 +449,8 @@ export default {
     EventApplicantEditLabCodeDialog,
     DialogExportLoader,
     ApplicantViewDialog,
-    DialogWarningTestResult
+    DialogWarningTestResult,
+    DialogIntegratingData
   },
   filters: {
     getChipColor
@@ -479,6 +486,7 @@ export default {
       blastNotifModalWarning: false,
       updateModal: false,
       updatePayload: null,
+      integratingModal: false,
       incompleteResultTest: []
     }
   },
@@ -622,13 +630,16 @@ export default {
         })
       }
     },
-    closeDialogWarning() {
-      this.blastNotifModalWarning = false
+    closeDialogIntegratingData() {
+      this.integratingModal = false
     },
     openModalIntegratingData() {
-      this.blastNotifModalWarning = true
+      this.integratingModal = true
       const data = this.records.filter((item) => item.lab_code_sample !== null)
       this.incompleteResultTest = data
+    },
+    closeDialogWarning() {
+      this.blastNotifModalWarning = false
     },
     openModalNotif(type) {
       if (type === 'Undangan') {
