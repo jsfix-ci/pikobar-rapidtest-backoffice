@@ -416,6 +416,11 @@ const headers = [
     width: 150
   },
   { text: 'Nama Lengkap', value: 'applicant.name', width: 250 },
+  {
+    text: 'Instansi Tempat Kerja',
+    value: 'applicant.workplace_name',
+    width: 250
+  },
   { text: 'Kloter', value: 'rdt_event_schedule_id', width: 85 },
   { text: 'Jenis Kelamin', value: 'applicant.gender', width: 140 },
   { text: 'Usia', value: 'applicant.birth_date', width: 85 },
