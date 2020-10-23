@@ -45,9 +45,12 @@
           </v-simple-table>
         </div>
       </v-card-text>
-      <v-card-actions class="pb-6 justify-end">
+      <v-card-actions class="pb-6 justify-center">
         <v-btn color="grey darken-1" outlined class="mr-2 px-2" @click="close">
-          Keluar
+          Batal
+        </v-btn>
+        <v-btn color="primary" class="ml-2 px-2" @click="send">
+          Kirim
         </v-btn>
       </v-card-actions>
     </v-card>
@@ -69,6 +72,9 @@ export default {
   methods: {
     close() {
       this.$emit('close')
+    },
+    send() {
+      this.$emit('send')
     }
   }
 }

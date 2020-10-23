@@ -388,6 +388,7 @@
       :open="integratingModal"
       :items="incompleteResultTest"
       @close="closeDialogIntegratingData"
+      @send="integrateData"
     />
   </div>
 </template>
@@ -629,6 +630,14 @@ export default {
           type: 'error'
         })
       }
+    },
+    integrateData() {
+      const participantId = this.records.map((item) => item.id)
+      const data = {
+        eventId: this.$route.params.eventId,
+        participant: participantId
+      }
+      console.log(data)
     },
     closeDialogIntegratingData() {
       this.integratingModal = false
