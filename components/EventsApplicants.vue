@@ -90,7 +90,7 @@
           <v-col cols="6">
             <v-text-field
               v-model="searchKey"
-              label="Nama Peserta / No. Pendaftaran / Kode Sampel"
+              label="Nama Peserta / No. Pendaftaran / Kode Sampel / Instansi Tempat Kerja"
               clearable
               outlined
               dense
