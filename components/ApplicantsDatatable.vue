@@ -46,18 +46,8 @@
               allow-null
             />
           </v-col>
-          <v-col v-if="listType === 'participant'" cols="auto">
-            <v-text-field
-              v-model="sessionId"
-              label="Session ID"
-              clearable
-              outlined
-              dense
-              hide-details
-            />
-          </v-col>
           <v-spacer></v-spacer>
-          <v-col v-if="listType === 'participant'" cols="auto">
+          <v-col v-if="false" cols="auto">
             <v-btn
               v-if="allow.includes('create-applicants')"
               color="primary"
@@ -70,11 +60,6 @@
             </v-btn>
           </v-col>
         </div>
-      </template>
-      <template v-slot:[`item.invitations`]="{ item }">
-        <v-layout justify-start>
-          {{ getLatestInvitation(item.invitations) }}
-        </v-layout>
       </template>
       <template v-slot:[`item.gender`]="{ item }">
         <v-layout justify-start>
@@ -97,11 +82,6 @@
           <template v-if="item.symptoms_interaction === '2'">
             Tidak Tahu
           </template>
-        </v-layout>
-      </template>
-      <template v-slot:[`item.person_status`]="{ item }">
-        <v-layout justify-start>
-          {{ getPersonStatusText(item.person_status) }}
         </v-layout>
       </template>
       <template v-slot:[`item.age`]="{ item }">
@@ -204,17 +184,9 @@ import {
 } from '@/utilities/constant'
 
 const headers = [
-  { text: 'ID', value: 'id', width: 80 },
-  {
-    text: 'Nomor Pendaftaran',
-    value: 'registration_code',
-    sortable: false,
-    width: 150
-  },
-  { text: 'Session Code', value: 'pikobar_session_id', width: 150 },
-  { text: 'Nama Peserta', value: 'name', width: 250 },
-  { text: 'Status Kesehatan', value: 'person_status', width: 150 },
-  { text: 'Jenis Kelamin', value: 'gender', width: 150 },
+  { text: 'NIK', value: 'nik', width: 200 },
+  { text: 'Nama Peserta', value: 'name', width: 200 },
+  { text: 'Jenis Kelamin', value: 'gender', width: 130 },
   {
     text: 'Usia (Thn)',
     value: 'age',
@@ -222,21 +194,11 @@ const headers = [
     align: 'center'
   },
   { text: 'Kota/Kab', value: 'city.name', sortable: false, width: 200 },
-  { text: 'Jenis Pekerjaan', value: 'occupation_type_name', width: 150 },
-  { text: 'Nama Profesi', value: 'occupation_name', width: 250 },
-  { text: 'Tempat Kerja', value: 'workplace_name', width: 250 },
   {
     text: 'Riwayat Kontak',
     value: 'symptoms_interaction',
     width: 150,
     align: 'center'
-  },
-  { text: 'Gejala', value: 'symptoms_notes', sortable: false, width: 300 },
-  {
-    text: 'Riwayat Undangan',
-    value: 'invitations',
-    sortable: false,
-    width: 150
   },
   { text: 'Tanggal Terdaftar', value: 'created_at', width: 200 },
   { text: 'Actions', value: 'actions', sortable: false, width: 150 }
@@ -297,8 +259,6 @@ export default {
       selectedData: null,
       headers: this.noActions
         ? headers.filter((head) => head.value !== 'actions')
-        : this.listType === 'applicant'
-        ? headers.filter((head) => head.value !== 'pikobar_session_id')
         : headers
     }
   },
