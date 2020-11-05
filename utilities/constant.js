@@ -64,3 +64,11 @@ export const SYMPTOMS_OPTIONS = [
   { value: 12, text: 'Suhu Tubuh >= 38 C' },
   { value: 99, text: 'Tidak ada Gejala' }
 ]
+export const CONGENITAL_DESEASE_OPTIONS = [
+  { value: 1, text: 'Darah Tinggi' },
+  { value: 2, text: 'Diabetes' },
+  { value: 3, text: 'Kronis' },
+  { value: 4, text: 'Gangguan Jantung' },
+  { value: 5, text: 'Gagal Ginjal' },
+  { value: 99, text: 'Tidak Ada' }
+]

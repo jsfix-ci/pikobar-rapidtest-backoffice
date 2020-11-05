@@ -155,10 +155,19 @@
           <v-row>
             <v-col>
               <v-list-item two-line>
-                <v-list-item-content>
+                <v-list-item-content v-if="congenitalDisease.length > 0">
+                  <v-list-item-title>Penyakit Bawaan</v-list-item-title>
+                  <v-list-item-subtitle
+                    v-for="item in congenitalDisease"
+                    :key="item"
+                  >
+                    {{ item }}
+                  </v-list-item-subtitle>
+                </v-list-item-content>
+                <v-list-item-content v-else>
                   <v-list-item-title>Penyakit Bawaan</v-list-item-title>
                   <v-list-item-subtitle>
-                    {{ congenitalDisease }}
+                    {{ '-' }}
                   </v-list-item-subtitle>
                 </v-list-item-content>
               </v-list-item>
@@ -297,7 +306,10 @@
 
 <script>
 import { getPersonStatusText } from '@/utilities/personStatus'
-import { SYMPTOMS_OPTIONS } from '@/utilities/constant'
+import {
+  SYMPTOMS_OPTIONS,
+  CONGENITAL_DESEASE_OPTIONS
+} from '@/utilities/constant'
 export default {
   props: {
     open: {
@@ -336,7 +348,7 @@ export default {
       symptomsInteraction: null,
       symptomsNotes: null,
       cityVisited: null,
-      congenitalDisease: null,
+      congenitalDisease: [],
       invitations: []
     }
   },
@@ -344,6 +356,9 @@ export default {
   computed: {
     symptomsOptions() {
       return SYMPTOMS_OPTIONS
+    },
+    congenitalDiseaseOptions() {
+      return CONGENITAL_DESEASE_OPTIONS
     }
   },
 
@@ -386,7 +401,7 @@ export default {
       this.symptomsInteraction = data.symptoms_interaction
       this.symptomsNotes = data.symptoms_notes
       this.cityVisited = data.city_visited
-      this.congenitalDisease = data.congenital_disease
+      this.getCongenitalDesease(data.congenital_disease)
       this.getSymptoms(data.symptoms)
     },
 
@@ -416,6 +431,18 @@ export default {
           )
           symptomsFilter.forEach((item) => {
             this.symptoms.push(item.text)
+          })
+        })
+      }
+    },
+    getCongenitalDesease(payload) {
+      if (payload) {
+        payload.map((element) => {
+          const congenitalDeseaseFilter = this.symptomsOptions.filter(
+            (item) => item.value === element
+          )
+          congenitalDeseaseFilter.forEach((item) => {
+            this.congenitalDisease.push(item.text)
           })
         })
       }
