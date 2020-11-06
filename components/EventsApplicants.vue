@@ -90,7 +90,7 @@
           <v-col cols="6">
             <v-text-field
               v-model="searchKey"
-              label="Nama Peserta / No. Pendaftaran / Kode Sampel"
+              label="Nama Peserta / No. Pendaftaran / Kode Sampel / Instansi Tempat Kerja"
               clearable
               outlined
               dense
@@ -122,8 +122,51 @@
           !!value ? $dateFns.format(new Date(value), 'dd MMMM yyyy HH:mm') : ''
         }}
       </template>
-      <template v-slot:[`item.lab_result_type`]="{ value }">
-        {{ value }}
+      <template v-slot:[`item.lab_result_type`]="{ item }">
+        <v-layout justify-center>
+          <v-card-actions>
+            <v-menu
+              :close-on-content-click="false"
+              :nudge-width="0"
+              :nudge-left="0"
+              :nudge-top="0"
+              offset-y
+            >
+              <template v-slot:activator="{ on }">
+                <v-btn
+                  class="ma-1"
+                  color="#828282"
+                  style="text-transform: none; height: 30px; min-width: 50px;"
+                  outlined
+                  v-on="on"
+                >
+                  <span v-if="item.lab_result_type">
+                    {{ checkResultLabel(item.lab_result_type) }}
+                  </span>
+                  <span v-else>Pilih hasil test</span>
+                  <v-icon style="color: #009d57; font-size: 2rem;" right
+                    >mdi-menu-down</v-icon
+                  >
+                </v-btn>
+              </template>
+              <v-card>
+                <v-list-item
+                  v-for="data in testResultOptions"
+                  :key="data.value"
+                >
+                  <v-btn
+                    text
+                    small
+                    color="normal"
+                    @click="openUpdateDialog(item, data.value)"
+                  >
+                    {{ data.label }}
+                  </v-btn>
+                </v-list-item>
+              </v-card>
+            </v-menu>
+          </v-card-actions>
+        </v-layout>
       </template>
       <template v-slot:[`item.applicant.status`]="{ value }">
         <v-chip small class="ma-2" :color="value | getChipColor">
@@ -160,6 +203,51 @@
         </v-icon>
       </template>
     </v-data-table>
+    <v-dialog v-model="updateModal" max-width="528">
+      <v-card class="text-center">
+        <v-card-title>
+          <span class="col pl-10">Perhatian!</span>
+        </v-card-title>
+        <v-card-text>
+          <div>
+            Apakah Anda akan mengubah hasil test peserta bernama
+            <strong>
+              {{ selectedData ? selectedData.applicant.name : '-' }}
+            </strong>
+            <span>
+              Menjadi
+            </span>
+            <strong>
+              {{
+                updatePayload
+                  ? checkResultLabel(updatePayload).toUpperCase()
+                  : updatePayload
+              }}
+            </strong>
+            <span>
+              ?
+            </span>
+          </div>
+        </v-card-text>
+        <v-card-actions class="pb-6 justify-center">
+          <v-btn
+            color="grey darken-1"
+            outlined
+            class="mr-2 px-2"
+            @click="updateModal = false"
+          >
+            Tidak
+          </v-btn>
+          <v-btn
+            color="error"
+            class="ml-2 px-2"
+            @click="setTestResult(selectedData.id, updatePayload)"
+          >
+            Ya
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
     <v-dialog v-model="deleteModal" max-width="528">
       <v-card class="text-center">
         <v-card-title>
@@ -201,28 +289,26 @@
           <div>
             Apakah anda akan mengirimkan notifikasi {{ modalType }} kepada
           </div>
-          <strong>Peserta Terpilih</strong> atau <strong>Semua Peserta</strong>.
+          <div v-if="pesertaSelected.length > 0">
+            <strong>{{ pesertaSelected.length }} Peserta Terpilih?</strong>
+          </div>
+          <div v-else><strong>Semua Peserta?</strong></div>
         </v-card-text>
         <v-card-actions class="pb-6 justify-center">
           <v-btn
             color="grey darken-1"
             outlined
             class="mr-2 px-2"
-            @click="blastNotify(null, `send${modalType.split(' ').join('')}`)"
+            @click="blastNotifModal = false"
           >
-            Semua
+            Batal
           </v-btn>
           <v-btn
             color="primary"
             class="ml-2 px-2"
-            @click="
-              blastNotify(
-                pesertaSelected,
-                `send${modalType.split(' ').join('')}`
-              )
-            "
+            @click="sendNotif(pesertaSelected.length, modalType)"
           >
-            Terpilih
+            Ya
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -282,6 +368,11 @@
       @save="modalEditLabCodeSave"
     />
     <dialog-export-loader :open="modalExportLoader" />
+    <dialog-warning-test-result
+      :open="blastNotifModalWarning"
+      :items="incompleteResultTest"
+      @close="closeDialogWarning"
+    />
     <applicant-view-dialog
       v-if="allow.includes('view-applicants')"
       :open="viewDialog"
@@ -307,10 +398,14 @@ import {
   DEFAULT_FILTER,
   CONFIRM_DELETE_PARTICIPANTS_EVENT,
   SUCCESS_DELETE,
-  FAILED_DELETE
+  FAILED_DELETE,
+  TEST_RESULT_OPTIONS,
+  SUCCESS_UPDATE_TEST_RESULT,
+  FAILED_UPDATE_TEST_RESULT
 } from '@/utilities/constant'
 import EventApplicantEditLabCodeDialog from '@/components/EventApplicantEditLabCodeDialog'
 import DialogExportLoader from '@/components/DialogLoader'
+import DialogWarningTestResult from '@/components/DialogWarningTestResult'
 import ApplicantViewDialog from '@/components/ApplicantViewDialog'
 
 const headers = [
@@ -321,6 +416,11 @@ const headers = [
     width: 150
   },
   { text: 'Nama Lengkap', value: 'applicant.name', width: 250 },
+  {
+    text: 'Instansi Tempat Kerja',
+    value: 'applicant.workplace_name',
+    width: 250
+  },
   { text: 'Kloter', value: 'rdt_event_schedule_id', width: 85 },
   { text: 'Jenis Kelamin', value: 'applicant.gender', width: 140 },
   { text: 'Usia', value: 'applicant.birth_date', width: 85 },
@@ -329,7 +429,7 @@ const headers = [
   { text: 'Checkin', value: 'attended_at', width: 200 },
   { text: 'Kode Sampel', value: 'lab_code_sample', width: 150 },
   { text: 'Tanggal Hasil Test', value: 'result_at', width: 200 },
-  { text: 'Hasil Test', value: 'lab_result_type', width: 150 },
+  { text: 'Hasil Test', value: 'lab_result_type', width: 150, align: 'center' },
   { text: 'Kirim Undangan', value: 'notified_at', width: 200 },
   {
     text: 'Kirim Hasil',
@@ -343,7 +443,8 @@ export default {
   components: {
     EventApplicantEditLabCodeDialog,
     DialogExportLoader,
-    ApplicantViewDialog
+    ApplicantViewDialog,
+    DialogWarningTestResult
   },
   filters: {
     getChipColor
@@ -375,11 +476,18 @@ export default {
       selectedData: null,
       viewDialog: false,
       viewRecordId: null,
-      labCodeSample: null
+      labCodeSample: null,
+      blastNotifModalWarning: false,
+      updateModal: false,
+      updatePayload: null,
+      incompleteResultTest: []
     }
   },
 
   computed: {
+    testResultOptions() {
+      return TEST_RESULT_OPTIONS
+    },
     confirmDeleteMsg() {
       return CONFIRM_DELETE_PARTICIPANTS_EVENT
     },
@@ -444,6 +552,42 @@ export default {
   },
 
   methods: {
+    checkResultLabel(payload) {
+      let testResultLabel = null
+      const testResultFilter = this.testResultOptions.filter(
+        (item) => item.value === payload
+      )
+      testResultFilter.forEach((element) => {
+        testResultLabel = element.label
+      })
+      return testResultLabel
+    },
+    openUpdateDialog(item, payload) {
+      this.selectedData = item
+      this.updatePayload = payload
+      this.updateModal = true
+    },
+    async setTestResult(id, payload) {
+      const data = { id, payload }
+      try {
+        await this.$store.dispatch('eventParticipants/updateTestResult', data)
+        this.$toast.show({
+          message: SUCCESS_UPDATE_TEST_RESULT,
+          type: 'success'
+        })
+        await this.$store.dispatch(
+          'eventParticipants/getList',
+          this.$route.params.eventId
+        )
+      } catch (error) {
+        this.$toast.show({
+          message: error.message || FAILED_UPDATE_TEST_RESULT,
+          type: 'error'
+        })
+      } finally {
+        this.updateModal = false
+      }
+    },
     viewItem(payload) {
       this.viewRecordId = payload.id
       this.viewDialog = true
@@ -479,12 +623,41 @@ export default {
         })
       }
     },
+    closeDialogWarning() {
+      this.blastNotifModalWarning = false
+    },
     openModalNotif(type) {
-      this.modalType = type || this.modalType
-      this.blastNotifModal = true
+      if (type === 'Undangan') {
+        this.modalType = type || this.modalType
+        this.blastNotifModal = true
+      } else {
+        const data =
+          this.pesertaSelected.length > 0 ? this.pesertaSelected : this.records
+
+        const incompleteData = data.filter(
+          (item) => item.lab_result_type === null
+        )
+        if (incompleteData.length === 0) {
+          this.modalType = type || this.modalType
+          this.blastNotifModal = true
+        } else {
+          this.blastNotifModalWarning = true
+          this.incompleteResultTest = incompleteData
+        }
+      }
     },
     openModalImportHasil() {
       this.ImportModalTest = true
+    },
+    sendNotif(participant, modalType) {
+      if (participant === 0) {
+        this.blastNotify(null, `send${modalType.split(' ').join('')}`)
+      } else {
+        this.blastNotify(
+          this.pesertaSelected,
+          `send${modalType.split(' ').join('')}`
+        )
+      }
     },
     async doImport() {
       const formData = new FormData()
