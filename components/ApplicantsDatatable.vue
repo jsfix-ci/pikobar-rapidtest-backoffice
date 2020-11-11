@@ -26,7 +26,7 @@
           <v-col cols="auto">
             <v-text-field
               v-model="searchKey"
-              label="Nama Peserta / Nomor Pendaftaran"
+              label="NIK/Nama Peserta / Nomor Pendaftaran"
               clearable
               outlined
               dense
