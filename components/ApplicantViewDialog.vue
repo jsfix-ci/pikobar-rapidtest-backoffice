@@ -8,7 +8,7 @@
         <v-divider />
         <v-card-text>
           <v-row>
-            <v-col>
+            <v-col cols="6">
               <v-list-item two-line>
                 <v-list-item-content>
                   <v-list-item-title>NIK</v-list-item-title>
@@ -18,7 +18,7 @@
                 </v-list-item-content>
               </v-list-item>
             </v-col>
-            <v-col>
+            <v-col cols="6">
               <v-list-item two-line>
                 <v-list-item-content>
                   <v-list-item-title>Nomor Registrasi</v-list-item-title>
@@ -30,7 +30,7 @@
             </v-col>
           </v-row>
           <v-row>
-            <v-col>
+            <v-col cols="6">
               <v-list-item two-line>
                 <v-list-item-content>
                   <v-list-item-title>Nama Peserta</v-list-item-title>
@@ -40,7 +40,7 @@
                 </v-list-item-content>
               </v-list-item>
             </v-col>
-            <v-col>
+            <v-col cols="6">
               <v-list-item two-line>
                 <v-list-item-content>
                   <v-list-item-title>Nomor Telepon</v-list-item-title>
@@ -52,7 +52,7 @@
             </v-col>
           </v-row>
           <v-row>
-            <v-col>
+            <v-col cols="6">
               <v-list-item two-line>
                 <v-list-item-content>
                   <v-list-item-title>Tanggal Lahir</v-list-item-title>
@@ -62,7 +62,7 @@
                 </v-list-item-content>
               </v-list-item>
             </v-col>
-            <v-col>
+            <v-col cols="6">
               <v-list-item two-line>
                 <v-list-item-content>
                   <v-list-item-title>Kota/Kabupaten</v-list-item-title>
@@ -74,7 +74,7 @@
             </v-col>
           </v-row>
           <v-row>
-            <v-col>
+            <v-col cols="6">
               <v-list-item two-line>
                 <v-list-item-content>
                   <v-list-item-title>Jenis Pekerjaan</v-list-item-title>
@@ -84,7 +84,7 @@
                 </v-list-item-content>
               </v-list-item>
             </v-col>
-            <v-col>
+            <v-col cols="6">
               <v-list-item two-line>
                 <v-list-item-content>
                   <v-list-item-title>Kecamatan</v-list-item-title>
@@ -96,7 +96,7 @@
             </v-col>
           </v-row>
           <v-row>
-            <v-col>
+            <v-col cols="6">
               <v-list-item two-line>
                 <v-list-item-content>
                   <v-list-item-title>Nama Pekerjaan</v-list-item-title>
@@ -106,7 +106,7 @@
                 </v-list-item-content>
               </v-list-item>
             </v-col>
-            <v-col>
+            <v-col cols="6">
               <v-list-item two-line>
                 <v-list-item-content>
                   <v-list-item-title>Kelurahan</v-list-item-title>
@@ -118,7 +118,7 @@
             </v-col>
           </v-row>
           <v-row>
-            <v-col>
+            <v-col cols="6">
               <v-list-item two-line>
                 <v-list-item-content>
                   <v-list-item-title>Tempat Bekerja</v-list-item-title>
@@ -128,7 +128,7 @@
                 </v-list-item-content>
               </v-list-item>
             </v-col>
-            <v-col>
+            <v-col cols="6">
               <v-list-item two-line>
                 <v-list-item-content>
                   <v-list-item-title>Alamat Domisili</v-list-item-title>
