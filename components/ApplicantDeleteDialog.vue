@@ -46,12 +46,7 @@ export default {
   },
   data() {
     return {
-      deleteModal: false
-    }
-  },
-  computed: {
-    confirmDeleteMsg() {
-      return CONFIRM_DELETE_PARTICIPANTS
+      confirmDeleteMsg: CONFIRM_DELETE_PARTICIPANTS
     }
   },
   methods: {
