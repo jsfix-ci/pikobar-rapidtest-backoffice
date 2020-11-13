@@ -203,51 +203,6 @@
         </v-icon>
       </template>
     </v-data-table>
-    <v-dialog v-model="updateModal" max-width="528">
-      <v-card class="text-center">
-        <v-card-title>
-          <span class="col pl-10">Perhatian!</span>
-        </v-card-title>
-        <v-card-text>
-          <div>
-            Apakah Anda akan mengubah hasil test peserta bernama
-            <strong>
-              {{ selectedData ? selectedData.applicant.name : '-' }}
-            </strong>
-            <span>
-              Menjadi
-            </span>
-            <strong>
-              {{
-                updatePayload
-                  ? checkResultLabel(updatePayload).toUpperCase()
-                  : updatePayload
-              }}
-            </strong>
-            <span>
-              ?
-            </span>
-          </div>
-        </v-card-text>
-        <v-card-actions class="pb-6 justify-center">
-          <v-btn
-            color="grey darken-1"
-            outlined
-            class="mr-2 px-2"
-            @click="updateModal = false"
-          >
-            Tidak
-          </v-btn>
-          <v-btn
-            color="error"
-            class="ml-2 px-2"
-            @click="setTestResult(selectedData.id, updatePayload)"
-          >
-            Ya
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
     <v-dialog v-model="blastNotifModal" max-width="528">
       <v-card class="text-center">
         <v-card-title>
@@ -358,6 +313,13 @@
       @close="deleteClose"
       @remove="remove"
     />
+    <event-update-result-dialog
+      :open="updateResultDialog"
+      :record="selectedData"
+      :payload="updatePayload"
+      @close="closeDialogUpdateResult"
+      @update="setTestResult"
+    />
   </div>
 </template>
 
@@ -386,6 +348,7 @@ import DialogExportLoader from '@/components/DialogLoader'
 import DialogWarningTestResult from '@/components/DialogWarningTestResult'
 import ApplicantViewDialog from '@/components/ApplicantViewDialog'
 import ApplicantDeleteDialog from '@/components/ApplicantDeleteDialog'
+import EventUpdateResultDialog from '@/components/EventUpdateResultDialog'
 
 const headers = [
   {
@@ -424,7 +387,8 @@ export default {
     DialogExportLoader,
     ApplicantViewDialog,
     DialogWarningTestResult,
-    ApplicantDeleteDialog
+    ApplicantDeleteDialog,
+    EventUpdateResultDialog
   },
   filters: {
     getChipColor
@@ -458,7 +422,7 @@ export default {
       viewRecordId: null,
       labCodeSample: null,
       blastNotifModalWarning: false,
-      updateModal: false,
+      updateResultDialog: false,
       updatePayload: null,
       incompleteResultTest: []
     }
@@ -545,10 +509,12 @@ export default {
     openUpdateDialog(item, payload) {
       this.selectedData = item
       this.updatePayload = payload
-      this.updateModal = true
+      this.updateResultDialog = true
     },
-    async setTestResult(id, payload) {
-      const data = { id, payload }
+    closeDialogUpdateResult() {
+      this.updateResultDialog = false
+    },
+    async setTestResult(data) {
       try {
         await this.$store.dispatch('eventParticipants/updateTestResult', data)
         this.$toast.show({
@@ -565,7 +531,7 @@ export default {
           type: 'error'
         })
       } finally {
-        this.updateModal = false
+        this.updateResultDialog = false
       }
     },
     viewItem(payload) {
