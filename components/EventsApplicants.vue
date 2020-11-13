@@ -248,35 +248,6 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
-    <v-dialog v-model="deleteModal" max-width="528">
-      <v-card class="text-center">
-        <v-card-title>
-          <span class="col pl-10">Perhatian!</span>
-        </v-card-title>
-        <v-card-text>
-          <div>
-            {{ confirmDeleteMsg }}
-          </div>
-          <span>Nama peserta: </span>
-          <strong>
-            {{ selectedData ? selectedData.applicant.name : '-' }}
-          </strong>
-        </v-card-text>
-        <v-card-actions class="pb-6 justify-center">
-          <v-btn
-            color="grey darken-1"
-            outlined
-            class="mr-2 px-2"
-            @click="deleteModal = false"
-          >
-            Tidak
-          </v-btn>
-          <v-btn color="error" class="ml-2 px-2" @click="remove(selectedData)">
-            Ya
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
     <v-dialog v-model="blastNotifModal" max-width="528">
       <v-card class="text-center">
         <v-card-title>
@@ -380,6 +351,13 @@
       :detail-type="'invitation'"
       @close="viewClose"
     />
+    <applicant-delete-dialog
+      :open="deleteDialog"
+      :record="selectedData"
+      dialog-type="event"
+      @close="deleteClose"
+      @remove="remove"
+    />
   </div>
 </template>
 
@@ -407,6 +385,7 @@ import EventApplicantEditLabCodeDialog from '@/components/EventApplicantEditLabC
 import DialogExportLoader from '@/components/DialogLoader'
 import DialogWarningTestResult from '@/components/DialogWarningTestResult'
 import ApplicantViewDialog from '@/components/ApplicantViewDialog'
+import ApplicantDeleteDialog from '@/components/ApplicantDeleteDialog'
 
 const headers = [
   {
@@ -444,7 +423,8 @@ export default {
     EventApplicantEditLabCodeDialog,
     DialogExportLoader,
     ApplicantViewDialog,
-    DialogWarningTestResult
+    DialogWarningTestResult,
+    ApplicantDeleteDialog
   },
   filters: {
     getChipColor
@@ -472,7 +452,7 @@ export default {
       modalExportLoader: false,
       modalEditLabCode: false,
       modalEditLabCodeId: null,
-      deleteModal: false,
+      deleteDialog: false,
       selectedData: null,
       viewDialog: false,
       viewRecordId: null,
@@ -598,7 +578,10 @@ export default {
     },
     selectToRemove(payload) {
       this.selectedData = payload
-      this.deleteModal = true
+      this.deleteDialog = true
+    },
+    deleteClose(payload) {
+      this.deleteDialog = false
     },
     async remove(payload) {
       try {
@@ -615,7 +598,7 @@ export default {
           'eventParticipants/getList',
           this.$route.params.eventId
         )
-        this.deleteModal = false
+        this.deleteDialog = false
       } catch (error) {
         this.$toast.show({
           message: error.message || FAILED_DELETE,
