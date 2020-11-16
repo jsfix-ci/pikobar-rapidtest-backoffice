@@ -203,53 +203,7 @@
         </v-icon>
       </template>
     </v-data-table>
-    <v-dialog v-model="ImportModalTest" max-width="528">
-      <validation-observer
-        v-slot="{ valid, handleSubmit }"
-        ref="observerImport"
-        tag="div"
-      >
-        <form ref="importForm" @submit.prevent="handleSubmit(doImport)">
-          <v-card class="text-center">
-            <v-card-title>
-              <span class="col">Import Hasil Test</span>
-            </v-card-title>
-            <v-card-text class="pb-0">
-              <div>
-                Untuk Import data hasil test, anda harus memakai format Excel
-                (.xls).
-              </div>
-              <pkbr-input
-                v-model="importFile"
-                label="Import Hasil Test"
-                type="file"
-                class="mt-4"
-                name="file"
-                rules="required"
-              />
-            </v-card-text>
-            <v-card-actions class="pb-6 justify-center">
-              <v-btn
-                color="grey darken-1"
-                outlined
-                class="mr-2 px-2"
-                @click="ImportModalTest = false"
-              >
-                Batal
-              </v-btn>
-              <v-btn
-                color="primary"
-                :disabled="!valid"
-                class="ml-2 px-2"
-                type="submit"
-              >
-                Upload
-              </v-btn>
-            </v-card-actions>
-          </v-card>
-        </form>
-      </validation-observer>
-    </v-dialog>
+    <dialog-export-loader :open="modalExportLoader" />
     <event-applicant-edit-lab-code-dialog
       :open="modalEditLabCode"
       :record-id="modalEditLabCodeId"
@@ -257,7 +211,6 @@
       @close="modalEditLabCodeClose"
       @save="modalEditLabCodeSave"
     />
-    <dialog-export-loader :open="modalExportLoader" />
     <dialog-warning-test-result
       :open="blastNotifModalWarning"
       :items="incompleteResultTest"
@@ -291,6 +244,11 @@
       @close="closeDialogBlashNotif"
       @send="sendNotif"
     />
+    <event-import-test-result-dialog
+      :open="ImportModalTest"
+      @close="closeDialogImport"
+      @doImport="doImport"
+    />
   </div>
 </template>
 
@@ -321,6 +279,7 @@ import ApplicantViewDialog from '@/components/ApplicantViewDialog'
 import ApplicantDeleteDialog from '@/components/ApplicantDeleteDialog'
 import EventUpdateResultDialog from '@/components/EventUpdateResultDialog'
 import EventBlashNotifDialog from '@/components/EventBlashNotifDialog'
+import EventImportTestResultDialog from '@/components/EventImportTestResultDialog'
 
 const headers = [
   {
@@ -361,7 +320,8 @@ export default {
     DialogWarningTestResult,
     ApplicantDeleteDialog,
     EventUpdateResultDialog,
-    EventBlashNotifDialog
+    EventBlashNotifDialog,
+    EventImportTestResultDialog
   },
   filters: {
     getChipColor
@@ -385,7 +345,6 @@ export default {
       blastNotifModal: false,
       ImportModalTest: false,
       modalType: 'Undangan',
-      importFile: null,
       modalExportLoader: false,
       modalEditLabCode: false,
       modalEditLabCodeId: null,
@@ -549,7 +508,6 @@ export default {
       this.blastNotifModalWarning = false
     },
     closeDialogBlashNotif() {
-      console.log('terpanggil')
       this.blastNotifModal = false
     },
     openModalNotif(type) {
@@ -585,9 +543,12 @@ export default {
         )
       }
     },
-    async doImport() {
+    closeDialogImport() {
+      this.ImportModalTest = false
+    },
+    async doImport(data) {
       const formData = new FormData()
-      formData.append('file', this.importFile)
+      formData.append('file', data)
       try {
         await this.$store.dispatch('eventParticipants/importTestResult', {
           idEvent: this.idEvent,
@@ -601,16 +562,13 @@ export default {
           'eventParticipants/getList',
           this.$route.params.eventId
         )
-        this.ImportModalTest = false
       } catch (error) {
         this.$toast.show({
           message: error.message || FAILED_IMPORT,
           type: 'error'
         })
       } finally {
-        // this.importModal = false
-        // this.kloter = null
-        // this.$refs.observerImport.reset()
+        this.ImportModalTest = false
       }
     },
     async blastNotify(invitationsIds, type) {
