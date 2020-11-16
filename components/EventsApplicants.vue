@@ -203,42 +203,6 @@
         </v-icon>
       </template>
     </v-data-table>
-    <v-dialog v-model="blastNotifModal" max-width="528">
-      <v-card class="text-center">
-        <v-card-title>
-          <span class="col pl-10">Kirim {{ modalType }}</span>
-          <v-btn icon @click="blastNotifModal = false">
-            <v-icon>mdi-close</v-icon>
-          </v-btn>
-        </v-card-title>
-        <v-card-text>
-          <div>
-            Apakah anda akan mengirimkan notifikasi {{ modalType }} kepada
-          </div>
-          <div v-if="pesertaSelected.length > 0">
-            <strong>{{ pesertaSelected.length }} Peserta Terpilih?</strong>
-          </div>
-          <div v-else><strong>Semua Peserta?</strong></div>
-        </v-card-text>
-        <v-card-actions class="pb-6 justify-center">
-          <v-btn
-            color="grey darken-1"
-            outlined
-            class="mr-2 px-2"
-            @click="blastNotifModal = false"
-          >
-            Batal
-          </v-btn>
-          <v-btn
-            color="primary"
-            class="ml-2 px-2"
-            @click="sendNotif(pesertaSelected.length, modalType)"
-          >
-            Ya
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
     <v-dialog v-model="ImportModalTest" max-width="528">
       <validation-observer
         v-slot="{ valid, handleSubmit }"
@@ -320,6 +284,13 @@
       @close="closeDialogUpdateResult"
       @update="setTestResult"
     />
+    <event-blash-notif-dialog
+      :open="blastNotifModal"
+      :items="pesertaSelected"
+      :modal-type="modalType"
+      @close="closeDialogBlashNotif"
+      @send="sendNotif"
+    />
   </div>
 </template>
 
@@ -349,6 +320,7 @@ import DialogWarningTestResult from '@/components/DialogWarningTestResult'
 import ApplicantViewDialog from '@/components/ApplicantViewDialog'
 import ApplicantDeleteDialog from '@/components/ApplicantDeleteDialog'
 import EventUpdateResultDialog from '@/components/EventUpdateResultDialog'
+import EventBlashNotifDialog from '@/components/EventBlashNotifDialog'
 
 const headers = [
   {
@@ -388,7 +360,8 @@ export default {
     ApplicantViewDialog,
     DialogWarningTestResult,
     ApplicantDeleteDialog,
-    EventUpdateResultDialog
+    EventUpdateResultDialog,
+    EventBlashNotifDialog
   },
   filters: {
     getChipColor
@@ -575,6 +548,10 @@ export default {
     closeDialogWarning() {
       this.blastNotifModalWarning = false
     },
+    closeDialogBlashNotif() {
+      console.log('terpanggil')
+      this.blastNotifModal = false
+    },
     openModalNotif(type) {
       if (type === 'Undangan') {
         this.modalType = type || this.modalType
@@ -598,13 +575,13 @@ export default {
     openModalImportHasil() {
       this.ImportModalTest = true
     },
-    sendNotif(participant, modalType) {
-      if (participant === 0) {
-        this.blastNotify(null, `send${modalType.split(' ').join('')}`)
+    sendNotif(data) {
+      if (data.length === 0) {
+        this.blastNotify(null, `send${data.type.split(' ').join('')}`)
       } else {
         this.blastNotify(
           this.pesertaSelected,
-          `send${modalType.split(' ').join('')}`
+          `send${data.type.split(' ').join('')}`
         )
       }
     },
