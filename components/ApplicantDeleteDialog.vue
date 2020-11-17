@@ -10,8 +10,11 @@
             {{ confirmDeleteMsg }}
           </div>
           <span>Nama peserta: </span>
-          <strong>
+          <strong v-if="dialogType === 'applicant'">
             {{ record ? record.name : '-' }}
+          </strong>
+          <strong v-else>
+            {{ record ? record.applicant.name : '-' }}
           </strong>
         </v-card-text>
         <v-card-actions class="pb-6 justify-center">
@@ -42,6 +45,10 @@ export default {
     record: {
       type: Object,
       default: null
+    },
+    dialogType: {
+      type: String,
+      default: 'applicant'
     }
   },
   data() {
