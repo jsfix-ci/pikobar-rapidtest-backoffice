@@ -90,36 +90,12 @@
         </v-icon>
       </template>
     </v-data-table>
-    <v-dialog v-model="deleteModal" max-width="528">
-      <v-card class="text-center">
-        <v-card-title>
-          <span class="col pl-10">Hapus Kegiatan</span>
-        </v-card-title>
-        <v-card-text>
-          <div>
-            {{ confirmDeleteMsg }}
-          </div>
-          <strong> {{ selectedEvent.name }} </strong>.
-        </v-card-text>
-        <v-card-actions class="pb-6 justify-center">
-          <v-btn
-            color="grey darken-1"
-            outlined
-            class="mr-2 px-2"
-            @click="deleteModal = false"
-          >
-            Tidak
-          </v-btn>
-          <v-btn
-            color="error"
-            class="ml-2 px-2"
-            @click="remove(selectedEvent.id)"
-          >
-            Ya
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
+    <event-delete-dialog
+      :open="deleteModal"
+      :record="selectedEvent"
+      @close="closeDeleteDialog"
+      @remove="remove"
+    />
   </div>
 </template>
 
@@ -131,6 +107,7 @@ import {
   CONFIRM_DELETE
 } from '@/utilities/constant'
 import { getChipColor } from '@/utilities/formater'
+import EventDeleteDialog from '@/components/EventDeleteDialog'
 
 const headers = [
   { text: 'ID', value: 'id', width: 80 },
@@ -145,6 +122,9 @@ const headers = [
 ]
 
 export default {
+  components: {
+    EventDeleteDialog
+  },
   filters: {
     getChipColor
   },
@@ -271,6 +251,9 @@ export default {
     selectToRemove(payload) {
       this.selectedEvent = payload
       this.deleteModal = true
+    },
+    closeDeleteDialog() {
+      this.deleteModal = false
     },
     async remove(id) {
       try {
