@@ -235,7 +235,6 @@ export default {
       editRecordId: null,
       viewDialog: false,
       viewRecordId: null,
-      filterSearch: null,
       selectedData: null,
       headers: this.noActions
         ? headers.filter((head) => head.value !== 'actions')
@@ -348,17 +347,16 @@ export default {
     }
     this.options = options
     this.$emit('optionChanged', options)
+    this.doFilterReset()
   },
 
   methods: {
     getPersonStatusText,
-    doFilterReset() {
-      this.filterSearch = null
-      this.doFilter()
-    },
-
-    doFilter() {
-      // this.getRecords()
+    async doFilterReset() {
+      await this.$store.dispatch('applicants/resetOptions')
+      this.options = {
+        ...this.options
+      }
     },
 
     createClose() {
