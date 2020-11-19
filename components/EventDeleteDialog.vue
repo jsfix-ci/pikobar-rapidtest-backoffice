@@ -3,7 +3,7 @@
     <v-dialog :value="open" max-width="528">
       <v-card class="text-center">
         <v-card-title>
-          <span class="col pl-10">Hapus Kegiatan coyy</span>
+          <span class="col pl-10">Hapus Kegiatan</span>
         </v-card-title>
         <v-card-text>
           <div>
