@@ -493,6 +493,10 @@ export default {
           type: 'success'
         })
         await this.$store.dispatch(
+          'events/getCurrent',
+          this.$route.params.eventId
+        )
+        await this.$store.dispatch(
           'eventParticipants/getList',
           this.$route.params.eventId
         )
