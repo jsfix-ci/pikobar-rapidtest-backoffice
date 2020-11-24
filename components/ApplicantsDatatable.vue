@@ -26,7 +26,7 @@
           <v-col cols="auto">
             <v-text-field
               v-model="searchKey"
-              label="Nama Peserta / Nomor Pendaftaran"
+              label="NIK/Nama Peserta / Nomor Pendaftaran"
               clearable
               outlined
               dense
@@ -130,6 +130,7 @@
       :record-id="viewRecordId"
       @close="viewClose"
     />
+
     <applicant-edit-dialog
       v-if="allow.includes('edit-applicants')"
       :open="editDialog"
@@ -138,35 +139,12 @@
       @save="editSave"
     />
 
-    <v-dialog v-model="deleteModal" max-width="528">
-      <v-card class="text-center">
-        <v-card-title>
-          <span class="col pl-10">Perhatian!</span>
-        </v-card-title>
-        <v-card-text>
-          <div>
-            {{ confirmDeleteMsg }}
-          </div>
-          <span>Nama peserta: </span>
-          <strong>
-            {{ selectedData ? selectedData.name : '-' }}
-          </strong>
-        </v-card-text>
-        <v-card-actions class="pb-6 justify-center">
-          <v-btn
-            color="grey darken-1"
-            outlined
-            class="mr-2 px-2"
-            @click="deleteModal = false"
-          >
-            Tidak
-          </v-btn>
-          <v-btn color="error" class="ml-2 px-2" @click="remove(selectedData)">
-            Ya
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
+    <applicant-delete-dialog
+      :open="deleteDialog"
+      :record="selectedData"
+      @close="deleteClose"
+      @remove="remove"
+    />
   </div>
 </template>
 
@@ -177,6 +155,7 @@ import { getPersonStatusText } from '@/utilities/personStatus'
 import ApplicantCreateDialog from '@/components/ApplicantCreateDialog'
 import ApplicantEditDialog from '@/components/ApplicantEditDialog'
 import ApplicantViewDialog from '@/components/ApplicantViewDialog'
+import ApplicantDeleteDialog from '@/components/ApplicantDeleteDialog'
 import {
   SUCCESS_DELETE,
   FAILED_DELETE,
@@ -208,7 +187,8 @@ export default {
   components: {
     ApplicantCreateDialog,
     ApplicantViewDialog,
-    ApplicantEditDialog
+    ApplicantEditDialog,
+    ApplicantDeleteDialog
   },
 
   props: {
@@ -251,11 +231,10 @@ export default {
       tempValue: this.value,
       createDialog: false,
       editDialog: false,
+      deleteDialog: false,
       editRecordId: null,
       viewDialog: false,
       viewRecordId: null,
-      filterSearch: null,
-      deleteModal: false,
       selectedData: null,
       headers: this.noActions
         ? headers.filter((head) => head.value !== 'actions')
@@ -368,17 +347,16 @@ export default {
     }
     this.options = options
     this.$emit('optionChanged', options)
+    this.doFilterReset()
   },
 
   methods: {
     getPersonStatusText,
-    doFilterReset() {
-      this.filterSearch = null
-      this.doFilter()
-    },
-
-    doFilter() {
-      // this.getRecords()
+    async doFilterReset() {
+      await this.$store.dispatch('applicants/resetOptions')
+      this.options = {
+        ...this.options
+      }
     },
 
     createClose() {
@@ -406,19 +384,27 @@ export default {
     },
 
     deleteItem(item) {
-      this.deleteModal = true
+      this.deleteDialog = true
       this.selectedData = item
+    },
+
+    deleteClose(payload) {
+      this.deleteDialog = false
     },
 
     async remove(payload) {
       try {
-        this.deleteModal = false
+        this.deleteDialog = false
         await this.$store.dispatch('applicants/delete', payload.id)
         this.$toast.show({
           message: SUCCESS_DELETE,
           type: 'success'
         })
-        await this.$store.dispatch('applicants/getList')
+        if (this.listType === 'applicant') {
+          await this.$store.dispatch('applicants/getRecordsNew')
+        } else {
+          await this.$store.dispatch('applicants/getRecordsApproved')
+        }
       } catch (error) {
         this.$toast.show({
           message: error.message || FAILED_DELETE,
@@ -434,7 +420,11 @@ export default {
 
     async editSave() {
       this.editClose()
-      await this.$store.dispatch('applicants/getList') // @TODO lost current state?
+      if (this.listType === 'applicant') {
+        await this.$store.dispatch('applicants/getRecordsNew')
+      } else {
+        await this.$store.dispatch('applicants/getRecordsApproved')
+      }
     },
 
     getLatestInvitation(invitations) {

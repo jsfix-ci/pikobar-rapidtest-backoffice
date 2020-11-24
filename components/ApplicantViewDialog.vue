@@ -1,111 +1,220 @@
 <template>
   <div>
-    <v-dialog :value="open" persistent max-width="900">
+    <v-dialog scrollable :value="open" persistent max-width="1000">
       <v-card>
         <v-card-title>
-          <span class="headline">Lihat Peserta</span>
+          <span class="headline" style="font-size: 52px;">Detail Peserta</span>
         </v-card-title>
-
+        <v-divider />
         <v-card-text>
+          <v-row>
+            <v-col cols="6">
+              <v-list-item two-line>
+                <v-list-item-content>
+                  <v-list-item-title>NIK</v-list-item-title>
+                  <v-list-item-subtitle>
+                    {{ nik }}
+                  </v-list-item-subtitle>
+                </v-list-item-content>
+              </v-list-item>
+            </v-col>
+            <v-col cols="6">
+              <v-list-item two-line>
+                <v-list-item-content>
+                  <v-list-item-title>Nomor Registrasi</v-list-item-title>
+                  <v-list-item-subtitle>
+                    {{ registrationCode }}
+                  </v-list-item-subtitle>
+                </v-list-item-content>
+              </v-list-item>
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col cols="6">
+              <v-list-item two-line>
+                <v-list-item-content>
+                  <v-list-item-title>Nama Peserta</v-list-item-title>
+                  <v-list-item-subtitle>
+                    {{ name }}
+                  </v-list-item-subtitle>
+                </v-list-item-content>
+              </v-list-item>
+            </v-col>
+            <v-col cols="6">
+              <v-list-item two-line>
+                <v-list-item-content>
+                  <v-list-item-title>Nomor Telepon</v-list-item-title>
+                  <v-list-item-subtitle>
+                    {{ phoneNumber }}
+                  </v-list-item-subtitle>
+                </v-list-item-content>
+              </v-list-item>
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col cols="6">
+              <v-list-item two-line>
+                <v-list-item-content>
+                  <v-list-item-title>Tanggal Lahir</v-list-item-title>
+                  <v-list-item-subtitle>
+                    {{ birthDate }}
+                  </v-list-item-subtitle>
+                </v-list-item-content>
+              </v-list-item>
+            </v-col>
+            <v-col cols="6">
+              <v-list-item two-line>
+                <v-list-item-content>
+                  <v-list-item-title>Kota/Kabupaten</v-list-item-title>
+                  <v-list-item-subtitle>
+                    {{ cityName }}
+                  </v-list-item-subtitle>
+                </v-list-item-content>
+              </v-list-item>
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col cols="6">
+              <v-list-item two-line>
+                <v-list-item-content>
+                  <v-list-item-title>Jenis Pekerjaan</v-list-item-title>
+                  <v-list-item-subtitle>
+                    {{ occupationType || '-' }}
+                  </v-list-item-subtitle>
+                </v-list-item-content>
+              </v-list-item>
+            </v-col>
+            <v-col cols="6">
+              <v-list-item two-line>
+                <v-list-item-content>
+                  <v-list-item-title>Kecamatan</v-list-item-title>
+                  <v-list-item-subtitle>
+                    {{ districtName }}
+                  </v-list-item-subtitle>
+                </v-list-item-content>
+              </v-list-item>
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col cols="6">
+              <v-list-item two-line>
+                <v-list-item-content>
+                  <v-list-item-title>Nama Pekerjaan</v-list-item-title>
+                  <v-list-item-subtitle>
+                    {{ occupationName }}
+                  </v-list-item-subtitle>
+                </v-list-item-content>
+              </v-list-item>
+            </v-col>
+            <v-col cols="6">
+              <v-list-item two-line>
+                <v-list-item-content>
+                  <v-list-item-title>Kelurahan</v-list-item-title>
+                  <v-list-item-subtitle>
+                    {{ villageName }}
+                  </v-list-item-subtitle>
+                </v-list-item-content>
+              </v-list-item>
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col cols="6">
+              <v-list-item two-line>
+                <v-list-item-content>
+                  <v-list-item-title>Tempat Bekerja</v-list-item-title>
+                  <v-list-item-subtitle>
+                    {{ workplaceName }}
+                  </v-list-item-subtitle>
+                </v-list-item-content>
+              </v-list-item>
+            </v-col>
+            <v-col cols="6">
+              <v-list-item two-line>
+                <v-list-item-content>
+                  <v-list-item-title>Alamat Domisili</v-list-item-title>
+                  <v-list-item-subtitle>
+                    {{ address }}
+                  </v-list-item-subtitle>
+                </v-list-item-content>
+              </v-list-item>
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col>
+              <v-list-item two-line>
+                <v-list-item-content>
+                  <v-list-item-title>Status Kesehatan</v-list-item-title>
+                  <v-list-item-subtitle>
+                    {{ personStatus }}
+                  </v-list-item-subtitle>
+                </v-list-item-content>
+              </v-list-item>
+            </v-col>
+          </v-row>
+          <v-divider class="mx-4" />
+          <v-row>
+            <v-col>
+              <v-list-item two-line>
+                <v-list-item-content v-if="congenitalDisease.length > 0">
+                  <v-list-item-title>Penyakit Bawaan</v-list-item-title>
+                  <v-list-item-subtitle
+                    v-for="item in congenitalDisease"
+                    :key="item"
+                  >
+                    {{ item }}
+                  </v-list-item-subtitle>
+                </v-list-item-content>
+                <v-list-item-content v-else>
+                  <v-list-item-title>Penyakit Bawaan</v-list-item-title>
+                  <v-list-item-subtitle>
+                    {{ '-' }}
+                  </v-list-item-subtitle>
+                </v-list-item-content>
+              </v-list-item>
+            </v-col>
+            <v-col>
+              <v-list-item two-line>
+                <v-list-item-content>
+                  <v-list-item-title>Kota Kunjungan</v-list-item-title>
+                  <v-list-item-subtitle>
+                    {{ cityVisited || '-' }}
+                  </v-list-item-subtitle>
+                </v-list-item-content>
+              </v-list-item>
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col>
+              <v-list-item two-line>
+                <v-list-item-content v-if="symptoms.length > 0">
+                  <v-list-item-title>Gejala</v-list-item-title>
+                  <v-list-item-subtitle v-for="item in symptoms" :key="item">
+                    {{ item }}
+                  </v-list-item-subtitle>
+                </v-list-item-content>
+                <v-list-item-content v-else>
+                  <v-list-item-title>Gejala</v-list-item-title>
+                  <v-list-item-subtitle>
+                    {{ '-' }}
+                  </v-list-item-subtitle>
+                </v-list-item-content>
+              </v-list-item>
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col cols="6">
+              <v-list-item two-line>
+                <v-list-item-content>
+                  <v-list-item-title>Gejala Lainnya</v-list-item-title>
+                  <v-list-item-subtitle>
+                    {{ symptomsNotes }}
+                  </v-list-item-subtitle>
+                </v-list-item-content>
+              </v-list-item>
+            </v-col>
+          </v-row>
           <v-container>
             <v-row>
-              <v-col cols="12">
-                <v-text-field
-                  v-model="registrationCode"
-                  label="Nomor Pendaftaran"
-                  filled
-                  readonly
-                />
-              </v-col>
-              <v-col cols="12">
-                <v-text-field
-                  v-model="name"
-                  label="Nama Peserta"
-                  filled
-                  readonly
-                />
-              </v-col>
-              <v-col cols="12">
-                <v-text-field
-                  v-model="birthDate"
-                  label="Tanggal Lahir"
-                  filled
-                  readonly
-                />
-              </v-col>
-              <v-col cols="12">
-                <v-text-field
-                  v-model="phoneNumber"
-                  label="Nomor Telepon"
-                  filled
-                  readonly
-                />
-              </v-col>
-              <v-col cols="12">
-                <v-text-field
-                  v-model="address"
-                  label="Alamat Domisili"
-                  filled
-                  readonly
-                />
-              </v-col>
-              <v-col v-if="cityName" cols="4">
-                <v-text-field
-                  v-model="cityName"
-                  label="Kota/Kabupaten"
-                  filled
-                  readonly
-                />
-              </v-col>
-              <v-col v-if="districtName" cols="4">
-                <v-text-field
-                  v-model="districtName"
-                  label="Kecamatan"
-                  filled
-                  readonly
-                />
-              </v-col>
-              <v-col v-if="villageName" cols="4">
-                <v-text-field
-                  v-model="villageName"
-                  label="Desa/Kelurahan"
-                  filled
-                  readonly
-                />
-              </v-col>
-              <v-col cols="12">
-                <v-text-field
-                  v-model="personStatus"
-                  label="Status Kesehatan"
-                  filled
-                  readonly
-                />
-              </v-col>
-              <v-col v-if="occupationType" cols="12">
-                <v-text-field
-                  v-model="occupationType"
-                  value="kosong"
-                  label="Jenis Pekerjaan"
-                  filled
-                  readonly
-                />
-              </v-col>
-              <v-col cols="12">
-                <v-text-field
-                  v-model="occupationName"
-                  label="Nama Profesi"
-                  filled
-                  readonly
-                />
-              </v-col>
-              <v-col cols="12">
-                <v-text-field
-                  v-model="workplaceName"
-                  label="Tempat Bekerja"
-                  filled
-                  readonly
-                />
-              </v-col>
               <v-col
                 v-if="detailType === 'applicant' && invitations.length > 0"
                 cols="12"
@@ -183,7 +292,7 @@
             </v-row>
           </v-container>
         </v-card-text>
-
+        <v-divider />
         <v-card-actions>
           <v-spacer />
           <v-btn color="blue darken-1" text @click="close">
@@ -197,6 +306,10 @@
 
 <script>
 import { getPersonStatusText } from '@/utilities/personStatus'
+import {
+  SYMPTOMS_OPTIONS,
+  CONGENITAL_DESEASE_OPTIONS
+} from '@/utilities/constant'
 export default {
   props: {
     open: {
@@ -218,6 +331,7 @@ export default {
   data() {
     return {
       registrationCode: null,
+      nik: null,
       name: null,
       address: null,
       cityName: null,
@@ -229,7 +343,22 @@ export default {
       phoneNumber: null,
       birthDate: null,
       personStatus: null,
+      symptoms: [],
+      symptomsActivity: null,
+      symptomsInteraction: null,
+      symptomsNotes: null,
+      cityVisited: null,
+      congenitalDisease: [],
       invitations: []
+    }
+  },
+
+  computed: {
+    symptomsOptions() {
+      return SYMPTOMS_OPTIONS
+    },
+    congenitalDiseaseOptions() {
+      return CONGENITAL_DESEASE_OPTIONS
     }
   },
 
@@ -255,6 +384,7 @@ export default {
       }
 
       this.registrationCode = data.registration_code
+      this.nik = data.nik
       this.name = data.name
       this.address = data.address
       this.cityName = data.city ? data.city.name : null
@@ -267,6 +397,12 @@ export default {
       this.birthDate = data.birth_date
       this.invitations = data.invitations
       this.personStatus = this.getPersonStatusText(data.person_status)
+      this.symptomsActivity = data.symptoms_activity
+      this.symptomsInteraction = data.symptoms_interaction
+      this.symptomsNotes = data.symptoms_notes
+      this.cityVisited = data.city_visited
+      this.getCongenitalDesease(data.congenital_disease)
+      this.getSymptoms(data.symptoms)
     },
 
     async save() {
@@ -285,6 +421,31 @@ export default {
 
     close() {
       this.$emit('close')
+    },
+
+    getSymptoms(payload) {
+      if (payload) {
+        payload.map((element) => {
+          const symptomsFilter = this.symptomsOptions.filter(
+            (item) => item.value === element
+          )
+          symptomsFilter.forEach((item) => {
+            this.symptoms.push(item.text)
+          })
+        })
+      }
+    },
+    getCongenitalDesease(payload) {
+      if (payload) {
+        payload.map((element) => {
+          const congenitalDeseaseFilter = this.symptomsOptions.filter(
+            (item) => item.value === element
+          )
+          congenitalDeseaseFilter.forEach((item) => {
+            this.congenitalDisease.push(item.text)
+          })
+        })
+      }
     }
   }
 }
