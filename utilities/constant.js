@@ -72,3 +72,10 @@ export const CONGENITAL_DESEASE_OPTIONS = [
   { value: 5, text: 'Gagal Ginjal' },
   { value: 99, text: 'Tidak Ada' }
 ]
+export const STATUS_OPTIONS = [
+  { value: 'CLOSE_CONTACT', text: 'Kontak Erat' },
+  { value: 'SUSPECT', text: 'Suspek' },
+  { value: 'PROBABLE', text: 'Probable' },
+  { value: 'CONFIRMED', text: 'Konfirmasi' },
+  { value: 'UNKNOWN', text: 'Tanpa Kriteria' }
+]

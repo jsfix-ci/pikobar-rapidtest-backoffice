@@ -23,7 +23,7 @@
           <v-col v-if="title" cols="12">
             {{ title }}
           </v-col>
-          <v-col cols="3">
+          <v-col cols="2">
             <v-text-field
               v-model="listQuery.nameNik"
               label="NIK/Nama Peserta / Nomor Pendaftaran"
@@ -33,7 +33,7 @@
               hide-details
             />
           </v-col>
-          <v-col cols="3">
+          <v-col cols="2">
             <pkbr-select
               v-model="listQuery.city"
               :items="getKabkot"
@@ -44,6 +44,36 @@
               item-value="code"
               hide-details
               allow-null
+            />
+          </v-col>
+          <v-col cols="2">
+            <pkbr-input-date
+              v-model="listQuery.startDate"
+              label="Tanggal Mulai"
+              name="Tanggal Mulai"
+              placeholder="Tanggal Mulai"
+            />
+          </v-col>
+          <v-col cols="2">
+            <pkbr-input-date
+              v-model="listQuery.endDate"
+              label="Tanggal Berakhir"
+              name="Tanggal Berakhir"
+              placeholder="Tanggal Berakhir"
+            />
+          </v-col>
+          <v-col cols="2">
+            <pkbr-select
+              v-model="listQuery.personStatus"
+              :items="statusOptions"
+              label="Status Kesehatan"
+              name="Status Kesehatan"
+              item-text="text"
+              item-value="value"
+              hide-details
+              allow-null
+              multiple
+              chips
             />
           </v-col>
           <v-col cols="2">
@@ -167,7 +197,8 @@ import ApplicantDeleteDialog from '@/components/ApplicantDeleteDialog'
 import {
   SUCCESS_DELETE,
   FAILED_DELETE,
-  CONFIRM_DELETE_PARTICIPANTS
+  CONFIRM_DELETE_PARTICIPANTS,
+  STATUS_OPTIONS
 } from '@/utilities/constant'
 
 const headers = [
@@ -246,8 +277,12 @@ export default {
       selectedData: null,
       listQuery: {
         nameNik: null,
-        city: null
+        city: null,
+        startDate: null,
+        endDate: null,
+        personStatus: null
       },
+      statusOptions: STATUS_OPTIONS,
       headers: this.noActions
         ? headers.filter((head) => head.value !== 'actions')
         : headers
@@ -314,11 +349,15 @@ export default {
   methods: {
     getPersonStatusText,
     async searchFilter() {
+      console.log(this.listQuery.personStatus)
       await this.$store.dispatch('applicants/resetOptions')
       this.options = {
         ...this.options,
         keyWords: this.listQuery.nameNik,
-        city: this.listQuery.city
+        city: this.listQuery.city,
+        startDate: this.listQuery.startDate,
+        endDate: this.listQuery.endDate,
+        personStatus: this.listQuery.personStatus
       }
     },
     async doFilterReset() {
@@ -327,7 +366,10 @@ export default {
       this.options = {
         ...this.options,
         keyWords: null,
-        city: null
+        city: null,
+        startDate: null,
+        endDate: null,
+        personStatus: null
       }
     },
 
