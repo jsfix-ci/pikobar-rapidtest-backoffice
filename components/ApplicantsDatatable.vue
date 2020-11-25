@@ -23,17 +23,18 @@
           <v-col v-if="title" cols="12">
             {{ title }}
           </v-col>
-          <v-col cols="auto">
+          <v-col cols="3">
             <v-text-field
-              v-model="searchKey"
+              v-model="listQuery.nameNik"
               label="NIK/Nama Peserta / Nomor Pendaftaran"
+              placeholder="NIK/Nama Peserta / Nomor Pendaftaran"
               clearable
               outlined
               dense
               hide-details
             />
           </v-col>
-          <v-col cols="auto">
+          <v-col cols="3">
             <pkbr-select
               v-model="city"
               :items="getKabkot"
@@ -45,6 +46,14 @@
               hide-details
               allow-null
             />
+          </v-col>
+          <v-col cols="2">
+            <v-btn color="primary" @click="searchFilter">
+              Cari
+            </v-btn>
+            <v-btn color="primary" @click="doFilterReset">
+              Reset
+            </v-btn>
           </v-col>
           <v-spacer></v-spacer>
           <v-col v-if="false" cols="auto">
@@ -236,6 +245,9 @@ export default {
       viewDialog: false,
       viewRecordId: null,
       selectedData: null,
+      listQuery: {
+        nameNik: null
+      },
       headers: this.noActions
         ? headers.filter((head) => head.value !== 'actions')
         : headers
@@ -352,7 +364,15 @@ export default {
 
   methods: {
     getPersonStatusText,
+    async searchFilter() {
+      await this.$store.dispatch('applicants/resetOptions')
+      this.options = {
+        ...this.options,
+        keyWords: this.listQuery.nameNik
+      }
+    },
     async doFilterReset() {
+      Object.assign(this.$data.listQuery, this.$options.data().listQuery)
       await this.$store.dispatch('applicants/resetOptions')
       this.options = {
         ...this.options
