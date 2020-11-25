@@ -28,7 +28,6 @@
               v-model="listQuery.nameNik"
               label="NIK/Nama Peserta / Nomor Pendaftaran"
               placeholder="NIK/Nama Peserta / Nomor Pendaftaran"
-              clearable
               outlined
               dense
               hide-details
@@ -36,7 +35,7 @@
           </v-col>
           <v-col cols="3">
             <pkbr-select
-              v-model="city"
+              v-model="listQuery.city"
               :items="getKabkot"
               label="Kab./Kota"
               name="Kab./Kota"
@@ -246,7 +245,8 @@ export default {
       viewRecordId: null,
       selectedData: null,
       listQuery: {
-        nameNik: null
+        nameNik: null,
+        city: null
       },
       headers: this.noActions
         ? headers.filter((head) => head.value !== 'actions')
@@ -272,48 +272,6 @@ export default {
     },
     totalItems() {
       return this.$store.getters['applicants/getTotalData']
-    },
-    city: {
-      async set(value) {
-        await this.$store.dispatch('applicants/resetOptions')
-        this.options = {
-          ...this.options,
-          keyWords: this.searchKey,
-          sessionId: this.sessionId,
-          city: value
-        }
-      },
-      get() {
-        return this.$route.query.city
-      }
-    },
-    searchKey: {
-      async set(value) {
-        await this.$store.dispatch('applicants/resetOptions')
-        this.options = {
-          ...this.options,
-          city: this.city,
-          sessionId: this.sessionId,
-          keyWords: value
-        }
-      },
-      get() {
-        return this.$route.query.keyWords
-      }
-    },
-    sessionId: {
-      async set(value) {
-        await this.$store.dispatch('applicants/resetOptions')
-        this.options = {
-          ...this.options,
-          city: this.city,
-          keyWords: this.keyWords,
-          sessionId: value
-        }
-      },
-      get() {
-        return this.$route.query.sessionId
-      }
     },
     confirmDeleteMsg() {
       return CONFIRM_DELETE_PARTICIPANTS
@@ -348,15 +306,6 @@ export default {
     if (this.$route.query.sortOrder) {
       options.sortOrder = [this.$route.query.sortOrder]
     }
-    if (this.$route.query.keyWords) {
-      options.keyWords = this.$route.query.keyWords
-    }
-    if (this.$route.query.city) {
-      options.city = this.$route.query.city
-    }
-    if (this.$route.query.sessionId) {
-      options.sessionId = this.$route.query.sessionId
-    }
     this.options = options
     this.$emit('optionChanged', options)
     this.doFilterReset()
@@ -368,14 +317,17 @@ export default {
       await this.$store.dispatch('applicants/resetOptions')
       this.options = {
         ...this.options,
-        keyWords: this.listQuery.nameNik
+        keyWords: this.listQuery.nameNik,
+        city: this.listQuery.city
       }
     },
     async doFilterReset() {
       Object.assign(this.$data.listQuery, this.$options.data().listQuery)
       await this.$store.dispatch('applicants/resetOptions')
       this.options = {
-        ...this.options
+        ...this.options,
+        keyWords: null,
+        city: null
       }
     },
 
