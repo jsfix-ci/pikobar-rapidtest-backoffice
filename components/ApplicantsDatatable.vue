@@ -57,20 +57,19 @@
           <v-col cols="2">
             <ValidationObserver ref="date">
               <pkbr-input-date
-                v-if="listQuery.startDate"
                 v-model="listQuery.endDate"
                 label="Tanggal Berakhir"
                 name="Tanggal Berakhir"
                 placeholder="Tanggal Berakhir"
                 :rules="validate"
               />
-              <pkbr-input-date
+              <!-- <pkbr-input-date
                 v-else
                 v-model="listQuery.endDate"
                 label="Tanggal Berakhir"
                 name="Tanggal Berakhir"
                 placeholder="Tanggal Berakhir"
-              />
+              /> -->
             </ValidationObserver>
           </v-col>
           <v-col cols="2">
@@ -287,7 +286,7 @@ export default {
       viewDialog: false,
       viewRecordId: null,
       selectedData: null,
-      validate: 'required',
+      validate: '',
       listQuery: {
         nameNik: null,
         city: null,
@@ -337,6 +336,9 @@ export default {
     },
     tempValue(value) {
       this.$emit('input', value)
+    },
+    'listQuery.startDate'(value) {
+      this.validate = value ? 'required' : ''
     }
   },
 
