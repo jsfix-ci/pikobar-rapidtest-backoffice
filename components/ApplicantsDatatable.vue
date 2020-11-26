@@ -55,12 +55,23 @@
             />
           </v-col>
           <v-col cols="2">
-            <pkbr-input-date
-              v-model="listQuery.endDate"
-              label="Tanggal Berakhir"
-              name="Tanggal Berakhir"
-              placeholder="Tanggal Berakhir"
-            />
+            <ValidationObserver ref="date">
+              <pkbr-input-date
+                v-if="listQuery.startDate"
+                v-model="listQuery.endDate"
+                label="Tanggal Berakhir"
+                name="Tanggal Berakhir"
+                placeholder="Tanggal Berakhir"
+                :rules="validate"
+              />
+              <pkbr-input-date
+                v-else
+                v-model="listQuery.endDate"
+                label="Tanggal Berakhir"
+                name="Tanggal Berakhir"
+                placeholder="Tanggal Berakhir"
+              />
+            </ValidationObserver>
           </v-col>
           <v-col cols="2">
             <pkbr-select
@@ -70,10 +81,9 @@
               name="Status Kesehatan"
               item-text="text"
               item-value="value"
+              placeholder="Status Kesehatan"
               hide-details
               allow-null
-              multiple
-              chips
             />
           </v-col>
           <v-col cols="2">
@@ -189,6 +199,7 @@
 <script>
 import { isEqual } from 'lodash'
 import { mapGetters } from 'vuex'
+import { ValidationObserver } from 'vee-validate'
 import { getPersonStatusText } from '@/utilities/personStatus'
 import ApplicantCreateDialog from '@/components/ApplicantCreateDialog'
 import ApplicantEditDialog from '@/components/ApplicantEditDialog'
@@ -227,7 +238,8 @@ export default {
     ApplicantCreateDialog,
     ApplicantViewDialog,
     ApplicantEditDialog,
-    ApplicantDeleteDialog
+    ApplicantDeleteDialog,
+    ValidationObserver
   },
 
   props: {
@@ -275,6 +287,7 @@ export default {
       viewDialog: false,
       viewRecordId: null,
       selectedData: null,
+      validate: 'required',
       listQuery: {
         nameNik: null,
         city: null,
@@ -349,15 +362,17 @@ export default {
   methods: {
     getPersonStatusText,
     async searchFilter() {
-      console.log(this.listQuery.personStatus)
-      await this.$store.dispatch('applicants/resetOptions')
-      this.options = {
-        ...this.options,
-        keyWords: this.listQuery.nameNik,
-        city: this.listQuery.city,
-        startDate: this.listQuery.startDate,
-        endDate: this.listQuery.endDate,
-        personStatus: this.listQuery.personStatus
+      const valid = await this.$refs.date.validate()
+      if (valid) {
+        await this.$store.dispatch('applicants/resetOptions')
+        this.options = {
+          ...this.options,
+          keyWords: this.listQuery.nameNik,
+          city: this.listQuery.city,
+          startDate: this.listQuery.startDate,
+          endDate: this.listQuery.endDate,
+          personStatus: this.listQuery.personStatus
+        }
       }
     },
     async doFilterReset() {
