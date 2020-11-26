@@ -23,7 +23,7 @@
           <v-col v-if="title" cols="12">
             {{ title }}
           </v-col>
-          <v-col cols="2" sm="12">
+          <v-col lg="2" md="2" sm="12">
             <v-text-field
               v-model="listQuery.nameNik"
               label="NIK/Nama Peserta / Nomor Pendaftaran"
@@ -33,7 +33,7 @@
               hide-details
             />
           </v-col>
-          <v-col cols="2" sm="12">
+          <v-col lg="2" md="2" sm="12">
             <pkbr-select
               v-model="listQuery.city"
               :items="getKabkot"
@@ -46,7 +46,7 @@
               allow-null
             />
           </v-col>
-          <v-col cols="2" sm="12">
+          <v-col lg="2" md="2" sm="12">
             <pkbr-input-date
               v-model="listQuery.startDate"
               label="Tanggal Mulai"
@@ -54,7 +54,7 @@
               placeholder="Tanggal Mulai"
             />
           </v-col>
-          <v-col cols="2" sm="12">
+          <v-col lg="2" md="2" sm="12">
             <ValidationObserver ref="date">
               <pkbr-input-date
                 v-model="listQuery.endDate"
@@ -65,7 +65,7 @@
               />
             </ValidationObserver>
           </v-col>
-          <v-col cols="2" sm="12">
+          <v-col lg="2" md="2" sm="12">
             <pkbr-select
               v-model="listQuery.personStatus"
               :items="statusOptions"
@@ -78,7 +78,7 @@
               allow-null
             />
           </v-col>
-          <v-col cols="2" sm="12">
+          <v-col lg="2" md="2" sm="12">
             <v-btn color="primary" @click="searchFilter">
               Cari
             </v-btn>
