@@ -192,15 +192,68 @@
         </v-layout>
       </template>
       <template v-slot:[`item.actions`]="{ item }">
-        <v-icon class="mr-2" @click="viewItem(item)">
-          mdi-card-search
-        </v-icon>
-        <v-icon class="mr-2" @click="modalEditLabCodeOpen(item.id)">
-          mdi-pencil
-        </v-icon>
-        <v-icon @click="selectToRemove(item)">
-          mdi-delete
-        </v-icon>
+        <v-tooltip bottom>
+          <template v-slot:activator="{ on, attrs }">
+            <v-icon
+              v-if="item.lab_code_sample === null"
+              class="mr-2"
+              v-bind="attrs"
+              v-on="on"
+              @click="uncheckWarning(item)"
+            >
+              mdi-checkbox-blank-outline
+            </v-icon>
+            <v-icon
+              v-else-if="item.lab_code_sample !== null"
+              class="mr-2"
+              v-bind="attrs"
+              v-on="on"
+              @click="uncheck(item)"
+            >
+              mdi-check-box-outline
+            </v-icon>
+          </template>
+          <span>Uncheck</span>
+        </v-tooltip>
+        <v-tooltip bottom>
+          <template v-slot:activator="{ on, attrs }">
+            <v-icon
+              class="mr-2"
+              v-bind="attrs"
+              v-on="on"
+              @click="viewItem(item)"
+            >
+              mdi-card-search
+            </v-icon>
+          </template>
+          <span>Detail</span>
+        </v-tooltip>
+        <v-tooltip bottom>
+          <template v-slot:activator="{ on, attrs }">
+            <v-icon
+              class="mr-2"
+              v-bind="attrs"
+              v-on="on"
+              @click="modalEditLabCodeOpen(item.id)"
+            >
+              mdi-pencil
+            </v-icon>
+          </template>
+          <span>Edit Kode Sample</span>
+        </v-tooltip>
+        <v-tooltip bottom>
+          <template v-slot:activator="{ on, attrs }">
+            <v-icon
+              class="mr-2"
+              v-bind="attrs"
+              v-on="on"
+              @click="selectToRemove(item)"
+            >
+              mdi-delete
+            </v-icon>
+          </template>
+          <span>Hapus</span>
+        </v-tooltip>
       </template>
     </v-data-table>
     <dialog-export-loader :open="modalExportLoader" />
@@ -309,7 +362,13 @@ const headers = [
     value: 'notified_result_at',
     width: 200
   },
-  { text: 'Actions', value: 'actions', sortable: false, width: 150 }
+  {
+    text: 'Actions',
+    value: 'actions',
+    align: 'center',
+    sortable: false,
+    width: 200
+  }
 ]
 
 export default {
@@ -428,6 +487,12 @@ export default {
   },
 
   methods: {
+    uncheckWarning(payload) {
+      console.log(payload)
+    },
+    uncheck(payload) {
+      console.log(payload)
+    },
     checkResultLabel(payload) {
       let testResultLabel = null
       const testResultFilter = this.testResultOptions.filter(
