@@ -186,7 +186,7 @@ export const actions = {
           sessionId,
           registrationDateStart: startDate,
           registrationDateEnd: endDate,
-          personStatus: [personStatus]
+          personStatus
         },
         (value, key) => snakeCase(key)
       )
