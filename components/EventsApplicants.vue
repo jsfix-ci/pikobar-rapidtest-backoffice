@@ -302,6 +302,10 @@
       @close="closeDialogImport"
       @doImport="doImport"
     />
+    <event-applicant-uncheck-warning-dialog
+      :open="uncheckWarningDialog"
+      @close="closeDialogUncheckWarning"
+    />
   </div>
 </template>
 
@@ -333,6 +337,7 @@ import ApplicantDeleteDialog from '@/components/ApplicantDeleteDialog'
 import EventUpdateResultDialog from '@/components/EventUpdateResultDialog'
 import EventBlashNotifDialog from '@/components/EventBlashNotifDialog'
 import EventImportTestResultDialog from '@/components/EventImportTestResultDialog'
+import EventApplicantUncheckWarningDialog from '@/components/EventApplicantUncheckWarningDialog'
 
 const headers = [
   {
@@ -380,7 +385,8 @@ export default {
     ApplicantDeleteDialog,
     EventUpdateResultDialog,
     EventBlashNotifDialog,
-    EventImportTestResultDialog
+    EventImportTestResultDialog,
+    EventApplicantUncheckWarningDialog
   },
   filters: {
     getChipColor
@@ -415,6 +421,7 @@ export default {
       blastNotifModalWarning: false,
       updateResultDialog: false,
       updatePayload: null,
+      uncheckWarningDialog: false,
       incompleteResultTest: []
     }
   },
@@ -488,7 +495,10 @@ export default {
 
   methods: {
     uncheckWarning(payload) {
-      console.log(payload)
+      this.uncheckWarningDialog = true
+    },
+    closeDialogUncheckWarning() {
+      this.uncheckWarningDialog = false
     },
     uncheck(payload) {
       console.log(payload)
