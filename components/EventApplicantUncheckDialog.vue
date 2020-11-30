@@ -3,7 +3,8 @@
     <v-dialog :value="open" max-width="528">
       <v-card class="text-center">
         <v-card-title class="text-left">
-          <span class="col pl-10" style="color: #b71b1c;">Perhatian</span>
+          <v-icon style="color: #b71b1c; font-size: 2rem;">mdi-alert</v-icon>
+          <span class="col" style="color: #b71b1c;">Perhatian</span>
           <v-btn icon @click="close">
             <v-icon>mdi-close</v-icon>
           </v-btn>
@@ -12,8 +13,7 @@
           <div>
             <v-checkbox
               v-model="isChecklist"
-              label="Saya yakin untuk melakukan unchecklist untuk Kode Sampel dan Tanggal
-            checkin di kolom ini."
+              label="Saya yakin untuk melakukan reset data Checkin dan Kode Sampel pada peserta ini."
               color="primary"
               hide-details
             ></v-checkbox>
@@ -66,6 +66,7 @@ export default {
     },
     save() {
       this.$emit('save', this.record)
+      this.isChecklist = false
     }
   }
 }
