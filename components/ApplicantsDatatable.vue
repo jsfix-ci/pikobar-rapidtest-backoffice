@@ -23,19 +23,19 @@
           <v-col v-if="title" cols="12">
             {{ title }}
           </v-col>
-          <v-col cols="auto">
+          <v-col lg="2" md="2" sm="12">
             <v-text-field
-              v-model="searchKey"
+              v-model="listQuery.nameNik"
               label="NIK/Nama Peserta / Nomor Pendaftaran"
-              clearable
+              placeholder="NIK/Nama Peserta / Nomor Pendaftaran"
               outlined
               dense
               hide-details
             />
           </v-col>
-          <v-col cols="auto">
+          <v-col lg="2" md="2" sm="12">
             <pkbr-select
-              v-model="city"
+              v-model="listQuery.city"
               :items="getKabkot"
               label="Kab./Kota"
               name="Kab./Kota"
@@ -45,6 +45,46 @@
               hide-details
               allow-null
             />
+          </v-col>
+          <v-col lg="2" md="2" sm="12">
+            <pkbr-input-date
+              v-model="listQuery.startDate"
+              label="Tanggal Mulai"
+              name="Tanggal Mulai"
+              placeholder="Tanggal Mulai"
+            />
+          </v-col>
+          <v-col lg="2" md="2" sm="12">
+            <ValidationObserver ref="date">
+              <pkbr-input-date
+                v-model="listQuery.endDate"
+                label="Tanggal Berakhir"
+                name="Tanggal Berakhir"
+                placeholder="Tanggal Berakhir"
+                :rules="validate"
+              />
+            </ValidationObserver>
+          </v-col>
+          <v-col lg="2" md="2" sm="12">
+            <pkbr-select
+              v-model="listQuery.personStatus"
+              :items="statusOptions"
+              label="Status Kesehatan"
+              name="Status Kesehatan"
+              item-text="text"
+              item-value="value"
+              placeholder="Status Kesehatan"
+              hide-details
+              allow-null
+            />
+          </v-col>
+          <v-col lg="2" md="2" sm="12">
+            <v-btn color="primary" @click="searchFilter">
+              Cari
+            </v-btn>
+            <v-btn color="primary" @click="doFilterReset">
+              Reset
+            </v-btn>
           </v-col>
           <v-spacer></v-spacer>
           <v-col v-if="false" cols="auto">
@@ -151,6 +191,7 @@
 <script>
 import { isEqual } from 'lodash'
 import { mapGetters } from 'vuex'
+import { ValidationObserver } from 'vee-validate'
 import { getPersonStatusText } from '@/utilities/personStatus'
 import ApplicantCreateDialog from '@/components/ApplicantCreateDialog'
 import ApplicantEditDialog from '@/components/ApplicantEditDialog'
@@ -159,7 +200,8 @@ import ApplicantDeleteDialog from '@/components/ApplicantDeleteDialog'
 import {
   SUCCESS_DELETE,
   FAILED_DELETE,
-  CONFIRM_DELETE_PARTICIPANTS
+  CONFIRM_DELETE_PARTICIPANTS,
+  STATUS_OPTIONS
 } from '@/utilities/constant'
 
 const headers = [
@@ -188,7 +230,8 @@ export default {
     ApplicantCreateDialog,
     ApplicantViewDialog,
     ApplicantEditDialog,
-    ApplicantDeleteDialog
+    ApplicantDeleteDialog,
+    ValidationObserver
   },
 
   props: {
@@ -236,6 +279,15 @@ export default {
       viewDialog: false,
       viewRecordId: null,
       selectedData: null,
+      validate: '',
+      listQuery: {
+        nameNik: null,
+        city: null,
+        startDate: null,
+        endDate: null,
+        personStatus: null
+      },
+      statusOptions: STATUS_OPTIONS,
       headers: this.noActions
         ? headers.filter((head) => head.value !== 'actions')
         : headers
@@ -261,48 +313,6 @@ export default {
     totalItems() {
       return this.$store.getters['applicants/getTotalData']
     },
-    city: {
-      async set(value) {
-        await this.$store.dispatch('applicants/resetOptions')
-        this.options = {
-          ...this.options,
-          keyWords: this.searchKey,
-          sessionId: this.sessionId,
-          city: value
-        }
-      },
-      get() {
-        return this.$route.query.city
-      }
-    },
-    searchKey: {
-      async set(value) {
-        await this.$store.dispatch('applicants/resetOptions')
-        this.options = {
-          ...this.options,
-          city: this.city,
-          sessionId: this.sessionId,
-          keyWords: value
-        }
-      },
-      get() {
-        return this.$route.query.keyWords
-      }
-    },
-    sessionId: {
-      async set(value) {
-        await this.$store.dispatch('applicants/resetOptions')
-        this.options = {
-          ...this.options,
-          city: this.city,
-          keyWords: this.keyWords,
-          sessionId: value
-        }
-      },
-      get() {
-        return this.$route.query.sessionId
-      }
-    },
     confirmDeleteMsg() {
       return CONFIRM_DELETE_PARTICIPANTS
     }
@@ -319,6 +329,9 @@ export default {
     },
     tempValue(value) {
       this.$emit('input', value)
+    },
+    'listQuery.startDate'(value) {
+      this.validate = value ? 'required' : ''
     }
   },
 
@@ -336,15 +349,6 @@ export default {
     if (this.$route.query.sortOrder) {
       options.sortOrder = [this.$route.query.sortOrder]
     }
-    if (this.$route.query.keyWords) {
-      options.keyWords = this.$route.query.keyWords
-    }
-    if (this.$route.query.city) {
-      options.city = this.$route.query.city
-    }
-    if (this.$route.query.sessionId) {
-      options.sessionId = this.$route.query.sessionId
-    }
     this.options = options
     this.$emit('optionChanged', options)
     this.doFilterReset()
@@ -352,10 +356,30 @@ export default {
 
   methods: {
     getPersonStatusText,
+    async searchFilter() {
+      const valid = await this.$refs.date.validate()
+      if (valid) {
+        await this.$store.dispatch('applicants/resetOptions')
+        this.options = {
+          ...this.options,
+          keyWords: this.listQuery.nameNik,
+          city: this.listQuery.city,
+          startDate: this.listQuery.startDate,
+          endDate: this.listQuery.endDate,
+          personStatus: this.listQuery.personStatus
+        }
+      }
+    },
     async doFilterReset() {
+      Object.assign(this.$data.listQuery, this.$options.data().listQuery)
       await this.$store.dispatch('applicants/resetOptions')
       this.options = {
-        ...this.options
+        ...this.options,
+        keyWords: null,
+        city: null,
+        startDate: null,
+        endDate: null,
+        personStatus: null
       }
     },
 
