@@ -3,7 +3,7 @@
     <v-dialog :value="open" max-width="528">
       <v-card class="text-center">
         <v-card-title>
-          <span class="col pl-10">Perhatian</span>
+          <span class="col pl-10" style="color: #b71b1c;">Perhatian</span>
           <v-btn icon @click="close">
             <v-icon>mdi-close</v-icon>
           </v-btn>

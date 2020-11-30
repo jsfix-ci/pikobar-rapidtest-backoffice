@@ -2,20 +2,22 @@
   <div>
     <v-dialog :value="open" max-width="528">
       <v-card class="text-center">
-        <v-card-title>
-          <span class="col pl-10">Kirim {{ modalType }}</span>
+        <v-card-title class="text-left">
+          <span class="col pl-10" style="color: #b71b1c;">Perhatian</span>
           <v-btn icon @click="close">
             <v-icon>mdi-close</v-icon>
           </v-btn>
         </v-card-title>
         <v-card-text>
           <div>
-            Apakah anda akan mengirimkan notifikasi {{ modalType }} kepada
+            <v-checkbox
+              v-model="isChecklist"
+              label="Saya yakin untuk melakukan unchecklist untuk Kode Sampel dan Tanggal
+            checkin di kolom ini."
+              color="primary"
+              hide-details
+            ></v-checkbox>
           </div>
-          <div v-if="items.length > 0">
-            <strong>{{ items.length }} Peserta Terpilih?</strong>
-          </div>
-          <div v-else><strong>Semua Peserta?</strong></div>
         </v-card-text>
         <v-card-actions class="pb-6 justify-center">
           <v-btn
@@ -28,10 +30,11 @@
           </v-btn>
           <v-btn
             color="primary"
-            class="ml-2 px-2"
-            @click="sendNotif(items.length, modalType)"
+            class="mr-2 px-2"
+            :disabled="!isChecklist"
+            @click="save"
           >
-            Ya
+            Simpan
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -45,24 +48,24 @@ export default {
       type: Boolean,
       default: false
     },
-    items: {
-      type: Array,
-      default: () => []
-    },
-    modalType: {
-      type: String,
+    record: {
+      type: Object,
       default: null
+    }
+  },
+  data() {
+    return {
+      isChecklist: false,
+      label:
+        'Saya yakin untuk melakukan unchecklist untuk Kode Sampel dan Tanggal checkin di kolom ini.'
     }
   },
   methods: {
     close() {
       this.$emit('close')
     },
-    sendNotif(length, type) {
-      const data = {}
-      data.length = length
-      data.type = type
-      this.$emit('send', data)
+    save() {
+      this.$emit('save', this.record)
     }
   }
 }

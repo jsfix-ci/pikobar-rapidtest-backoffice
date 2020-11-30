@@ -302,6 +302,12 @@
       @close="closeDialogImport"
       @doImport="doImport"
     />
+    <event-applicant-uncheck-dialog
+      :open="uncheckDialog"
+      :record="selectedData"
+      @close="closeDialogUncheck"
+      @save="deleteSampleCode"
+    />
     <event-applicant-uncheck-warning-dialog
       :open="uncheckWarningDialog"
       @close="closeDialogUncheckWarning"
@@ -327,7 +333,9 @@ import {
   FAILED_DELETE,
   TEST_RESULT_OPTIONS,
   SUCCESS_UPDATE_TEST_RESULT,
-  FAILED_UPDATE_TEST_RESULT
+  FAILED_UPDATE_TEST_RESULT,
+  UNCHECK_SUCCESS,
+  UNCHECK_FAILED
 } from '@/utilities/constant'
 import EventApplicantEditLabCodeDialog from '@/components/EventApplicantEditLabCodeDialog'
 import DialogExportLoader from '@/components/DialogLoader'
@@ -337,6 +345,7 @@ import ApplicantDeleteDialog from '@/components/ApplicantDeleteDialog'
 import EventUpdateResultDialog from '@/components/EventUpdateResultDialog'
 import EventBlashNotifDialog from '@/components/EventBlashNotifDialog'
 import EventImportTestResultDialog from '@/components/EventImportTestResultDialog'
+import EventApplicantUncheckDialog from '@/components/EventApplicantUncheckDialog'
 import EventApplicantUncheckWarningDialog from '@/components/EventApplicantUncheckWarningDialog'
 
 const headers = [
@@ -386,6 +395,7 @@ export default {
     EventUpdateResultDialog,
     EventBlashNotifDialog,
     EventImportTestResultDialog,
+    EventApplicantUncheckDialog,
     EventApplicantUncheckWarningDialog
   },
   filters: {
@@ -421,6 +431,7 @@ export default {
       blastNotifModalWarning: false,
       updateResultDialog: false,
       updatePayload: null,
+      uncheckDialog: false,
       uncheckWarningDialog: false,
       incompleteResultTest: []
     }
@@ -494,6 +505,33 @@ export default {
   },
 
   methods: {
+    async deleteSampleCode(payload) {
+      try {
+        await this.$store.dispatch(
+          'eventParticipants/deleteCheckin',
+          payload.id
+        )
+        this.$toast.show({
+          message: UNCHECK_SUCCESS,
+          type: 'success'
+        })
+        await this.$store.dispatch(
+          'events/getCurrent',
+          this.$route.params.eventId
+        )
+        await this.$store.dispatch(
+          'eventParticipants/getList',
+          this.$route.params.eventId
+        )
+      } catch (error) {
+        this.$toast.show({
+          message: error.message || UNCHECK_FAILED,
+          type: 'error'
+        })
+      } finally {
+        this.uncheckDialog = false
+      }
+    },
     uncheckWarning(payload) {
       this.uncheckWarningDialog = true
     },
@@ -501,7 +539,11 @@ export default {
       this.uncheckWarningDialog = false
     },
     uncheck(payload) {
-      console.log(payload)
+      this.uncheckDialog = true
+      this.selectedData = payload
+    },
+    closeDialogUncheck() {
+      this.uncheckDialog = false
     },
     checkResultLabel(payload) {
       let testResultLabel = null
