@@ -55,9 +55,7 @@ export default {
   },
   data() {
     return {
-      isChecklist: false,
-      label:
-        'Saya yakin untuk melakukan unchecklist untuk Kode Sampel dan Tanggal checkin di kolom ini.'
+      isChecklist: false
     }
   },
   methods: {
