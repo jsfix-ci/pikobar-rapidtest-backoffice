@@ -24,6 +24,8 @@ export const SET_LABCODE_SUCCESS =
   'Kode Sampel Hasil Lab Berhasil di perbaharui'
 export const SET_LABCODE_FAILED =
   'Maaf, ada kesalahan dalam menyimpan Kode Sampel Hasil Lab '
+export const UNCHECK_SUCCESS = 'Data checkin berhasil dihapus'
+export const UNCHECK_FAILED = 'Data checkin gagal dihapus'
 
 export const DEFAULT_FILTER = {
   groupBy: [],
