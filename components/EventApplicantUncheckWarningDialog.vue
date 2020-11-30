@@ -30,10 +30,6 @@ export default {
     open: {
       type: Boolean,
       default: false
-    },
-    items: {
-      type: Object,
-      default: null
     }
   },
   methods: {
