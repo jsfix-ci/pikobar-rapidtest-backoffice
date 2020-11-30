@@ -247,5 +247,15 @@ export const actions = {
     } finally {
       commit('SET_LOADING', false)
     }
+  },
+  async deleteCheckin({ commit }, id) {
+    commit('SET_LOADING', true)
+    try {
+      await this.$axios.$put(`rdt/invitation/${id}/reset`)
+    } catch (e) {
+      throw new Error(e.response.data.message)
+    } finally {
+      commit('SET_LOADING', false)
+    }
   }
 }
