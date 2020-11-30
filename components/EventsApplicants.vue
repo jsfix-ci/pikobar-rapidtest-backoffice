@@ -306,7 +306,7 @@
       :open="uncheckDialog"
       :record="selectedData"
       @close="closeDialogUncheck"
-      @save="deleteSampleCode"
+      @save="resetDataCheckin"
     />
     <event-applicant-uncheck-warning-dialog
       :open="uncheckWarningDialog"
@@ -505,10 +505,10 @@ export default {
   },
 
   methods: {
-    async deleteSampleCode(payload) {
+    async resetDataCheckin(payload) {
       try {
         await this.$store.dispatch(
-          'eventParticipants/deleteCheckin',
+          'eventParticipants/resetDataCheckin',
           payload.id
         )
         this.$toast.show({

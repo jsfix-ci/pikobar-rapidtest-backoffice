@@ -248,7 +248,7 @@ export const actions = {
       commit('SET_LOADING', false)
     }
   },
-  async deleteCheckin({ commit }, id) {
+  async resetDataCheckin({ commit }, id) {
     commit('SET_LOADING', true)
     try {
       await this.$axios.$put(`rdt/invitation/${id}/reset`)
