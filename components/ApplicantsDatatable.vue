@@ -47,15 +47,18 @@
             />
           </v-col>
           <v-col lg="2" md="2" sm="12">
-            <pkbr-input-date
-              v-model="listQuery.startDate"
-              label="Tanggal Mulai"
-              name="Tanggal Mulai"
-              placeholder="Tanggal Mulai"
-            />
+            <ValidationObserver ref="date">
+              <pkbr-input-date
+                v-model="listQuery.startDate"
+                label="Tanggal Mulai"
+                name="Tanggal Mulai"
+                placeholder="Tanggal Mulai"
+                :rules="validateStartDate"
+              />
+            </ValidationObserver>
           </v-col>
           <v-col lg="2" md="2" sm="12">
-            <ValidationObserver ref="date">
+            <ValidationObserver ref="date2">
               <pkbr-input-date
                 v-model="listQuery.endDate"
                 label="Tanggal Berakhir"
@@ -280,6 +283,7 @@ export default {
       viewRecordId: null,
       selectedData: null,
       validate: '',
+      validateStartDate: '',
       listQuery: {
         nameNik: null,
         city: null,
@@ -332,6 +336,9 @@ export default {
     },
     'listQuery.startDate'(value) {
       this.validate = value ? 'required' : ''
+    },
+    'listQuery.endDate'(value) {
+      this.validateStartDate = value ? 'required' : ''
     }
   },
 
@@ -358,7 +365,8 @@ export default {
     getPersonStatusText,
     async searchFilter() {
       const valid = await this.$refs.date.validate()
-      if (valid) {
+      const valid2 = await this.$refs.date2.validate()
+      if (valid && valid2) {
         await this.$store.dispatch('applicants/resetOptions')
         this.options = {
           ...this.options,
