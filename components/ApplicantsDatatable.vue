@@ -47,7 +47,7 @@
             />
           </v-col>
           <v-col lg="2" md="2" sm="12">
-            <ValidationObserver ref="date">
+            <ValidationObserver ref="startDate">
               <pkbr-input-date
                 v-model="listQuery.startDate"
                 label="Tanggal Mulai"
@@ -58,7 +58,7 @@
             </ValidationObserver>
           </v-col>
           <v-col lg="2" md="2" sm="12">
-            <ValidationObserver ref="date2">
+            <ValidationObserver ref="endDate">
               <pkbr-input-date
                 v-model="listQuery.endDate"
                 label="Tanggal Berakhir"
@@ -291,6 +291,7 @@ export default {
         endDate: null,
         personStatus: null
       },
+      isFiltered: false,
       statusOptions: STATUS_OPTIONS,
       headers: this.noActions
         ? headers.filter((head) => head.value !== 'actions')
@@ -364,9 +365,9 @@ export default {
   methods: {
     getPersonStatusText,
     async searchFilter() {
-      const valid = await this.$refs.date.validate()
-      const valid2 = await this.$refs.date2.validate()
-      if (valid && valid2) {
+      const validStartDate = await this.$refs.startDate.validate()
+      const validEndDate = await this.$refs.endDate.validate()
+      if (validStartDate && validEndDate) {
         await this.$store.dispatch('applicants/resetOptions')
         this.options = {
           ...this.options,
@@ -376,18 +377,22 @@ export default {
           endDate: this.listQuery.endDate,
           personStatus: this.listQuery.personStatus
         }
+        this.isFiltered = true
       }
     },
     async doFilterReset() {
       Object.assign(this.$data.listQuery, this.$options.data().listQuery)
-      await this.$store.dispatch('applicants/resetOptions')
-      this.options = {
-        ...this.options,
-        keyWords: null,
-        city: null,
-        startDate: null,
-        endDate: null,
-        personStatus: null
+      if (this.isFiltered) {
+        await this.$store.dispatch('applicants/resetOptions')
+        this.options = {
+          ...this.options,
+          keyWords: null,
+          city: null,
+          startDate: null,
+          endDate: null,
+          personStatus: null
+        }
+        this.isFiltered = false
       }
     },
 
