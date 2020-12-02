@@ -47,15 +47,18 @@
             />
           </v-col>
           <v-col lg="2" md="2" sm="12">
-            <pkbr-input-date
-              v-model="listQuery.startDate"
-              label="Tanggal Mulai"
-              name="Tanggal Mulai"
-              placeholder="Tanggal Mulai"
-            />
+            <ValidationObserver ref="startDate">
+              <pkbr-input-date
+                v-model="listQuery.startDate"
+                label="Tanggal Mulai"
+                name="Tanggal Mulai"
+                placeholder="Tanggal Mulai"
+                :rules="validateStartDate"
+              />
+            </ValidationObserver>
           </v-col>
           <v-col lg="2" md="2" sm="12">
-            <ValidationObserver ref="date">
+            <ValidationObserver ref="endDate">
               <pkbr-input-date
                 v-model="listQuery.endDate"
                 label="Tanggal Berakhir"
@@ -280,6 +283,7 @@ export default {
       viewRecordId: null,
       selectedData: null,
       validate: '',
+      validateStartDate: '',
       listQuery: {
         nameNik: null,
         city: null,
@@ -287,6 +291,7 @@ export default {
         endDate: null,
         personStatus: null
       },
+      isFiltered: false,
       statusOptions: STATUS_OPTIONS,
       headers: this.noActions
         ? headers.filter((head) => head.value !== 'actions')
@@ -332,6 +337,9 @@ export default {
     },
     'listQuery.startDate'(value) {
       this.validate = value ? 'required' : ''
+    },
+    'listQuery.endDate'(value) {
+      this.validateStartDate = value ? 'required' : ''
     }
   },
 
@@ -357,8 +365,9 @@ export default {
   methods: {
     getPersonStatusText,
     async searchFilter() {
-      const valid = await this.$refs.date.validate()
-      if (valid) {
+      const validStartDate = await this.$refs.startDate.validate()
+      const validEndDate = await this.$refs.endDate.validate()
+      if (validStartDate && validEndDate) {
         await this.$store.dispatch('applicants/resetOptions')
         this.options = {
           ...this.options,
@@ -368,18 +377,22 @@ export default {
           endDate: this.listQuery.endDate,
           personStatus: this.listQuery.personStatus
         }
+        this.isFiltered = true
       }
     },
     async doFilterReset() {
       Object.assign(this.$data.listQuery, this.$options.data().listQuery)
-      await this.$store.dispatch('applicants/resetOptions')
-      this.options = {
-        ...this.options,
-        keyWords: null,
-        city: null,
-        startDate: null,
-        endDate: null,
-        personStatus: null
+      if (this.isFiltered) {
+        await this.$store.dispatch('applicants/resetOptions')
+        this.options = {
+          ...this.options,
+          keyWords: null,
+          city: null,
+          startDate: null,
+          endDate: null,
+          personStatus: null
+        }
+        this.isFiltered = false
       }
     },
 
