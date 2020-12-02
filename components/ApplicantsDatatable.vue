@@ -343,7 +343,7 @@ export default {
     }
   },
 
-  mounted() {
+  async mounted() {
     const options = { ...this.options }
     if (this.$route.query.page) {
       options.page = parseInt(this.$route.query.page)
@@ -359,7 +359,15 @@ export default {
     }
     this.options = options
     this.$emit('optionChanged', options)
-    this.doFilterReset()
+    await this.$store.dispatch('applicants/resetOptions')
+    this.options = {
+      ...this.options,
+      keyWords: null,
+      city: null,
+      startDate: null,
+      endDate: null,
+      personStatus: null
+    }
   },
 
   methods: {
