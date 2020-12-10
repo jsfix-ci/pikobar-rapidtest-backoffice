@@ -420,6 +420,8 @@ export default {
     },
 
     close() {
+      this.symptoms.length = 0
+      this.congenitalDisease.length = 0
       this.$emit('close')
     },
 
@@ -438,7 +440,7 @@ export default {
     getCongenitalDesease(payload) {
       if (payload) {
         payload.map((element) => {
-          const congenitalDeseaseFilter = this.symptomsOptions.filter(
+          const congenitalDeseaseFilter = this.congenitalDiseaseOptions.filter(
             (item) => item.value === element
           )
           congenitalDeseaseFilter.forEach((item) => {
