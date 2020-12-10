@@ -24,6 +24,8 @@ export const SET_LABCODE_SUCCESS =
   'Kode Sampel Hasil Lab Berhasil di perbaharui'
 export const SET_LABCODE_FAILED =
   'Maaf, ada kesalahan dalam menyimpan Kode Sampel Hasil Lab '
+export const UNCHECK_SUCCESS = 'Data Checkin dan Kode Sampel berhasil direset'
+export const UNCHECK_FAILED = 'Data Checkin dan Kode Sampel gagal direset'
 
 export const DEFAULT_FILTER = {
   groupBy: [],
@@ -48,4 +50,34 @@ export const TEST_RESULT_OPTIONS = [
   { value: 'NONREACTIVE', label: 'Non Reaktif' },
   { value: 'INCONCLUSIVE', label: 'Inkonklusif' },
   { value: 'INVALID', label: 'Invalid' }
+]
+export const SYMPTOMS_OPTIONS = [
+  { value: 1, text: 'Batuk' },
+  { value: 2, text: 'Menggigil' },
+  { value: 3, text: 'Nyeri Abdomen' },
+  { value: 4, text: 'Pilek' },
+  { value: 5, text: 'Sakit Tenggorokan' },
+  { value: 6, text: 'Suhu Tubuh < 38' },
+  { value: 7, text: 'Lemah (malaise)' },
+  { value: 8, text: 'Mual atau Muntah' },
+  { value: 9, text: 'Nyeri Otot' },
+  { value: 10, text: 'Sakit Kepala' },
+  { value: 11, text: 'Sesak Napas' },
+  { value: 12, text: 'Suhu Tubuh >= 38 C' },
+  { value: 99, text: 'Tidak ada Gejala' }
+]
+export const CONGENITAL_DESEASE_OPTIONS = [
+  { value: 1, text: 'Darah Tinggi' },
+  { value: 2, text: 'Diabetes' },
+  { value: 3, text: 'Kronis' },
+  { value: 4, text: 'Gangguan Jantung' },
+  { value: 5, text: 'Gagal Ginjal' },
+  { value: 99, text: 'Tidak Ada' }
+]
+export const STATUS_OPTIONS = [
+  { value: 'CLOSE_CONTACT', text: 'Kontak Erat' },
+  { value: 'SUSPECT', text: 'Suspek' },
+  { value: 'PROBABLE', text: 'Probable' },
+  { value: 'CONFIRMED', text: 'Konfirmasi' },
+  { value: 'UNKNOWN', text: 'Tanpa Kriteria' }
 ]

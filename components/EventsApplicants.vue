@@ -94,7 +94,7 @@
           <v-col cols="6">
             <v-text-field
               v-model="searchKey"
-              label="Nama Peserta / No. Pendaftaran / Kode Sampel"
+              label="Nama Peserta / No. Pendaftaran / Kode Sampel / Instansi Tempat Kerja"
               clearable
               outlined
               dense
@@ -196,174 +196,71 @@
         </v-layout>
       </template>
       <template v-slot:[`item.actions`]="{ item }">
-        <v-icon class="mr-2" @click="viewItem(item)">
-          mdi-card-search
-        </v-icon>
-        <v-icon class="mr-2" @click="modalEditLabCodeOpen(item.id)">
-          mdi-pencil
-        </v-icon>
-        <v-icon @click="selectToRemove(item)">
-          mdi-delete
-        </v-icon>
+        <v-tooltip bottom>
+          <template v-slot:activator="{ on, attrs }">
+            <v-icon
+              v-if="item.lab_code_sample === null"
+              class="mr-2"
+              v-bind="attrs"
+              v-on="on"
+              @click="uncheckWarning(item)"
+            >
+              mdi-checkbox-blank-outline
+            </v-icon>
+            <v-icon
+              v-else-if="item.lab_code_sample !== null"
+              class="mr-2"
+              v-bind="attrs"
+              v-on="on"
+              @click="uncheck(item)"
+            >
+              mdi-check-box-outline
+            </v-icon>
+          </template>
+          <span>Uncheck</span>
+        </v-tooltip>
+        <v-tooltip bottom>
+          <template v-slot:activator="{ on, attrs }">
+            <v-icon
+              class="mr-2"
+              v-bind="attrs"
+              v-on="on"
+              @click="viewItem(item)"
+            >
+              mdi-card-search
+            </v-icon>
+          </template>
+          <span>Detail</span>
+        </v-tooltip>
+        <v-tooltip bottom>
+          <template v-slot:activator="{ on, attrs }">
+            <v-icon
+              class="mr-2"
+              v-bind="attrs"
+              v-on="on"
+              @click="modalEditLabCodeOpen(item.id)"
+            >
+              mdi-pencil
+            </v-icon>
+          </template>
+          <span>Edit Kode Sample</span>
+        </v-tooltip>
+        <v-tooltip bottom>
+          <template v-slot:activator="{ on, attrs }">
+            <v-icon
+              class="mr-2"
+              v-bind="attrs"
+              v-on="on"
+              @click="selectToRemove(item)"
+            >
+              mdi-delete
+            </v-icon>
+          </template>
+          <span>Hapus</span>
+        </v-tooltip>
       </template>
     </v-data-table>
-    <v-dialog v-model="updateModal" max-width="528">
-      <v-card class="text-center">
-        <v-card-title>
-          <span class="col pl-10">Perhatian!</span>
-        </v-card-title>
-        <v-card-text>
-          <div>
-            Apakah Anda akan mengubah hasil test peserta bernama
-            <strong>
-              {{ selectedData ? selectedData.applicant.name : '-' }}
-            </strong>
-            <span>
-              Menjadi
-            </span>
-            <strong>
-              {{
-                updatePayload
-                  ? checkResultLabel(updatePayload).toUpperCase()
-                  : updatePayload
-              }}
-            </strong>
-            <span>
-              ?
-            </span>
-          </div>
-        </v-card-text>
-        <v-card-actions class="pb-6 justify-center">
-          <v-btn
-            color="grey darken-1"
-            outlined
-            class="mr-2 px-2"
-            @click="updateModal = false"
-          >
-            Tidak
-          </v-btn>
-          <v-btn
-            color="error"
-            class="ml-2 px-2"
-            @click="setTestResult(selectedData.id, updatePayload)"
-          >
-            Ya
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-    <v-dialog v-model="deleteModal" max-width="528">
-      <v-card class="text-center">
-        <v-card-title>
-          <span class="col pl-10">Perhatian!</span>
-        </v-card-title>
-        <v-card-text>
-          <div>
-            {{ confirmDeleteMsg }}
-          </div>
-          <span>Nama peserta: </span>
-          <strong>
-            {{ selectedData ? selectedData.applicant.name : '-' }}
-          </strong>
-        </v-card-text>
-        <v-card-actions class="pb-6 justify-center">
-          <v-btn
-            color="grey darken-1"
-            outlined
-            class="mr-2 px-2"
-            @click="deleteModal = false"
-          >
-            Tidak
-          </v-btn>
-          <v-btn color="error" class="ml-2 px-2" @click="remove(selectedData)">
-            Ya
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-    <v-dialog v-model="blastNotifModal" max-width="528">
-      <v-card class="text-center">
-        <v-card-title>
-          <span class="col pl-10">Kirim {{ modalType }}</span>
-          <v-btn icon @click="blastNotifModal = false">
-            <v-icon>mdi-close</v-icon>
-          </v-btn>
-        </v-card-title>
-        <v-card-text>
-          <div>
-            Apakah anda akan mengirimkan notifikasi {{ modalType }} kepada
-          </div>
-          <div v-if="pesertaSelected.length > 0">
-            <strong>{{ pesertaSelected.length }} Peserta Terpilih?</strong>
-          </div>
-          <div v-else><strong>Semua Peserta?</strong></div>
-        </v-card-text>
-        <v-card-actions class="pb-6 justify-center">
-          <v-btn
-            color="grey darken-1"
-            outlined
-            class="mr-2 px-2"
-            @click="blastNotifModal = false"
-          >
-            Batal
-          </v-btn>
-          <v-btn
-            color="primary"
-            class="ml-2 px-2"
-            @click="sendNotif(pesertaSelected.length, modalType)"
-          >
-            Ya
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-    <v-dialog v-model="ImportModalTest" max-width="528">
-      <validation-observer
-        v-slot="{ valid, handleSubmit }"
-        ref="observerImport"
-        tag="div"
-      >
-        <form ref="importForm" @submit.prevent="handleSubmit(doImport)">
-          <v-card class="text-center">
-            <v-card-title>
-              <span class="col">Import Hasil Test</span>
-            </v-card-title>
-            <v-card-text class="pb-0">
-              <div>
-                Untuk Import data hasil test, anda harus memakai format Excel
-                (.xls).
-              </div>
-              <pkbr-input
-                v-model="importFile"
-                label="Import Hasil Test"
-                type="file"
-                class="mt-4"
-                name="file"
-                rules="required"
-              />
-            </v-card-text>
-            <v-card-actions class="pb-6 justify-center">
-              <v-btn
-                color="grey darken-1"
-                outlined
-                class="mr-2 px-2"
-                @click="ImportModalTest = false"
-              >
-                Batal
-              </v-btn>
-              <v-btn
-                color="primary"
-                :disabled="!valid"
-                class="ml-2 px-2"
-                type="submit"
-              >
-                Upload
-              </v-btn>
-            </v-card-actions>
-          </v-card>
-        </form>
-      </validation-observer>
-    </v-dialog>
+    <dialog-export-loader :open="modalExportLoader" />
     <event-applicant-edit-lab-code-dialog
       :open="modalEditLabCode"
       :record-id="modalEditLabCodeId"
@@ -371,7 +268,6 @@
       @close="modalEditLabCodeClose"
       @save="modalEditLabCodeSave"
     />
-    <dialog-export-loader :open="modalExportLoader" />
     <dialog-warning-test-result
       :open="blastNotifModalWarning"
       :items="incompleteResultTest"
@@ -383,6 +279,42 @@
       :record-id="viewRecordId"
       :detail-type="'invitation'"
       @close="viewClose"
+    />
+    <applicant-delete-dialog
+      :open="deleteDialog"
+      :record="selectedData"
+      dialog-type="event"
+      @close="deleteClose"
+      @remove="remove"
+    />
+    <event-update-result-dialog
+      :open="updateResultDialog"
+      :record="selectedData"
+      :payload="updatePayload"
+      @close="closeDialogUpdateResult"
+      @update="setTestResult"
+    />
+    <event-blash-notif-dialog
+      :open="blastNotifModal"
+      :items="pesertaSelected"
+      :modal-type="modalType"
+      @close="closeDialogBlashNotif"
+      @send="sendNotif"
+    />
+    <event-import-test-result-dialog
+      :open="ImportModalTest"
+      @close="closeDialogImport"
+      @doImport="doImport"
+    />
+    <event-applicant-uncheck-dialog
+      :open="uncheckDialog"
+      :record="selectedData"
+      @close="closeDialogUncheck"
+      @save="resetDataCheckin"
+    />
+    <event-applicant-uncheck-warning-dialog
+      :open="uncheckWarningDialog"
+      @close="closeDialogUncheckWarning"
     />
     <dialog-integrating-data
       :open="integratingModal"
@@ -411,13 +343,21 @@ import {
   FAILED_DELETE,
   TEST_RESULT_OPTIONS,
   SUCCESS_UPDATE_TEST_RESULT,
-  FAILED_UPDATE_TEST_RESULT
+  FAILED_UPDATE_TEST_RESULT,
+  UNCHECK_SUCCESS,
+  UNCHECK_FAILED
 } from '@/utilities/constant'
 import EventApplicantEditLabCodeDialog from '@/components/EventApplicantEditLabCodeDialog'
 import DialogExportLoader from '@/components/DialogLoader'
 import DialogWarningTestResult from '@/components/DialogWarningTestResult'
 import DialogIntegratingData from '@/components/DialogIntegratingData'
 import ApplicantViewDialog from '@/components/ApplicantViewDialog'
+import ApplicantDeleteDialog from '@/components/ApplicantDeleteDialog'
+import EventUpdateResultDialog from '@/components/EventUpdateResultDialog'
+import EventBlashNotifDialog from '@/components/EventBlashNotifDialog'
+import EventImportTestResultDialog from '@/components/EventImportTestResultDialog'
+import EventApplicantUncheckDialog from '@/components/EventApplicantUncheckDialog'
+import EventApplicantUncheckWarningDialog from '@/components/EventApplicantUncheckWarningDialog'
 
 const headers = [
   {
@@ -427,6 +367,11 @@ const headers = [
     width: 150
   },
   { text: 'Nama Lengkap', value: 'applicant.name', width: 250 },
+  {
+    text: 'Instansi Tempat Kerja',
+    value: 'applicant.workplace_name',
+    width: 250
+  },
   { text: 'Kloter', value: 'rdt_event_schedule_id', width: 85 },
   { text: 'Jenis Kelamin', value: 'applicant.gender', width: 140 },
   { text: 'Usia', value: 'applicant.birth_date', width: 85 },
@@ -442,7 +387,13 @@ const headers = [
     value: 'notified_result_at',
     width: 200
   },
-  { text: 'Actions', value: 'actions', sortable: false, width: 150 }
+  {
+    text: 'Actions',
+    value: 'actions',
+    align: 'center',
+    sortable: false,
+    width: 200
+  }
 ]
 
 export default {
@@ -450,6 +401,13 @@ export default {
     EventApplicantEditLabCodeDialog,
     DialogExportLoader,
     ApplicantViewDialog,
+    DialogWarningTestResult,
+    ApplicantDeleteDialog,
+    EventUpdateResultDialog,
+    EventBlashNotifDialog,
+    EventImportTestResultDialog,
+    EventApplicantUncheckDialog,
+    EventApplicantUncheckWarningDialog
     DialogWarningTestResult,
     DialogIntegratingData
   },
@@ -475,18 +433,19 @@ export default {
       blastNotifModal: false,
       ImportModalTest: false,
       modalType: 'Undangan',
-      importFile: null,
       modalExportLoader: false,
       modalEditLabCode: false,
       modalEditLabCodeId: null,
-      deleteModal: false,
+      deleteDialog: false,
       selectedData: null,
       viewDialog: false,
       viewRecordId: null,
       labCodeSample: null,
       blastNotifModalWarning: false,
-      updateModal: false,
+      updateResultDialog: false,
       updatePayload: null,
+      uncheckDialog: false,
+      uncheckWarningDialog: false,
       integratingModal: false,
       incompleteResultTest: []
     }
@@ -560,6 +519,46 @@ export default {
   },
 
   methods: {
+    async resetDataCheckin(payload) {
+      try {
+        await this.$store.dispatch(
+          'eventParticipants/resetDataCheckin',
+          payload.id
+        )
+        this.$toast.show({
+          message: UNCHECK_SUCCESS,
+          type: 'success'
+        })
+        await this.$store.dispatch(
+          'events/getCurrent',
+          this.$route.params.eventId
+        )
+        await this.$store.dispatch(
+          'eventParticipants/getList',
+          this.$route.params.eventId
+        )
+      } catch (error) {
+        this.$toast.show({
+          message: error.message || UNCHECK_FAILED,
+          type: 'error'
+        })
+      } finally {
+        this.uncheckDialog = false
+      }
+    },
+    uncheckWarning(payload) {
+      this.uncheckWarningDialog = true
+    },
+    closeDialogUncheckWarning() {
+      this.uncheckWarningDialog = false
+    },
+    uncheck(payload) {
+      this.uncheckDialog = true
+      this.selectedData = payload
+    },
+    closeDialogUncheck() {
+      this.uncheckDialog = false
+    },
     checkResultLabel(payload) {
       let testResultLabel = null
       const testResultFilter = this.testResultOptions.filter(
@@ -573,16 +572,22 @@ export default {
     openUpdateDialog(item, payload) {
       this.selectedData = item
       this.updatePayload = payload
-      this.updateModal = true
+      this.updateResultDialog = true
     },
-    async setTestResult(id, payload) {
-      const data = { id, payload }
+    closeDialogUpdateResult() {
+      this.updateResultDialog = false
+    },
+    async setTestResult(data) {
       try {
         await this.$store.dispatch('eventParticipants/updateTestResult', data)
         this.$toast.show({
           message: SUCCESS_UPDATE_TEST_RESULT,
           type: 'success'
         })
+        await this.$store.dispatch(
+          'events/getCurrent',
+          this.$route.params.eventId
+        )
         await this.$store.dispatch(
           'eventParticipants/getList',
           this.$route.params.eventId
@@ -593,7 +598,7 @@ export default {
           type: 'error'
         })
       } finally {
-        this.updateModal = false
+        this.updateResultDialog = false
       }
     },
     viewItem(payload) {
@@ -606,7 +611,10 @@ export default {
     },
     selectToRemove(payload) {
       this.selectedData = payload
-      this.deleteModal = true
+      this.deleteDialog = true
+    },
+    deleteClose(payload) {
+      this.deleteDialog = false
     },
     async remove(payload) {
       try {
@@ -620,10 +628,14 @@ export default {
           type: 'success'
         })
         await this.$store.dispatch(
+          'events/getCurrent',
+          this.$route.params.eventId
+        )
+        await this.$store.dispatch(
           'eventParticipants/getList',
           this.$route.params.eventId
         )
-        this.deleteModal = false
+        this.deleteDialog = false
       } catch (error) {
         this.$toast.show({
           message: error.message || FAILED_DELETE,
@@ -650,6 +662,9 @@ export default {
     closeDialogWarning() {
       this.blastNotifModalWarning = false
     },
+    closeDialogBlashNotif() {
+      this.blastNotifModal = false
+    },
     openModalNotif(type) {
       if (type === 'Undangan') {
         this.modalType = type || this.modalType
@@ -673,19 +688,22 @@ export default {
     openModalImportHasil() {
       this.ImportModalTest = true
     },
-    sendNotif(participant, modalType) {
-      if (participant === 0) {
-        this.blastNotify(null, `send${modalType.split(' ').join('')}`)
+    sendNotif(data) {
+      if (data.length === 0) {
+        this.blastNotify(null, `send${data.type.split(' ').join('')}`)
       } else {
         this.blastNotify(
           this.pesertaSelected,
-          `send${modalType.split(' ').join('')}`
+          `send${data.type.split(' ').join('')}`
         )
       }
     },
-    async doImport() {
+    closeDialogImport() {
+      this.ImportModalTest = false
+    },
+    async doImport(data) {
       const formData = new FormData()
-      formData.append('file', this.importFile)
+      formData.append('file', data)
       try {
         await this.$store.dispatch('eventParticipants/importTestResult', {
           idEvent: this.idEvent,
@@ -699,16 +717,13 @@ export default {
           'eventParticipants/getList',
           this.$route.params.eventId
         )
-        this.ImportModalTest = false
       } catch (error) {
         this.$toast.show({
           message: error.message || FAILED_IMPORT,
           type: 'error'
         })
       } finally {
-        // this.importModal = false
-        // this.kloter = null
-        // this.$refs.observerImport.reset()
+        this.ImportModalTest = false
       }
     },
     async blastNotify(invitationsIds, type) {

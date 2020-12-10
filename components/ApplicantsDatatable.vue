@@ -23,19 +23,19 @@
           <v-col v-if="title" cols="12">
             {{ title }}
           </v-col>
-          <v-col cols="auto">
+          <v-col lg="2" md="2" sm="12">
             <v-text-field
-              v-model="searchKey"
-              label="Nama Peserta / Nomor Pendaftaran"
-              clearable
+              v-model="listQuery.nameNik"
+              label="NIK/Nama Peserta / Nomor Pendaftaran"
+              placeholder="NIK/Nama Peserta / Nomor Pendaftaran"
               outlined
               dense
               hide-details
             />
           </v-col>
-          <v-col cols="auto">
+          <v-col lg="2" md="2" sm="12">
             <pkbr-select
-              v-model="city"
+              v-model="listQuery.city"
               :items="getKabkot"
               label="Kab./Kota"
               name="Kab./Kota"
@@ -46,18 +46,51 @@
               allow-null
             />
           </v-col>
-          <v-col v-if="listType === 'participant'" cols="auto">
-            <v-text-field
-              v-model="sessionId"
-              label="Session ID"
-              clearable
-              outlined
-              dense
+          <v-col lg="2" md="2" sm="12">
+            <ValidationObserver ref="startDate">
+              <pkbr-input-date
+                v-model="listQuery.startDate"
+                label="Tanggal Mulai"
+                name="Tanggal Mulai"
+                placeholder="Tanggal Mulai"
+                :rules="validateStartDate"
+              />
+            </ValidationObserver>
+          </v-col>
+          <v-col lg="2" md="2" sm="12">
+            <ValidationObserver ref="endDate">
+              <pkbr-input-date
+                v-model="listQuery.endDate"
+                label="Tanggal Berakhir"
+                name="Tanggal Berakhir"
+                placeholder="Tanggal Berakhir"
+                :rules="validate"
+              />
+            </ValidationObserver>
+          </v-col>
+          <v-col lg="2" md="2" sm="12">
+            <pkbr-select
+              v-model="listQuery.personStatus"
+              :items="statusOptions"
+              label="Status Kesehatan"
+              name="Status Kesehatan"
+              item-text="text"
+              item-value="value"
+              placeholder="Status Kesehatan"
               hide-details
+              allow-null
             />
           </v-col>
+          <v-col lg="2" md="2" sm="12">
+            <v-btn color="primary" @click="searchFilter">
+              Cari
+            </v-btn>
+            <v-btn color="primary" @click="doFilterReset">
+              Reset
+            </v-btn>
+          </v-col>
           <v-spacer></v-spacer>
-          <v-col v-if="listType === 'participant'" cols="auto">
+          <v-col v-if="false" cols="auto">
             <v-btn
               v-if="allow.includes('create-applicants')"
               color="primary"
@@ -70,11 +103,6 @@
             </v-btn>
           </v-col>
         </div>
-      </template>
-      <template v-slot:[`item.invitations`]="{ item }">
-        <v-layout justify-start>
-          {{ getLatestInvitation(item.invitations) }}
-        </v-layout>
       </template>
       <template v-slot:[`item.gender`]="{ item }">
         <v-layout justify-start>
@@ -97,11 +125,6 @@
           <template v-if="item.symptoms_interaction === '2'">
             Tidak Tahu
           </template>
-        </v-layout>
-      </template>
-      <template v-slot:[`item.person_status`]="{ item }">
-        <v-layout justify-start>
-          {{ getPersonStatusText(item.person_status) }}
         </v-layout>
       </template>
       <template v-slot:[`item.age`]="{ item }">
@@ -150,6 +173,7 @@
       :record-id="viewRecordId"
       @close="viewClose"
     />
+
     <applicant-edit-dialog
       v-if="allow.includes('edit-applicants')"
       :open="editDialog"
@@ -158,63 +182,35 @@
       @save="editSave"
     />
 
-    <v-dialog v-model="deleteModal" max-width="528">
-      <v-card class="text-center">
-        <v-card-title>
-          <span class="col pl-10">Perhatian!</span>
-        </v-card-title>
-        <v-card-text>
-          <div>
-            {{ confirmDeleteMsg }}
-          </div>
-          <span>Nama peserta: </span>
-          <strong>
-            {{ selectedData ? selectedData.name : '-' }}
-          </strong>
-        </v-card-text>
-        <v-card-actions class="pb-6 justify-center">
-          <v-btn
-            color="grey darken-1"
-            outlined
-            class="mr-2 px-2"
-            @click="deleteModal = false"
-          >
-            Tidak
-          </v-btn>
-          <v-btn color="error" class="ml-2 px-2" @click="remove(selectedData)">
-            Ya
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
+    <applicant-delete-dialog
+      :open="deleteDialog"
+      :record="selectedData"
+      @close="deleteClose"
+      @remove="remove"
+    />
   </div>
 </template>
 
 <script>
 import { isEqual } from 'lodash'
 import { mapGetters } from 'vuex'
+import { ValidationObserver } from 'vee-validate'
 import { getPersonStatusText } from '@/utilities/personStatus'
 import ApplicantCreateDialog from '@/components/ApplicantCreateDialog'
 import ApplicantEditDialog from '@/components/ApplicantEditDialog'
 import ApplicantViewDialog from '@/components/ApplicantViewDialog'
+import ApplicantDeleteDialog from '@/components/ApplicantDeleteDialog'
 import {
   SUCCESS_DELETE,
   FAILED_DELETE,
-  CONFIRM_DELETE_PARTICIPANTS
+  CONFIRM_DELETE_PARTICIPANTS,
+  STATUS_OPTIONS
 } from '@/utilities/constant'
 
 const headers = [
-  { text: 'ID', value: 'id', width: 80 },
-  {
-    text: 'Nomor Pendaftaran',
-    value: 'registration_code',
-    sortable: false,
-    width: 150
-  },
-  { text: 'Session Code', value: 'pikobar_session_id', width: 150 },
-  { text: 'Nama Peserta', value: 'name', width: 250 },
-  { text: 'Status Kesehatan', value: 'person_status', width: 150 },
-  { text: 'Jenis Kelamin', value: 'gender', width: 150 },
+  { text: 'NIK', value: 'nik', width: 200 },
+  { text: 'Nama Peserta', value: 'name', width: 200 },
+  { text: 'Jenis Kelamin', value: 'gender', width: 130 },
   {
     text: 'Usia (Thn)',
     value: 'age',
@@ -222,21 +218,11 @@ const headers = [
     align: 'center'
   },
   { text: 'Kota/Kab', value: 'city.name', sortable: false, width: 200 },
-  { text: 'Jenis Pekerjaan', value: 'occupation_type_name', width: 150 },
-  { text: 'Nama Profesi', value: 'occupation_name', width: 250 },
-  { text: 'Tempat Kerja', value: 'workplace_name', width: 250 },
   {
     text: 'Riwayat Kontak',
     value: 'symptoms_interaction',
     width: 150,
     align: 'center'
-  },
-  { text: 'Gejala', value: 'symptoms_notes', sortable: false, width: 300 },
-  {
-    text: 'Riwayat Undangan',
-    value: 'invitations',
-    sortable: false,
-    width: 150
   },
   { text: 'Tanggal Terdaftar', value: 'created_at', width: 200 },
   { text: 'Actions', value: 'actions', sortable: false, width: 150 }
@@ -246,7 +232,9 @@ export default {
   components: {
     ApplicantCreateDialog,
     ApplicantViewDialog,
-    ApplicantEditDialog
+    ApplicantEditDialog,
+    ApplicantDeleteDialog,
+    ValidationObserver
   },
 
   props: {
@@ -289,16 +277,24 @@ export default {
       tempValue: this.value,
       createDialog: false,
       editDialog: false,
+      deleteDialog: false,
       editRecordId: null,
       viewDialog: false,
       viewRecordId: null,
-      filterSearch: null,
-      deleteModal: false,
       selectedData: null,
+      validate: '',
+      validateStartDate: '',
+      listQuery: {
+        nameNik: null,
+        city: null,
+        startDate: null,
+        endDate: null,
+        personStatus: null
+      },
+      isFiltered: false,
+      statusOptions: STATUS_OPTIONS,
       headers: this.noActions
         ? headers.filter((head) => head.value !== 'actions')
-        : this.listType === 'applicant'
-        ? headers.filter((head) => head.value !== 'pikobar_session_id')
         : headers
     }
   },
@@ -322,48 +318,6 @@ export default {
     totalItems() {
       return this.$store.getters['applicants/getTotalData']
     },
-    city: {
-      async set(value) {
-        await this.$store.dispatch('applicants/resetOptions')
-        this.options = {
-          ...this.options,
-          keyWords: this.searchKey,
-          sessionId: this.sessionId,
-          city: value
-        }
-      },
-      get() {
-        return this.$route.query.city
-      }
-    },
-    searchKey: {
-      async set(value) {
-        await this.$store.dispatch('applicants/resetOptions')
-        this.options = {
-          ...this.options,
-          city: this.city,
-          sessionId: this.sessionId,
-          keyWords: value
-        }
-      },
-      get() {
-        return this.$route.query.keyWords
-      }
-    },
-    sessionId: {
-      async set(value) {
-        await this.$store.dispatch('applicants/resetOptions')
-        this.options = {
-          ...this.options,
-          city: this.city,
-          keyWords: this.keyWords,
-          sessionId: value
-        }
-      },
-      get() {
-        return this.$route.query.sessionId
-      }
-    },
     confirmDeleteMsg() {
       return CONFIRM_DELETE_PARTICIPANTS
     }
@@ -380,10 +334,16 @@ export default {
     },
     tempValue(value) {
       this.$emit('input', value)
+    },
+    'listQuery.startDate'(value) {
+      this.validate = value ? 'required' : ''
+    },
+    'listQuery.endDate'(value) {
+      this.validateStartDate = value ? 'required' : ''
     }
   },
 
-  mounted() {
+  async mounted() {
     const options = { ...this.options }
     if (this.$route.query.page) {
       options.page = parseInt(this.$route.query.page)
@@ -397,28 +357,51 @@ export default {
     if (this.$route.query.sortOrder) {
       options.sortOrder = [this.$route.query.sortOrder]
     }
-    if (this.$route.query.keyWords) {
-      options.keyWords = this.$route.query.keyWords
-    }
-    if (this.$route.query.city) {
-      options.city = this.$route.query.city
-    }
-    if (this.$route.query.sessionId) {
-      options.sessionId = this.$route.query.sessionId
-    }
     this.options = options
     this.$emit('optionChanged', options)
+    await this.$store.dispatch('applicants/resetOptions')
+    this.options = {
+      ...this.options,
+      keyWords: null,
+      city: null,
+      startDate: null,
+      endDate: null,
+      personStatus: null
+    }
   },
 
   methods: {
     getPersonStatusText,
-    doFilterReset() {
-      this.filterSearch = null
-      this.doFilter()
+    async searchFilter() {
+      const validStartDate = await this.$refs.startDate.validate()
+      const validEndDate = await this.$refs.endDate.validate()
+      if (validStartDate && validEndDate) {
+        await this.$store.dispatch('applicants/resetOptions')
+        this.options = {
+          ...this.options,
+          keyWords: this.listQuery.nameNik,
+          city: this.listQuery.city,
+          startDate: this.listQuery.startDate,
+          endDate: this.listQuery.endDate,
+          personStatus: this.listQuery.personStatus
+        }
+        this.isFiltered = true
+      }
     },
-
-    doFilter() {
-      // this.getRecords()
+    async doFilterReset() {
+      Object.assign(this.$data.listQuery, this.$options.data().listQuery)
+      if (this.isFiltered) {
+        await this.$store.dispatch('applicants/resetOptions')
+        this.options = {
+          ...this.options,
+          keyWords: null,
+          city: null,
+          startDate: null,
+          endDate: null,
+          personStatus: null
+        }
+        this.isFiltered = false
+      }
     },
 
     createClose() {
@@ -446,19 +429,27 @@ export default {
     },
 
     deleteItem(item) {
-      this.deleteModal = true
+      this.deleteDialog = true
       this.selectedData = item
+    },
+
+    deleteClose(payload) {
+      this.deleteDialog = false
     },
 
     async remove(payload) {
       try {
-        this.deleteModal = false
+        this.deleteDialog = false
         await this.$store.dispatch('applicants/delete', payload.id)
         this.$toast.show({
           message: SUCCESS_DELETE,
           type: 'success'
         })
-        await this.$store.dispatch('applicants/getList')
+        if (this.listType === 'applicant') {
+          await this.$store.dispatch('applicants/getRecordsNew')
+        } else {
+          await this.$store.dispatch('applicants/getRecordsApproved')
+        }
       } catch (error) {
         this.$toast.show({
           message: error.message || FAILED_DELETE,
@@ -474,7 +465,11 @@ export default {
 
     async editSave() {
       this.editClose()
-      await this.$store.dispatch('applicants/getList') // @TODO lost current state?
+      if (this.listType === 'applicant') {
+        await this.$store.dispatch('applicants/getRecordsNew')
+      } else {
+        await this.$store.dispatch('applicants/getRecordsApproved')
+      }
     },
 
     getLatestInvitation(invitations) {
