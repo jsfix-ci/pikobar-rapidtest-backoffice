@@ -24,6 +24,8 @@ export const SET_LABCODE_SUCCESS =
   'Kode Sampel Hasil Lab Berhasil di perbaharui'
 export const SET_LABCODE_FAILED =
   'Maaf, ada kesalahan dalam menyimpan Kode Sampel Hasil Lab '
+export const UNCHECK_SUCCESS = 'Data Checkin dan Kode Sampel berhasil direset'
+export const UNCHECK_FAILED = 'Data Checkin dan Kode Sampel gagal direset'
 
 export const DEFAULT_FILTER = {
   groupBy: [],
@@ -71,4 +73,11 @@ export const CONGENITAL_DESEASE_OPTIONS = [
   { value: 4, text: 'Gangguan Jantung' },
   { value: 5, text: 'Gagal Ginjal' },
   { value: 99, text: 'Tidak Ada' }
+]
+export const STATUS_OPTIONS = [
+  { value: 'CLOSE_CONTACT', text: 'Kontak Erat' },
+  { value: 'SUSPECT', text: 'Suspek' },
+  { value: 'PROBABLE', text: 'Probable' },
+  { value: 'CONFIRMED', text: 'Konfirmasi' },
+  { value: 'UNKNOWN', text: 'Tanpa Kriteria' }
 ]

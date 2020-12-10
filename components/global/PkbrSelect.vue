@@ -8,6 +8,8 @@
       :item-value="itemValue"
       outlined
       :hide-details="hideDetails"
+      :multiple="multiple"
+      :chips="chips"
       dense
     >
       <template v-slot:label>
@@ -32,7 +34,7 @@ export default {
       default: ''
     },
     value: {
-      type: [String, Number],
+      type: [String, Number, Array],
       default: null
     },
     itemText: {
@@ -60,6 +62,14 @@ export default {
       default: () => []
     },
     hideDetails: {
+      type: Boolean,
+      default: false
+    },
+    multiple: {
+      type: Boolean,
+      default: false
+    },
+    chips: {
       type: Boolean,
       default: false
     }

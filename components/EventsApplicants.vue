@@ -192,15 +192,68 @@
         </v-layout>
       </template>
       <template v-slot:[`item.actions`]="{ item }">
-        <v-icon class="mr-2" @click="viewItem(item)">
-          mdi-card-search
-        </v-icon>
-        <v-icon class="mr-2" @click="modalEditLabCodeOpen(item.id)">
-          mdi-pencil
-        </v-icon>
-        <v-icon @click="selectToRemove(item)">
-          mdi-delete
-        </v-icon>
+        <v-tooltip bottom>
+          <template v-slot:activator="{ on, attrs }">
+            <v-icon
+              v-if="item.lab_code_sample === null"
+              class="mr-2"
+              v-bind="attrs"
+              v-on="on"
+              @click="uncheckWarning(item)"
+            >
+              mdi-checkbox-blank-outline
+            </v-icon>
+            <v-icon
+              v-else-if="item.lab_code_sample !== null"
+              class="mr-2"
+              v-bind="attrs"
+              v-on="on"
+              @click="uncheck(item)"
+            >
+              mdi-check-box-outline
+            </v-icon>
+          </template>
+          <span>Uncheck</span>
+        </v-tooltip>
+        <v-tooltip bottom>
+          <template v-slot:activator="{ on, attrs }">
+            <v-icon
+              class="mr-2"
+              v-bind="attrs"
+              v-on="on"
+              @click="viewItem(item)"
+            >
+              mdi-card-search
+            </v-icon>
+          </template>
+          <span>Detail</span>
+        </v-tooltip>
+        <v-tooltip bottom>
+          <template v-slot:activator="{ on, attrs }">
+            <v-icon
+              class="mr-2"
+              v-bind="attrs"
+              v-on="on"
+              @click="modalEditLabCodeOpen(item.id)"
+            >
+              mdi-pencil
+            </v-icon>
+          </template>
+          <span>Edit Kode Sample</span>
+        </v-tooltip>
+        <v-tooltip bottom>
+          <template v-slot:activator="{ on, attrs }">
+            <v-icon
+              class="mr-2"
+              v-bind="attrs"
+              v-on="on"
+              @click="selectToRemove(item)"
+            >
+              mdi-delete
+            </v-icon>
+          </template>
+          <span>Hapus</span>
+        </v-tooltip>
       </template>
     </v-data-table>
     <dialog-export-loader :open="modalExportLoader" />
@@ -249,6 +302,16 @@
       @close="closeDialogImport"
       @doImport="doImport"
     />
+    <event-applicant-uncheck-dialog
+      :open="uncheckDialog"
+      :record="selectedData"
+      @close="closeDialogUncheck"
+      @save="resetDataCheckin"
+    />
+    <event-applicant-uncheck-warning-dialog
+      :open="uncheckWarningDialog"
+      @close="closeDialogUncheckWarning"
+    />
   </div>
 </template>
 
@@ -270,7 +333,9 @@ import {
   FAILED_DELETE,
   TEST_RESULT_OPTIONS,
   SUCCESS_UPDATE_TEST_RESULT,
-  FAILED_UPDATE_TEST_RESULT
+  FAILED_UPDATE_TEST_RESULT,
+  UNCHECK_SUCCESS,
+  UNCHECK_FAILED
 } from '@/utilities/constant'
 import EventApplicantEditLabCodeDialog from '@/components/EventApplicantEditLabCodeDialog'
 import DialogExportLoader from '@/components/DialogLoader'
@@ -280,6 +345,8 @@ import ApplicantDeleteDialog from '@/components/ApplicantDeleteDialog'
 import EventUpdateResultDialog from '@/components/EventUpdateResultDialog'
 import EventBlashNotifDialog from '@/components/EventBlashNotifDialog'
 import EventImportTestResultDialog from '@/components/EventImportTestResultDialog'
+import EventApplicantUncheckDialog from '@/components/EventApplicantUncheckDialog'
+import EventApplicantUncheckWarningDialog from '@/components/EventApplicantUncheckWarningDialog'
 
 const headers = [
   {
@@ -309,7 +376,13 @@ const headers = [
     value: 'notified_result_at',
     width: 200
   },
-  { text: 'Actions', value: 'actions', sortable: false, width: 150 }
+  {
+    text: 'Actions',
+    value: 'actions',
+    align: 'center',
+    sortable: false,
+    width: 200
+  }
 ]
 
 export default {
@@ -321,7 +394,9 @@ export default {
     ApplicantDeleteDialog,
     EventUpdateResultDialog,
     EventBlashNotifDialog,
-    EventImportTestResultDialog
+    EventImportTestResultDialog,
+    EventApplicantUncheckDialog,
+    EventApplicantUncheckWarningDialog
   },
   filters: {
     getChipColor
@@ -356,6 +431,8 @@ export default {
       blastNotifModalWarning: false,
       updateResultDialog: false,
       updatePayload: null,
+      uncheckDialog: false,
+      uncheckWarningDialog: false,
       incompleteResultTest: []
     }
   },
@@ -428,6 +505,46 @@ export default {
   },
 
   methods: {
+    async resetDataCheckin(payload) {
+      try {
+        await this.$store.dispatch(
+          'eventParticipants/resetDataCheckin',
+          payload.id
+        )
+        this.$toast.show({
+          message: UNCHECK_SUCCESS,
+          type: 'success'
+        })
+        await this.$store.dispatch(
+          'events/getCurrent',
+          this.$route.params.eventId
+        )
+        await this.$store.dispatch(
+          'eventParticipants/getList',
+          this.$route.params.eventId
+        )
+      } catch (error) {
+        this.$toast.show({
+          message: error.message || UNCHECK_FAILED,
+          type: 'error'
+        })
+      } finally {
+        this.uncheckDialog = false
+      }
+    },
+    uncheckWarning(payload) {
+      this.uncheckWarningDialog = true
+    },
+    closeDialogUncheckWarning() {
+      this.uncheckWarningDialog = false
+    },
+    uncheck(payload) {
+      this.uncheckDialog = true
+      this.selectedData = payload
+    },
+    closeDialogUncheck() {
+      this.uncheckDialog = false
+    },
     checkResultLabel(payload) {
       let testResultLabel = null
       const testResultFilter = this.testResultOptions.filter(
