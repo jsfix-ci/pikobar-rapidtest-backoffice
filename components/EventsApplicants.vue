@@ -632,12 +632,12 @@ export default {
       }
     },
     integrateData() {
-      const participantId = this.records.map((item) => item.id)
-      const data = {
-        eventId: this.$route.params.eventId,
-        participant: participantId
-      }
-      console.log(data)
+      // const participantId = this.records.map((item) => item.id)
+      // const data = {
+      //   eventId: this.$route.params.eventId,
+      //   participant: participantId
+      // }
+      console.log(this.incompleteResultTest)
     },
     closeDialogIntegratingData() {
       this.integratingModal = false
