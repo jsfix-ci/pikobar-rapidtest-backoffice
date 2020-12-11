@@ -26,8 +26,8 @@
           <v-col lg="2" md="2" sm="12">
             <v-text-field
               v-model="listQuery.nameNik"
-              label="NIK/Nama Peserta / Nomor Pendaftaran"
-              placeholder="NIK/Nama Peserta / Nomor Pendaftaran"
+              label="NIK/Nama Peserta/SessionId/Nomor Pendaftaran"
+              placeholder="NIK/Nama Peserta/SessionId/Nomor Pendaftaran"
               outlined
               dense
               hide-details

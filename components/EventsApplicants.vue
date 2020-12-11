@@ -345,7 +345,9 @@ import {
   SUCCESS_UPDATE_TEST_RESULT,
   FAILED_UPDATE_TEST_RESULT,
   UNCHECK_SUCCESS,
-  UNCHECK_FAILED
+  UNCHECK_FAILED,
+  INTEGRATE_SUCCESS,
+  INTEGRATE_FAILED
 } from '@/utilities/constant'
 import EventApplicantEditLabCodeDialog from '@/components/EventApplicantEditLabCodeDialog'
 import DialogExportLoader from '@/components/DialogLoader'
@@ -407,8 +409,7 @@ export default {
     EventBlashNotifDialog,
     EventImportTestResultDialog,
     EventApplicantUncheckDialog,
-    EventApplicantUncheckWarningDialog
-    DialogWarningTestResult,
+    EventApplicantUncheckWarningDialog,
     DialogIntegratingData
   },
   filters: {
@@ -643,12 +644,25 @@ export default {
         })
       }
     },
-    integrateData() {
-      // const participantId = this.records.map((item) => item.id)
-      // const data = {
-      //   eventId: this.$route.params.eventId,
-      //   participant: participantId
-      // }
+    async integrateData() {
+      console.log('terpanggil')
+      try {
+        await this.$store.dispatch(
+          'eventParticipants/integrateDataToLabkes',
+          this.idEvent
+        )
+        this.$toast.show({
+          message: INTEGRATE_SUCCESS,
+          type: 'success'
+        })
+      } catch (error) {
+        this.$toast.show({
+          message: error.message || INTEGRATE_FAILED,
+          type: 'error'
+        })
+      } finally {
+        this.integratingModal = false
+      }
       console.log(this.incompleteResultTest)
     },
     closeDialogIntegratingData() {

@@ -7,7 +7,7 @@
           <v-icon>mdi-close</v-icon>
         </v-btn>
       </v-card-title>
-      <v-card-text>
+      <v-card-text v-if="items.length > 0">
         <div class="text-center">
           <p>
             Berikut ini adalah data peserta yang akan diintegrasikan ke aplikasi
@@ -45,11 +45,24 @@
           </v-simple-table>
         </div>
       </v-card-text>
+      <v-card-text v-else>
+        <div class="text-center">
+          <p class="body-1">
+            Mohon maaf data peserta pada kegiatan ini belum memiliki kode sampel
+            sehingga belum bisa dikirim ke aplikasi Labkes.
+          </p>
+        </div>
+      </v-card-text>
       <v-card-actions class="pb-6 justify-center">
         <v-btn color="grey darken-1" outlined class="mr-2 px-2" @click="close">
           Batal
         </v-btn>
-        <v-btn color="primary" class="ml-2 px-2" @click="send">
+        <v-btn
+          v-if="items.length > 0"
+          color="primary"
+          class="ml-2 px-2"
+          @click="send"
+        >
           Kirim
         </v-btn>
       </v-card-actions>
