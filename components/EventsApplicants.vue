@@ -645,7 +645,6 @@ export default {
       }
     },
     async integrateData() {
-      console.log('terpanggil')
       try {
         await this.$store.dispatch(
           'eventParticipants/integrateDataToLabkes',
