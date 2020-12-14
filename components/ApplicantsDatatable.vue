@@ -91,7 +91,7 @@
               allow-null
             />
           </v-col>
-          <v-col lg="2" md="2" sm="12">
+          <v-col lg="3" md="3" sm="12" class="mt-n8">
             <v-btn color="primary" @click="searchFilter">
               Cari
             </v-btn>
