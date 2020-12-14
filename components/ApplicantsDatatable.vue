@@ -34,6 +34,16 @@
             />
           </v-col>
           <v-col lg="2" md="2" sm="12">
+            <v-text-field
+              v-model="listQuery.sessionId"
+              label="SessionId"
+              placeholder="SessionId"
+              outlined
+              dense
+              hide-details
+            />
+          </v-col>
+          <v-col lg="2" md="2" sm="12">
             <pkbr-select
               v-model="listQuery.city"
               :items="getKabkot"
@@ -289,7 +299,8 @@ export default {
         city: null,
         startDate: null,
         endDate: null,
-        personStatus: null
+        personStatus: null,
+        sessionId: null
       },
       isFiltered: false,
       statusOptions: STATUS_OPTIONS,
@@ -383,7 +394,8 @@ export default {
           city: this.listQuery.city,
           startDate: this.listQuery.startDate,
           endDate: this.listQuery.endDate,
-          personStatus: this.listQuery.personStatus
+          personStatus: this.listQuery.personStatus,
+          sessionId: this.listQuery.sessionId
         }
         this.isFiltered = true
       }
@@ -398,7 +410,8 @@ export default {
           city: null,
           startDate: null,
           endDate: null,
-          personStatus: null
+          personStatus: null,
+          sessionId: null
         }
         this.isFiltered = false
       }
