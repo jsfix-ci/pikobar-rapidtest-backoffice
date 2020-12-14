@@ -59,6 +59,7 @@ export default {
       query.startDate = value.startDate
       query.endDate = value.endDate
       query.personStatus = value.personStatus
+      query.sessionId = value.sessionId
       query = pickBy(query, identity)
       this.$router
         .replace({
