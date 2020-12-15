@@ -259,7 +259,6 @@ export const actions = {
     }
   },
   async integrateDataToLabkes({ commit }, idEvent) {
-    console.log(idEvent)
     commit('SET_LOADING', true)
     try {
       await this.$axios.$post(`/synctolabkes/${idEvent}`)
