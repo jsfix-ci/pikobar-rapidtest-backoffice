@@ -662,7 +662,6 @@ export default {
       } finally {
         this.integratingModal = false
       }
-      console.log(this.incompleteResultTest)
     },
     closeDialogIntegratingData() {
       this.integratingModal = false
