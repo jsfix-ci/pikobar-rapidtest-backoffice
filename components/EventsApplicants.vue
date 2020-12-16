@@ -31,7 +31,7 @@
           <v-icon class="mr-1">mdi-file-send-outline</v-icon>
           Kirim Hasil Test
         </v-btn>
-        <v-btn color="warning" @click="openModalIntegratingData">
+        <v-btn v-if="false" color="warning" @click="openModalIntegratingData">
           <v-icon class="mr-1">mdi-file-send-outline</v-icon>
           Kirim data
         </v-btn>
