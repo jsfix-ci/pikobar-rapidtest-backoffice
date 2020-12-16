@@ -26,6 +26,8 @@ export const SET_LABCODE_FAILED =
   'Maaf, ada kesalahan dalam menyimpan Kode Sampel Hasil Lab '
 export const UNCHECK_SUCCESS = 'Data Checkin dan Kode Sampel berhasil direset'
 export const UNCHECK_FAILED = 'Data Checkin dan Kode Sampel gagal direset'
+export const INTEGRATE_SUCCESS = 'Data berhasil dikirim ke Aplikasi Labkes'
+export const INTEGRATE_FAILED = 'Data gagal dikirim ke Aplikasi Labkes'
 
 export const DEFAULT_FILTER = {
   groupBy: [],
