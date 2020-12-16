@@ -377,7 +377,8 @@ export default {
       city: null,
       startDate: null,
       endDate: null,
-      personStatus: null
+      personStatus: null,
+      sessionId: null
     }
   },
 
