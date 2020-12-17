@@ -227,7 +227,13 @@ const headers = [
     width: 120,
     align: 'center'
   },
-  { text: 'Kota/Kab', value: 'city.name', sortable: false, width: 200 },
+  { text: 'Kota/Kab', value: 'city.name', sortable: false, width: 175 },
+  {
+    text: 'Instansi Pekerjaan',
+    value: 'workplace_name',
+    sortable: false,
+    width: 175
+  },
   {
     text: 'Riwayat Kontak',
     value: 'symptoms_interaction',
