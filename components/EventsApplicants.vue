@@ -31,7 +31,11 @@
           <v-icon class="mr-1">mdi-file-send-outline</v-icon>
           Kirim Hasil Test
         </v-btn>
-        <v-btn v-if="false" color="warning" @click="openModalIntegratingData">
+        <v-btn
+          v-if="configIntegration === 'true'"
+          color="warning"
+          @click="openModalIntegratingData"
+        >
           <v-icon class="mr-1">mdi-file-send-outline</v-icon>
           Kirim data
         </v-btn>
@@ -429,6 +433,7 @@ export default {
 
   data() {
     return {
+      configIntegration: process.env.featureIntegrationLabkes,
       headers,
       pesertaSelected: [],
       blastNotifModal: false,
