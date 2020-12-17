@@ -31,6 +31,14 @@
           <v-icon class="mr-1">mdi-file-send-outline</v-icon>
           Kirim Hasil Test
         </v-btn>
+        <v-btn
+          v-if="configIntegration === 'true'"
+          color="warning"
+          @click="openModalIntegratingData"
+        >
+          <v-icon class="mr-1">mdi-file-send-outline</v-icon>
+          Kirim data
+        </v-btn>
       </v-col>
       <v-spacer></v-spacer>
       <v-col cols="auto">
@@ -312,6 +320,12 @@
       :open="uncheckWarningDialog"
       @close="closeDialogUncheckWarning"
     />
+    <dialog-integrating-data
+      :open="integratingModal"
+      :items="incompleteResultTest"
+      @close="closeDialogIntegratingData"
+      @send="integrateData"
+    />
   </div>
 </template>
 
@@ -335,11 +349,14 @@ import {
   SUCCESS_UPDATE_TEST_RESULT,
   FAILED_UPDATE_TEST_RESULT,
   UNCHECK_SUCCESS,
-  UNCHECK_FAILED
+  UNCHECK_FAILED,
+  INTEGRATE_SUCCESS,
+  INTEGRATE_FAILED
 } from '@/utilities/constant'
 import EventApplicantEditLabCodeDialog from '@/components/EventApplicantEditLabCodeDialog'
 import DialogExportLoader from '@/components/DialogLoader'
 import DialogWarningTestResult from '@/components/DialogWarningTestResult'
+import DialogIntegratingData from '@/components/DialogIntegratingData'
 import ApplicantViewDialog from '@/components/ApplicantViewDialog'
 import ApplicantDeleteDialog from '@/components/ApplicantDeleteDialog'
 import EventUpdateResultDialog from '@/components/EventUpdateResultDialog'
@@ -396,7 +413,8 @@ export default {
     EventBlashNotifDialog,
     EventImportTestResultDialog,
     EventApplicantUncheckDialog,
-    EventApplicantUncheckWarningDialog
+    EventApplicantUncheckWarningDialog,
+    DialogIntegratingData
   },
   filters: {
     getChipColor
@@ -415,6 +433,7 @@ export default {
 
   data() {
     return {
+      configIntegration: process.env.featureIntegrationLabkes,
       headers,
       pesertaSelected: [],
       blastNotifModal: false,
@@ -433,6 +452,7 @@ export default {
       updatePayload: null,
       uncheckDialog: false,
       uncheckWarningDialog: false,
+      integratingModal: false,
       incompleteResultTest: []
     }
   },
@@ -628,6 +648,33 @@ export default {
           type: 'error'
         })
       }
+    },
+    async integrateData() {
+      try {
+        await this.$store.dispatch(
+          'eventParticipants/integrateDataToLabkes',
+          this.idEvent
+        )
+        this.$toast.show({
+          message: INTEGRATE_SUCCESS,
+          type: 'success'
+        })
+      } catch (error) {
+        this.$toast.show({
+          message: error.message || INTEGRATE_FAILED,
+          type: 'error'
+        })
+      } finally {
+        this.integratingModal = false
+      }
+    },
+    closeDialogIntegratingData() {
+      this.integratingModal = false
+    },
+    openModalIntegratingData() {
+      this.integratingModal = true
+      const data = this.records.filter((item) => item.lab_code_sample !== null)
+      this.incompleteResultTest = data
     },
     closeDialogWarning() {
       this.blastNotifModalWarning = false

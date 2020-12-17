@@ -13,7 +13,8 @@ export default {
     keycloakUrl: process.env.KEYCLOAK_URL,
     keycloakRealm: process.env.KEYCLOAK_REALM,
     keycloakClientId: process.env.KEYCLOAK_CLIENT_ID,
-    keycloakRedirectUri: process.env.KEYCLOAK_REDIRECT_URI
+    keycloakRedirectUri: process.env.KEYCLOAK_REDIRECT_URI,
+    featureIntegrationLabkes: process.env.FEATURE_INTEGRATION_LABKES
   },
 
   /*

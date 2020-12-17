@@ -26,8 +26,18 @@
           <v-col lg="2" md="2" sm="12">
             <v-text-field
               v-model="listQuery.nameNik"
-              label="NIK/Nama Peserta / Nomor Pendaftaran"
-              placeholder="NIK/Nama Peserta / Nomor Pendaftaran"
+              label="NIK/Nama Peserta/Nomor Pendaftaran"
+              placeholder="NIK/Nama Peserta/Nomor Pendaftaran"
+              outlined
+              dense
+              hide-details
+            />
+          </v-col>
+          <v-col lg="2" md="2" sm="12">
+            <v-text-field
+              v-model="listQuery.sessionId"
+              label="SessionId"
+              placeholder="SessionId"
               outlined
               dense
               hide-details
@@ -81,7 +91,7 @@
               allow-null
             />
           </v-col>
-          <v-col lg="2" md="2" sm="12">
+          <v-col lg="3" md="3" sm="12" class="mt-n8">
             <v-btn color="primary" @click="searchFilter">
               Cari
             </v-btn>
@@ -217,7 +227,13 @@ const headers = [
     width: 120,
     align: 'center'
   },
-  { text: 'Kota/Kab', value: 'city.name', sortable: false, width: 200 },
+  { text: 'Kota/Kab', value: 'city.name', sortable: false, width: 175 },
+  {
+    text: 'Instansi Pekerjaan',
+    value: 'workplace_name',
+    sortable: false,
+    width: 175
+  },
   {
     text: 'Riwayat Kontak',
     value: 'symptoms_interaction',
@@ -289,7 +305,8 @@ export default {
         city: null,
         startDate: null,
         endDate: null,
-        personStatus: null
+        personStatus: null,
+        sessionId: null
       },
       isFiltered: false,
       statusOptions: STATUS_OPTIONS,
@@ -366,7 +383,8 @@ export default {
       city: null,
       startDate: null,
       endDate: null,
-      personStatus: null
+      personStatus: null,
+      sessionId: null
     }
   },
 
@@ -383,7 +401,8 @@ export default {
           city: this.listQuery.city,
           startDate: this.listQuery.startDate,
           endDate: this.listQuery.endDate,
-          personStatus: this.listQuery.personStatus
+          personStatus: this.listQuery.personStatus,
+          sessionId: this.listQuery.sessionId
         }
         this.isFiltered = true
       }
@@ -398,7 +417,8 @@ export default {
           city: null,
           startDate: null,
           endDate: null,
-          personStatus: null
+          personStatus: null,
+          sessionId: null
         }
         this.isFiltered = false
       }
