@@ -664,12 +664,9 @@ export default {
           'eventParticipants/integrateDataToLabkes',
           this.idEvent
         )
-        const successCount = response.result.success
-          ? response.result.success.length
-          : 0
-        const failedCount = response.result.failed
-          ? response.result.failed.length
-          : 0
+        const { success, failed } = response.result
+        const successCount = Array.isArray(success) ? success.length : 0
+        const failedCount = Array.isArray(failed) ? failed.length : 0
         const message = `Data berhasil dikirim ${successCount}. Data Gagal dikirim ${failedCount}.`
         this.$toast.show({
           message,
