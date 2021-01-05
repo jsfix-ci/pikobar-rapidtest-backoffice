@@ -10,12 +10,12 @@
       <v-card-text v-if="items.length > 0">
         <div class="text-center">
           <p>
-            Berikut ini adalah data peserta yang akan diintegrasikan ke aplikasi
-            Labkesda.
+            Berikut ini adalah data peserta yang akan diintegrasikan ke Aplikasi
+            Manlab.
           </p>
           <p>
-            Data yang diintegrasikan adalah data yang sudah memiliki kode
-            sampel.
+            Data yang diintegrasikan adalah data peserta yang telah melakukan
+            checkin.
           </p>
         </div>
         <div>

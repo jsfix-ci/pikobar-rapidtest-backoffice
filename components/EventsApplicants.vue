@@ -117,6 +117,11 @@
           !!value ? $dateFns.format(new Date(value), 'dd MMMM yyyy HH:mm') : ''
         }}
       </template>
+      <template v-slot:[`item.synchronization_at`]="{ value }">
+        {{
+          !!value ? $dateFns.format(new Date(value), 'dd MMMM yyyy HH:mm') : ''
+        }}
+      </template>
       <template v-slot:[`item.created_at`]="{ value }">
         {{ $dateFns.format(new Date(value), 'dd MMMM yyyy HH:mm') }}
       </template>
@@ -350,7 +355,6 @@ import {
   FAILED_UPDATE_TEST_RESULT,
   UNCHECK_SUCCESS,
   UNCHECK_FAILED,
-  INTEGRATE_SUCCESS,
   INTEGRATE_FAILED
 } from '@/utilities/constant'
 import EventApplicantEditLabCodeDialog from '@/components/EventApplicantEditLabCodeDialog'
@@ -391,6 +395,11 @@ const headers = [
   {
     text: 'Kirim Hasil',
     value: 'notified_result_at',
+    width: 200
+  },
+  {
+    text: 'Tanggal Terkirim ke Manlab',
+    value: 'synchronization_at',
     width: 200
   },
   {
@@ -651,12 +660,16 @@ export default {
     },
     async integrateData() {
       try {
-        await this.$store.dispatch(
+        const response = await this.$store.dispatch(
           'eventParticipants/integrateDataToLabkes',
           this.idEvent
         )
+        const { success, failed } = response.result
+        const successCount = Array.isArray(success) ? success.length : 0
+        const failedCount = Array.isArray(failed) ? failed.length : 0
+        const message = `Data berhasil dikirim ${successCount}. Data Gagal dikirim ${failedCount}.`
         this.$toast.show({
-          message: INTEGRATE_SUCCESS,
+          message,
           type: 'success'
         })
       } catch (error) {
@@ -673,7 +686,9 @@ export default {
     },
     openModalIntegratingData() {
       this.integratingModal = true
-      const data = this.records.filter((item) => item.lab_code_sample !== null)
+      const data = this.records.filter(
+        (item) => item.attended_at !== null && item.synchronization_at === null
+      )
       this.incompleteResultTest = data
     },
     closeDialogWarning() {
