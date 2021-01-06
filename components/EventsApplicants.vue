@@ -664,14 +664,18 @@ export default {
           'eventParticipants/integrateDataToLabkes',
           this.idEvent
         )
-        const { success, failed } = response.result
-        const successCount = Array.isArray(success) ? success.length : 0
+        const { succes, failed } = response.result
+        const successCount = Array.isArray(succes) ? succes.length : 0
         const failedCount = Array.isArray(failed) ? failed.length : 0
         const message = `Data berhasil dikirim ${successCount}. Data Gagal dikirim ${failedCount}.`
         this.$toast.show({
           message,
           type: 'success'
         })
+        await this.$store.dispatch(
+          'eventParticipants/getList',
+          this.$route.params.eventId
+        )
       } catch (error) {
         this.$toast.show({
           message: error.message || INTEGRATE_FAILED,
