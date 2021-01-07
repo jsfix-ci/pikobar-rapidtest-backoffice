@@ -232,7 +232,7 @@ export default {
     '$route.query': {
       handler(value, oldValue) {
         this.$store.dispatch(
-          'applicants/getRecordsNew',
+          'applicants/getRecords',
           value.keyWords !== oldValue.keyWords || value.page !== oldValue.page
         )
       },
