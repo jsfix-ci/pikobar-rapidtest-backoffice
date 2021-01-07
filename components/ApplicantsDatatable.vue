@@ -147,6 +147,15 @@
           {{ $dateFns.format(new Date(item.created_at), 'dd MMMM yyyy HH:mm') }}
         </v-layout>
       </template>
+      <template v-slot:[`item.person_status`]="{ item }">
+        <v-layout justify-center>
+          <template v-for="data in statusOptions">
+            <template v-if="item.person_status === data.value">
+              {{ data.text }}
+            </template>
+          </template>
+        </v-layout>
+      </template>
       <template v-slot:[`item.actions`]="{ item }">
         <v-icon
           v-if="allow.includes('view-applicants')"
@@ -235,8 +244,8 @@ const headers = [
     width: 175
   },
   {
-    text: 'Riwayat Kontak',
-    value: 'symptoms_interaction',
+    text: 'Status Kesehatan',
+    value: 'person_status',
     width: 150,
     align: 'center'
   },
