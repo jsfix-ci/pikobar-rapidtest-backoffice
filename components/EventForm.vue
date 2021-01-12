@@ -37,6 +37,18 @@
         </v-col>
         <v-col cols="6">
           <pkbr-select
+            v-model="city_code"
+            :items="getKabkot"
+            label="Kab./Kota"
+            name="Kab./Kota"
+            placeholder="Pilih Kab./Kota"
+            rules="required"
+            item-text="name"
+            item-value="code"
+          />
+        </v-col>
+        <v-col cols="6">
+          <pkbr-select
             v-model="host_type"
             :items="typeOptions"
             label="Jenis Penyelenggara"
@@ -44,7 +56,17 @@
             placeholder="Jenis Penyelenggara"
             rules="required"
             item-text="name"
-            item-value="code"
+            item-value="value"
+            @change="getFasyankes"
+          />
+        </v-col>
+        <v-col cols="6">
+          <pkbr-input
+            v-model="event_location"
+            name="Lokasi"
+            label="Lokasi"
+            placeholder="Masukan Alamat Lokasi"
+            rules="required"
           />
         </v-col>
         <v-col cols="6">
@@ -60,27 +82,6 @@
             :return-object="false"
             outlined
             dense
-          />
-        </v-col>
-        <v-col cols="6">
-          <pkbr-input
-            v-model="event_location"
-            name="Lokasi"
-            label="Lokasi"
-            placeholder="Masukan Alamat Lokasi"
-            rules="required"
-          />
-        </v-col>
-        <v-col cols="6">
-          <pkbr-select
-            v-model="city_code"
-            :items="getKabkot"
-            label="Kab./Kota"
-            name="Kab./Kota"
-            placeholder="Pilih Kab./Kota"
-            rules="required"
-            item-text="name"
-            item-value="code"
           />
         </v-col>
         <v-col cols="6">
@@ -232,7 +233,7 @@ export default {
   },
   methods: {
     async getFasyankes() {
-      await this.$store.dispatch('events/getFasyankes')
+      await this.$store.dispatch('events/getFasyankes', this.host_type)
     },
     addKloter() {
       this.kloter.push(null)
