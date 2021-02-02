@@ -88,3 +88,8 @@ sw.*
 
 # Vim swap files
 *.swp
+
+# SonarQube
+sonar-project.properties
+.sonar/
+.scannerwork/
