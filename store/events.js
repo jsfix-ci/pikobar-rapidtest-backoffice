@@ -216,12 +216,15 @@ export const actions = {
       commit('SET_LOADING', false)
     }
   },
-  async getFasyankes({ commit }) {
+  async getFasyankes({ commit }, payload) {
     commit('SET_LOADING', true)
     try {
       const { data } = await this.$axios.$get('master/fasyankes', {
         headers: {
           Authorization: null
+        },
+        params: {
+          type: payload
         }
       })
       commit('SET_FASYANKES', data)

@@ -142,9 +142,18 @@
           {{ item.age }}
         </v-layout>
       </template>
-      <template v-slot:[`item.created_at`]="{ item }">
+      <template v-slot:[`item.updated_at`]="{ item }">
         <v-layout justify-start>
-          {{ $dateFns.format(new Date(item.created_at), 'dd MMMM yyyy HH:mm') }}
+          {{ $dateFns.format(new Date(item.updated_at), 'dd MMMM yyyy HH:mm') }}
+        </v-layout>
+      </template>
+      <template v-slot:[`item.person_status`]="{ item }">
+        <v-layout justify-center>
+          <template v-for="data in statusOptions">
+            <template v-if="item.person_status === data.value">
+              {{ data.text }}
+            </template>
+          </template>
         </v-layout>
       </template>
       <template v-slot:[`item.actions`]="{ item }">
@@ -235,12 +244,12 @@ const headers = [
     width: 175
   },
   {
-    text: 'Riwayat Kontak',
-    value: 'symptoms_interaction',
+    text: 'Status Kesehatan',
+    value: 'person_status',
     width: 150,
     align: 'center'
   },
-  { text: 'Tanggal Terdaftar', value: 'created_at', width: 200 },
+  { text: 'Tanggal Terdaftar', value: 'updated_at', width: 200 },
   { text: 'Actions', value: 'actions', sortable: false, width: 150 }
 ]
 
@@ -285,6 +294,10 @@ export default {
     listType: {
       type: String,
       default: 'participant'
+    },
+    eventId: {
+      type: Number,
+      default: null
     }
   },
 
@@ -326,6 +339,7 @@ export default {
     },
     options: {
       set(value) {
+        value.eventId = this.eventId
         this.$store.commit('applicants/SET_TABLE_OPTIONS', value)
       },
       get() {

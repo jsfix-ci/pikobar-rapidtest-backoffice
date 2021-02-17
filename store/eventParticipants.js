@@ -5,6 +5,7 @@ import { DEFAULT_FILTER, DEFAULT_PAGINATION } from '@/utilities/constant'
 
 const defaultFilter = { ...DEFAULT_FILTER }
 delete defaultFilter.status
+defaultFilter.sortBy = ['updated_at']
 
 export const state = () => ({
   loading: false,
@@ -261,7 +262,8 @@ export const actions = {
   async integrateDataToLabkes({ commit }, idEvent) {
     commit('SET_LOADING', true)
     try {
-      await this.$axios.$post(`/synctolabkes/${idEvent}`)
+      const response = await this.$axios.$post(`/synctolabkes/${idEvent}`)
+      return response
     } catch (e) {
       throw new Error(e.response.data.message)
     } finally {
