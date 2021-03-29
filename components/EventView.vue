@@ -73,8 +73,8 @@
                 <label class="text-subtitle-2 grey--text">
                   Jenis Pendaftaran
                 </label>
-                <p class="font-weight-medium mt-2 mb-0">
-                  {{ registration_type ? registration_type : 'Mandiri' }}
+                <p class="font-weight-medium mt-2 mb-0 text-capitalize">
+                  {{ data.registration_type }}
                 </p>
               </v-col>
             </v-row>
