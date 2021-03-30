@@ -7,7 +7,7 @@
         </v-list-item>
         <v-list-item two-line :class="miniVariant && 'px-0'">
           <v-list-item-avatar>
-            <img src="https://randomuser.me/api/portraits/men/81.jpg" />
+            <v-img src="https://randomuser.me/api/portraits/men/81.jpg" />
           </v-list-item-avatar>
           <v-list-item-content>
             <v-list-item-title>
@@ -74,7 +74,13 @@
         <nuxt />
       </v-container>
 
-      <v-snackbar v-model="showToast" :color="typeToast" top center>
+      <v-snackbar
+        v-model="showToast"
+        :color="typeToast"
+        top
+        center
+        timeout="3000"
+      >
         {{ messageToast }}
         <template v-slot:action="{ attrs }">
           <v-btn text v-bind="attrs" @click="showToast = false">

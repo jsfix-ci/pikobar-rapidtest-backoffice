@@ -28,7 +28,7 @@
         </v-col>
         <v-col cols="6">
           <pkbr-input
-            v-model="event_name"
+            v-model="eventName"
             name="Nama Kegiatan"
             label="Nama Kegiatan"
             placeholder="Masukan Nama Kegiatan"
@@ -37,7 +37,7 @@
         </v-col>
         <v-col cols="6">
           <pkbr-select
-            v-model="city_code"
+            v-model="cityCode"
             :items="getKabkot"
             label="Kab./Kota"
             name="Kab./Kota"
@@ -49,7 +49,7 @@
         </v-col>
         <v-col cols="6">
           <pkbr-select
-            v-model="host_type"
+            v-model="hostType"
             :items="typeOptions"
             label="Jenis Penyelenggara"
             name="Jenis Penyelenggara"
@@ -62,7 +62,7 @@
         </v-col>
         <v-col cols="6">
           <pkbr-input
-            v-model="event_location"
+            v-model="eventLocation"
             name="Lokasi"
             label="Lokasi"
             placeholder="Masukan Alamat Lokasi"
@@ -71,7 +71,7 @@
         </v-col>
         <v-col cols="6">
           <pkbr-combobox
-            v-model="host_name"
+            v-model="hostName"
             :items="getFasyankesListOptions"
             label="Penyelenggara"
             name="Penyelenggara"
@@ -140,6 +140,19 @@
           </pkbr-input-time>
         </v-col>
         <v-col cols="6">
+          <pkbr-select
+            v-model="registrationType"
+            :items="registrationTypeOptions"
+            label="Jenis Pendaftaran"
+            name="Jenis Pendaftaran"
+            placeholder="Jenis Pendaftaran"
+            rules="required"
+            item-text="name"
+            item-value="value"
+            @change="getFasyankes"
+          />
+        </v-col>
+        <v-col cols="6">
           <v-btn color="success" :disabled="!valid" type="submit">
             Simpan
           </v-btn>
@@ -168,20 +181,25 @@ export default {
 
   data() {
     return {
-      host_type: null,
-      event_name: null,
-      host_name: null,
-      event_location: null,
-      city_code: null,
+      hostType: null,
+      eventName: null,
+      hostName: null,
+      eventLocation: null,
+      cityCode: null,
       status: 'DRAFT',
       startDate: null,
       endDate: null,
       isDateRange: false,
+      registrationType: null,
       kloter: [null],
       typeOptions: [
         { name: 'Rumah Sakit', value: 'rumah_sakit' },
         { name: 'Puskesmas', value: 'puskesmas' },
         { name: 'Dinkes', value: 'dinkes' }
+      ],
+      registrationTypeOptions: [
+        { name: 'Rujukan', value: 'rujukan' },
+        { name: 'Mandiri', value: 'mandiri' }
       ]
     }
   },
@@ -192,6 +210,9 @@ export default {
   },
 
   watch: {
+    hostType(newVal, oldVal) {
+      if (oldVal !== null && newVal !== oldVal) this.hostName = null
+    },
     formData(val) {
       let kloter = [null]
       if (val) {
@@ -205,12 +226,13 @@ export default {
           return `${inputScheduleStart}-${inputScheduleEnd}`
         })
       }
-      this.host_type = val ? val.host_type : null
-      this.event_name = val ? val.event_name : null
+      this.hostType = val ? val.host_type : null
+      this.eventName = val ? val.event_name : null
       this.status = val ? val.status : null
-      this.host_name = val ? val.host_name : null
-      this.event_location = val ? val.event_location : null
-      this.city_code = val && val.city ? val.city.code : null
+      this.hostName = val ? val.host_name : null
+      this.registrationType = val ? val.registration_type : null
+      this.eventLocation = val ? val.event_location : null
+      this.cityCode = val && val.city ? val.city.code : null
       this.startDate = val
         ? this.$dateFns.format(
             val.start_at.split(':')[0],
@@ -233,8 +255,7 @@ export default {
   },
   methods: {
     async getFasyankes() {
-      this.host_name = null
-      await this.$store.dispatch('events/getFasyankes', this.host_type)
+      await this.$store.dispatch('events/getFasyankes', this.hostType)
     },
     addKloter() {
       this.kloter.push(null)
@@ -277,12 +298,13 @@ export default {
       const start_at = schedules[0].start_at
       const end_at = schedules[schedules.length - 1].end_at
       const data = {
-        event_name: this.event_name,
-        host_name: this.host_name,
-        event_location: this.event_location,
-        city_code: this.city_code,
+        event_name: this.eventName,
+        host_name: this.hostName,
+        event_location: this.eventLocation,
+        city_code: this.cityCode,
         status: this.status,
-        host_type: this.host_type,
+        host_type: this.hostType,
+        registration_type: this.registrationType,
         start_at,
         end_at,
         schedules
