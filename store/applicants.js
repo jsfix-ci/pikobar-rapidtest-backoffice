@@ -5,7 +5,7 @@ import { DEFAULT_FILTER, DEFAULT_PAGINATION } from '@/utilities/constant'
 
 const defaultFilter = { ...DEFAULT_FILTER }
 delete defaultFilter.status
-defaultFilter.sortBy = ['updated_at']
+defaultFilter.sortBy = ['registration_at']
 
 export const state = () => {
   return {
@@ -169,7 +169,7 @@ export const actions = {
       const {
         keyWords,
         sortBy,
-        sortOrder,
+        sortDesc,
         city,
         sessionId,
         startDate,
@@ -183,7 +183,7 @@ export const actions = {
           perPage: itemsPerPage,
           search: keyWords,
           sortBy: sortBy[0] || null,
-          sortOrder: sortOrder[0] ? 'desc' : 'asc',
+          sortOrder: sortDesc[0] ? 'desc' : 'asc',
           status,
           cityCode: city,
           sessionId,

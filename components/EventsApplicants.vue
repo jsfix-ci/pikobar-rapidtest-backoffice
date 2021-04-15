@@ -418,7 +418,7 @@ const headers = [
   { text: 'Jenis Kelamin', value: 'applicant.gender', width: 140 },
   { text: 'Usia', value: 'applicant.birth_date', width: 85 },
   { text: 'Lokasi Checkin', value: 'attend_location', width: 200 },
-  { text: 'Terdaftar', value: 'created_at', width: 200 },
+  { text: 'Terdaftar di kegiatan', value: 'created_at', width: 200 },
   { text: 'Checkin', value: 'attended_at', width: 200 },
   { text: 'Kode Sampel', value: 'lab_code_sample', width: 150 },
   { text: 'Tanggal Hasil Test', value: 'result_at', width: 200 },
@@ -430,14 +430,14 @@ const headers = [
     width: 200
   },
   {
-    text: 'Status Terkirim',
+    text: 'Data Terkirim ke SIM Lab',
     value: 'status_on_simlab',
     width: 200
   },
   {
-    text: 'Tanggal Terkirim ke Manlab',
+    text: 'Tanggal Terkirim ke SIM Lab',
     value: 'synchronization_at',
-    width: 200
+    width: 225
   },
   {
     text: 'Actions',
@@ -840,6 +840,9 @@ export default {
             message: error.message,
             type: 'error'
           })
+        } finally {
+          this.$store.dispatch('events/getCurrent', this.$route.params.eventId)
+          this.pesertaSelected = []
         }
       }
     },
