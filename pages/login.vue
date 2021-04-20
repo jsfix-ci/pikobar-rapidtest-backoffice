@@ -1,42 +1,51 @@
 <template>
   <v-app id="inspire">
     <v-main>
-      <v-container class="fill-height" fluid>
-        <v-row align="center" justify="center">
-          <v-col cols="12" sm="8" md="4">
-            <v-card class="elevation-12">
-              <v-toolbar color="primary" dark flat>
-                <v-toolbar-title>Login PIKOBAR</v-toolbar-title>
-              </v-toolbar>
-              <v-card-text>
-                <v-form>
-                  <v-text-field
-                    label="Login"
-                    name="login"
-                    prepend-icon="mdi-account"
-                    type="text"
-                  ></v-text-field>
-
-                  <v-text-field
-                    id="password"
-                    label="Password"
-                    name="password"
-                    prepend-icon="mdi-lock"
-                    type="password"
-                  ></v-text-field>
-                </v-form>
-              </v-card-text>
-              <v-card-actions>
-                <v-spacer></v-spacer>
-                <v-btn color="green" dark @click="login">
-                  Login SSO
-                </v-btn>
-                <v-btn color="primary">Login</v-btn>
-              </v-card-actions>
-            </v-card>
-          </v-col>
-        </v-row>
-      </v-container>
+      <v-row class="login-full-height">
+        <v-col>
+          <div class="mx-16 my-7">
+            <v-img src="/pikobar-logo.png" width="176" height="60" />
+          </div>
+          <v-row class="login-height-icon">
+            <v-col class="d-none d-sm-flex align-end">
+              <div class="ml-5">
+                <v-img src="/login-asset.svg" width="248" height="248" />
+              </div>
+            </v-col>
+          </v-row>
+        </v-col>
+        <v-col offset="1" class="mb-10">
+          <div class="my-1 my-sm-12 pt-1 pt-sm-8">
+            <h2>Selamat datang di Aplikasi</h2>
+            <h2 class="primary--text">Pikobar Pendaftaran Tes</h2>
+          </div>
+          <div align="center">
+            <v-img src="/login-icon.svg" width="300" />
+          </div>
+          <div class="my-8">
+            <v-alert
+              border="left"
+              colored-border
+              color="primary"
+              class="text--disabled text-caption"
+            >
+              Kamu berada di Aplikasi Pikobar Pendaftaran Tes Covid-19 Jawa
+              Barat. Klik tombol “Masuk Dengan SSO”, kemudian login menggunakan
+              email dan kata sandi yang sudah diberikan.
+            </v-alert>
+          </div>
+          <div>
+            <v-btn color="primary" block large dark @click="login">
+              Masuk dengan SSO
+            </v-btn>
+          </div>
+        </v-col>
+        <v-col offset="1" class="d-none d-sm-flex justify-end mr-3">
+          <div class="ma-1">
+            <v-img src="/login-asset2.svg" width="248" height="248" />
+          </div>
+        </v-col>
+      </v-row>
     </v-main>
   </v-app>
 </template>
