@@ -18,64 +18,84 @@
               outlined
               dense
             />
-            <v-text-field
+            <pkbr-input
               v-if="isEditApplicant"
               v-model="nik"
-              label="NIK"
-              outlined
-              dense
+              name="NIK"
+              label="NIK Baru"
+              placeholder="Masukan NIK"
+              :clearable="false"
+              rules="required"
             />
-            <v-text-field v-model="name" label="Nama Peserta" outlined dense />
-            <v-select
+            <pkbr-input
+              v-model="name"
+              name="Nama Peserta"
+              label="Nama Peserta"
+              placeholder="Masukan Nama Peserta"
+              :clearable="false"
+              rules="required"
+            />
+            <pkbr-select
               v-model="gender"
               :items="[
                 { text: 'Laki-Laki', value: 'M' },
                 { text: 'Perempuan', value: 'F' }
               ]"
               label="Jenis Kelamin"
-              outlined
-              dense
-            ></v-select>
-            <v-text-field
-              v-model="workPlace"
-              label="Instansi Tempat Bekerja"
-              outlined
-              dense
+              name="Jenis Kelamin"
+              placeholder="Pilih Jenis Kelamin"
+              rules="required"
+              item-text="text"
+              item-value="value"
             />
-            <v-text-field
+            <pkbr-input
+              v-model="workPlace"
+              name="Instansi Tempat Bekerja"
+              label="Instansi Tempat Bekerja"
+              placeholder="Masukan Instansi Tempat Bekerja"
+              :clearable="false"
+              rules="required"
+            />
+            <pkbr-input
               v-if="isEditApplicant"
               v-model="phone_number"
+              name="Nomor Telepon"
               label="Nomor Telepon"
-              outlined
-              dense
+              placeholder="Masukan Nomor Telepon"
+              :clearable="false"
+              rules="required"
             />
-            <v-select
+            <pkbr-select
               v-if="isEditApplicant"
               v-model="city_code"
               :items="getKabkot"
               label="Kab/Kota Tinggal Sekarang"
+              name="Kab/Kota Tinggal Sekarang"
+              placeholder="Pilih Kab/Kota Tinggal Sekarang"
+              rules="required"
               item-text="name"
               item-value="code"
-              outlined
-              dense
             />
-            <v-text-field
+            <pkbr-input
               v-if="isEditApplicant"
               v-model="address"
+              name="Alamat Tempat Tinggal Sekarang"
               label="Alamat Tempat Tinggal Sekarang"
-              outlined
-              dense
+              placeholder="Masukan Alamat Tempat Tinggal Sekarang"
+              :clearable="false"
+              rules="required"
             />
-            <v-select
+            <pkbr-select
               v-if="isEditApplicant"
               v-model="status"
               :items="statusOptions"
+              label="Status Kesehatan"
+              name="Status Kesehatan"
+              placeholder="Pilih Status Kesehatan"
+              rules="required"
               item-text="text"
               item-value="value"
-              label="Status Kesehatan"
-              outlined
-              dense
-            ></v-select>
+            />
           </v-container>
         </v-card-text>
 
