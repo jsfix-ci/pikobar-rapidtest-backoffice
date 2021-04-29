@@ -61,6 +61,7 @@
             <v-list-item
               v-for="(item, i) in [
                 { icon: 'table', format: 'xls', text: 'Excel F1' },
+                { icon: 'table', format: 'xls', text: 'Excel F2' },
                 { icon: 'table', format: 'xls', text: 'Excel Raw' }
               ]"
               :key="i"
@@ -181,6 +182,35 @@
           </v-card-actions>
         </v-layout>
       </template>
+      <template v-slot:[`item.lab_code_sample`]="{ item }">
+        <v-tooltip bottom>
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn
+              v-if="item.lab_code_sample === null"
+              small
+              outlined
+              v-bind="attrs"
+              color="#828282"
+              v-on="on"
+              @click="modalEditLabCodeOpen(item.id)"
+            >
+              {{ 'Kode sampel' }}
+            </v-btn>
+            <v-btn
+              v-else
+              small
+              outlined
+              v-bind="attrs"
+              color="success"
+              v-on="on"
+              @click="modalEditLabCodeOpen(item.id)"
+            >
+              {{ item.lab_code_sample }}
+            </v-btn>
+          </template>
+          <span>Edit Kode Sample</span>
+        </v-tooltip>
+      </template>
       <template v-slot:[`item.applicant.status`]="{ value }">
         <v-chip small class="ma-2" :color="value | getChipColor">
           {{ value }}
@@ -280,12 +310,12 @@
               class="mr-2"
               v-bind="attrs"
               v-on="on"
-              @click="modalEditLabCodeOpen(item.id)"
+              @click="editApplicantOpen(item)"
             >
               mdi-pencil
             </v-icon>
           </template>
-          <span>Edit Kode Sample</span>
+          <span>Edit Data Peserta</span>
         </v-tooltip>
         <v-tooltip bottom>
           <template v-slot:activator="{ on, attrs }">
@@ -329,6 +359,13 @@
       @close="deleteClose"
       @remove="remove"
     />
+    <applicant-edit-dialog
+      :open="editApplicant"
+      :record-id="idApplicant"
+      :is-edit-applicant="false"
+      @close="editClose"
+      @save="editSave"
+    />
     <event-update-result-dialog
       :open="updateResultDialog"
       :record="selectedData"
@@ -361,6 +398,7 @@
     <dialog-integrating-data
       :open="integratingModal"
       :items="incompleteResultTest"
+      :loading="integratingLoading"
       @close="closeDialogIntegratingData"
       @send="integrateData"
     />
@@ -394,6 +432,7 @@ import DialogExportLoader from '@/components/DialogLoader'
 import DialogWarningTestResult from '@/components/DialogWarningTestResult'
 import DialogIntegratingData from '@/components/DialogIntegratingData'
 import ApplicantViewDialog from '@/components/ApplicantViewDialog'
+import ApplicantEditDialog from '@/components/ApplicantEditDialog'
 import ApplicantDeleteDialog from '@/components/ApplicantDeleteDialog'
 import EventUpdateResultDialog from '@/components/EventUpdateResultDialog'
 import EventBlashNotifDialog from '@/components/EventBlashNotifDialog'
@@ -412,16 +451,14 @@ const headers = [
   {
     text: 'Instansi Tempat Kerja',
     value: 'applicant.workplace_name',
-    width: 250
+    width: 200
   },
-  { text: 'Kloter', value: 'rdt_event_schedule_id', width: 85 },
+  { text: 'Kode Sampel', value: 'lab_code_sample', width: 150 },
   { text: 'Jenis Kelamin', value: 'applicant.gender', width: 140 },
   { text: 'Usia', value: 'applicant.birth_date', width: 85 },
   { text: 'Lokasi Checkin', value: 'attend_location', width: 200 },
   { text: 'Terdaftar di kegiatan', value: 'created_at', width: 200 },
   { text: 'Checkin', value: 'attended_at', width: 200 },
-  { text: 'Kode Sampel', value: 'lab_code_sample', width: 150 },
-  { text: 'Tanggal Hasil Test', value: 'result_at', width: 200 },
   { text: 'Hasil Test', value: 'lab_result_type', width: 150, align: 'center' },
   { text: 'Kirim Undangan', value: 'notified_at', width: 200 },
   {
@@ -460,7 +497,8 @@ export default {
     EventImportTestResultDialog,
     EventApplicantUncheckDialog,
     EventApplicantUncheckWarningDialog,
-    DialogIntegratingData
+    DialogIntegratingData,
+    ApplicantEditDialog
   },
   filters: {
     getChipColor
@@ -500,7 +538,9 @@ export default {
       uncheckWarningDialog: false,
       integratingModal: false,
       integratingLoading: false,
-      incompleteResultTest: []
+      incompleteResultTest: [],
+      editApplicant: false,
+      idApplicant: null
     }
   },
 
@@ -654,6 +694,20 @@ export default {
         this.updateResultDialog = false
       }
     },
+    editApplicantOpen(item) {
+      this.editApplicant = true
+      this.idApplicant = item.applicant.id
+    },
+    editClose() {
+      this.editApplicant = false
+    },
+    async editSave() {
+      this.editApplicant = false
+      await this.$store.dispatch(
+        'eventParticipants/getList',
+        this.$route.params.eventId
+      )
+    },
     viewItem(payload) {
       this.viewRecordId = payload.id
       this.viewDialog = true
@@ -730,12 +784,17 @@ export default {
     closeDialogIntegratingData() {
       this.integratingModal = false
     },
-    openModalIntegratingData() {
+    async openModalIntegratingData() {
       this.integratingModal = true
-      const data = this.records.filter(
+      this.integratingLoading = true
+      const getAllDataParticipant = await this.$axios.$get(
+        `/rdt/events/${this.$route.params.eventId}/participants`
+      )
+      const participantFiltered = getAllDataParticipant.data.filter(
         (item) => item.attended_at !== null && item.synchronization_at === null
       )
-      this.incompleteResultTest = data
+      this.incompleteResultTest = participantFiltered
+      this.integratingLoading = false
     },
     closeDialogWarning() {
       this.blastNotifModalWarning = false
@@ -885,9 +944,14 @@ export default {
     downloadExport(param) {
       this.modalLoader = true
       const exportFormatF1 = `/rdt/events/${this.idEvent}/participants-export-f1?format=${param.format}`
+      const exportFormatF2 = `/rdt/events/${this.idEvent}/participants-export-f2?format=${param.format}`
       const exportFormatRaw = `/rdt/events/${this.idEvent}/participants-export?format=${param.format}`
       const exportType =
-        param.text === 'Excel F1' ? exportFormatF1 : exportFormatRaw
+        param.text === 'Excel F1'
+          ? exportFormatF1
+          : param.text === 'Excel F2'
+          ? exportFormatF2
+          : exportFormatRaw
 
       this.$axios
         .get(exportType, {
@@ -907,9 +971,12 @@ export default {
           let fileName = 'unknown'
 
           if (contentDisposition) {
-            const fileNameMatch = contentDisposition.match(/filename="(.+)"/)
+            const fileNameMatch = contentDisposition.match(/filename=(.+)/)
             if (fileNameMatch.length === 2) {
-              fileName = fileNameMatch[1]
+              const data = fileNameMatch[1].includes('"')
+                ? fileNameMatch[1].slice(1, -2)
+                : fileNameMatch[1]
+              fileName = data
             }
           }
 

@@ -1,81 +1,94 @@
 <template>
   <div>
-    <v-dialog :value="open" persistent max-width="800">
+    <v-dialog :value="open" persistent max-width="700">
       <v-card>
         <v-card-title>
-          <span class="headline">Edit Peserta</span>
+          <span class="headline font-weight-medium pl-4 pt-4"
+            >Edit Peserta Tes</span
+          >
         </v-card-title>
 
         <v-card-text>
           <v-container>
-            <v-row>
-              <v-col cols="12">
-                <v-text-field
-                  v-model="registrationCode"
-                  label="Nomor Pendaftaran"
-                  filled
-                  readonly
-                />
-              </v-col>
-              <v-col cols="12">
-                <v-text-field v-model="name" label="Nama Peserta" outlined />
-              </v-col>
-              <v-col cols="12">
-                <v-text-field v-model="nik" label="NIK" outlined />
-              </v-col>
-              <v-col cols="12">
-                <v-select
-                  v-model="gender"
-                  :items="[
-                    { text: 'Laki-Laki', value: 'M' },
-                    { text: 'Perempuan', value: 'F' }
-                  ]"
-                  label="Jenis Kelamin"
-                  outlined
-                ></v-select>
-              </v-col>
-              <v-col cols="12">
-                <v-text-field
-                  v-model="phone_number"
-                  label="Nomor Telepon"
-                  outlined
-                />
-              </v-col>
-              <v-col cols="12">
-                <v-text-field
-                  v-model="city_code"
-                  label="Kab/Kota Tinggal Sekarang"
-                  outlined
-                />
-              </v-col>
-              <v-col cols="12">
-                <v-text-field
-                  v-model="address"
-                  label="Alamat Tempat Tinggal Sekarang"
-                  outlined
-                />
-              </v-col>
-              <v-col cols="12">
-                <v-select
-                  v-model="status"
-                  :items="[
-                    { text: 'Calon Peserta', value: 'NEW' },
-                    { text: 'Disetujui', value: 'APPROVED' }
-                  ]"
-                  label="Status"
-                  outlined
-                ></v-select>
-              </v-col>
-            </v-row>
+            <v-text-field
+              v-model="registrationCode"
+              label="Nomor Pendaftaran"
+              filled
+              readonly
+              outlined
+              dense
+            />
+            <v-text-field
+              v-if="isEditApplicant"
+              v-model="nik"
+              label="NIK"
+              outlined
+              dense
+            />
+            <v-text-field v-model="name" label="Nama Peserta" outlined dense />
+            <v-select
+              v-model="gender"
+              :items="[
+                { text: 'Laki-Laki', value: 'M' },
+                { text: 'Perempuan', value: 'F' }
+              ]"
+              label="Jenis Kelamin"
+              outlined
+              dense
+            ></v-select>
+            <v-text-field
+              v-model="workPlace"
+              label="Instansi Tempat Bekerja"
+              outlined
+              dense
+            />
+            <v-text-field
+              v-if="isEditApplicant"
+              v-model="phone_number"
+              label="Nomor Telepon"
+              outlined
+              dense
+            />
+            <v-select
+              v-if="isEditApplicant"
+              v-model="city_code"
+              :items="getKabkot"
+              label="Kab/Kota Tinggal Sekarang"
+              item-text="name"
+              item-value="code"
+              outlined
+              dense
+            />
+            <v-text-field
+              v-if="isEditApplicant"
+              v-model="address"
+              label="Alamat Tempat Tinggal Sekarang"
+              outlined
+              dense
+            />
+            <v-select
+              v-if="isEditApplicant"
+              v-model="status"
+              :items="statusOptions"
+              item-text="text"
+              item-value="value"
+              label="Status Kesehatan"
+              outlined
+              dense
+            ></v-select>
           </v-container>
         </v-card-text>
 
-        <v-card-actions>
-          <v-spacer />
-          <v-btn color="blue darken-1" text @click="close">
+        <v-card-actions class="pb-8 mr-7 mt-n8 justify-end">
+          <v-btn
+            color="grey darken-1"
+            outlined
+            class="mr-2 px-2"
+            @click="close"
+          >
             Batal
           </v-btn>
-          <v-btn color="blue darken-1" text @click="save">
+          <v-btn color="primary" class="ml-2 px-2" @click="save">
             Simpan
           </v-btn>
         </v-card-actions>
@@ -85,6 +98,8 @@
 </template>
 
 <script>
+import { STATUS_OPTIONS } from '@/utilities/constant'
+import { mapGetters } from 'vuex'
 export default {
   props: {
     open: {
@@ -95,6 +110,11 @@ export default {
     recordId: {
       type: Number,
       default: null
+    },
+
+    isEditApplicant: {
+      type: Boolean,
+      default: true
     }
   },
 
@@ -107,7 +127,15 @@ export default {
       city_code: null,
       address: null,
       phone_number: null,
-      status: null
+      status: null,
+      workPlace: null
+    }
+  },
+
+  computed: {
+    ...mapGetters('area', ['getKabkot']),
+    statusOptions() {
+      return STATUS_OPTIONS
     }
   },
 
@@ -131,7 +159,8 @@ export default {
       this.city_code = data.city_code
       this.address = data.address
       this.phone_number = data.phone_number
-      this.status = data.status
+      this.status = data.person_status
+      this.workPlace = data.workplace_name
     },
 
     async save() {
@@ -145,7 +174,8 @@ export default {
           city_code: this.city_code,
           address: this.address,
           phone_number: this.phone_number,
-          status: this.status
+          person_status: this.status,
+          workplace_name: this.workPlace
         })
 
         this.$emit('save')
