@@ -190,7 +190,6 @@ export default {
 
     async save() {
       const valid = await this.$refs.form.validate()
-      console.log(valid)
       if (valid) {
         const id = this.recordId
 
