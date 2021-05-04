@@ -207,7 +207,7 @@ export default {
 
           this.$emit('save')
         } catch (e) {
-          //
+          throw new Error(e)
         }
       }
     },
