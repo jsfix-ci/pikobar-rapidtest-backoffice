@@ -7,75 +7,98 @@
             >Edit Peserta Tes</span
           >
         </v-card-title>
-
         <v-card-text>
           <v-container>
-            <v-text-field
-              v-model="registrationCode"
-              label="Nomor Pendaftaran"
-              filled
-              readonly
-              outlined
-              dense
-            />
-            <v-text-field
-              v-if="isEditApplicant"
-              v-model="nik"
-              label="NIK"
-              outlined
-              dense
-            />
-            <v-text-field v-model="name" label="Nama Peserta" outlined dense />
-            <v-select
-              v-model="gender"
-              :items="[
-                { text: 'Laki-Laki', value: 'M' },
-                { text: 'Perempuan', value: 'F' }
-              ]"
-              label="Jenis Kelamin"
-              outlined
-              dense
-            ></v-select>
-            <v-text-field
-              v-model="workPlace"
-              label="Instansi Tempat Bekerja"
-              outlined
-              dense
-            />
-            <v-text-field
-              v-if="isEditApplicant"
-              v-model="phone_number"
-              label="Nomor Telepon"
-              outlined
-              dense
-            />
-            <v-select
-              v-if="isEditApplicant"
-              v-model="city_code"
-              :items="getKabkot"
-              label="Kab/Kota Tinggal Sekarang"
-              item-text="name"
-              item-value="code"
-              outlined
-              dense
-            />
-            <v-text-field
-              v-if="isEditApplicant"
-              v-model="address"
-              label="Alamat Tempat Tinggal Sekarang"
-              outlined
-              dense
-            />
-            <v-select
-              v-if="isEditApplicant"
-              v-model="status"
-              :items="statusOptions"
-              item-text="text"
-              item-value="value"
-              label="Status Kesehatan"
-              outlined
-              dense
-            ></v-select>
+            <div>
+              <ValidationObserver ref="form">
+                <v-text-field
+                  v-model="registrationCode"
+                  label="Nomor Pendaftaran"
+                  filled
+                  readonly
+                  outlined
+                  dense
+                />
+                <pkbr-input
+                  v-if="isEditApplicant"
+                  v-model="nik"
+                  name="NIK"
+                  label="NIK Baru"
+                  placeholder="Masukan NIK"
+                  :clearable="false"
+                  rules="required|nik"
+                />
+                <pkbr-input
+                  v-model="name"
+                  name="Nama Peserta"
+                  label="Nama Peserta"
+                  placeholder="Masukan Nama Peserta"
+                  :clearable="false"
+                  rules="required"
+                />
+                <pkbr-select
+                  v-model="gender"
+                  :items="[
+                    { text: 'Laki-Laki', value: 'M' },
+                    { text: 'Perempuan', value: 'F' }
+                  ]"
+                  label="Jenis Kelamin"
+                  name="Jenis Kelamin"
+                  placeholder="Pilih Jenis Kelamin"
+                  rules="required"
+                  item-text="text"
+                  item-value="value"
+                />
+                <pkbr-input
+                  v-model="workPlace"
+                  name="Instansi Tempat Bekerja"
+                  label="Instansi Tempat Bekerja"
+                  placeholder="Masukan Instansi Tempat Bekerja"
+                  :clearable="false"
+                  rules="required"
+                />
+                <pkbr-input
+                  v-if="isEditApplicant"
+                  v-model="phone_number"
+                  name="Nomor Telepon"
+                  label="Nomor Telepon"
+                  placeholder="Masukan Nomor Telepon"
+                  :clearable="false"
+                  rules="required|phone_number"
+                />
+                <pkbr-select
+                  v-if="isEditApplicant"
+                  v-model="city_code"
+                  :items="getKabkot"
+                  label="Kab/Kota Tinggal Sekarang"
+                  name="Kab/Kota Tinggal Sekarang"
+                  placeholder="Pilih Kab/Kota Tinggal Sekarang"
+                  rules="required"
+                  item-text="name"
+                  item-value="code"
+                />
+                <pkbr-input
+                  v-if="isEditApplicant"
+                  v-model="address"
+                  name="Alamat Tempat Tinggal Sekarang"
+                  label="Alamat Tempat Tinggal Sekarang"
+                  placeholder="Masukan Alamat Tempat Tinggal Sekarang"
+                  :clearable="false"
+                  rules="required"
+                />
+                <pkbr-select
+                  v-if="isEditApplicant"
+                  v-model="status"
+                  :items="statusOptions"
+                  label="Status Kesehatan"
+                  name="Status Kesehatan"
+                  placeholder="Pilih Status Kesehatan"
+                  rules="required"
+                  item-text="text"
+                  item-value="value"
+                />
+              </ValidationObserver>
+            </div>
           </v-container>
         </v-card-text>
 
@@ -99,8 +122,10 @@
 
 <script>
 import { STATUS_OPTIONS } from '@/utilities/constant'
+import { ValidationObserver } from 'vee-validate'
 import { mapGetters } from 'vuex'
 export default {
+  components: { ValidationObserver },
   props: {
     open: {
       type: Boolean,
@@ -164,23 +189,26 @@ export default {
     },
 
     async save() {
-      const id = this.recordId
+      const valid = await this.$refs.form.validate()
+      if (valid) {
+        const id = this.recordId
 
-      try {
-        await this.$axios.$put(`/rdt/applicants/${id}`, {
-          name: this.name,
-          gender: this.gender,
-          nik: this.nik,
-          city_code: this.city_code,
-          address: this.address,
-          phone_number: this.phone_number,
-          person_status: this.status,
-          workplace_name: this.workPlace
-        })
+        try {
+          await this.$axios.$put(`/rdt/applicants/${id}`, {
+            name: this.name,
+            gender: this.gender,
+            nik: this.nik,
+            city_code: this.city_code,
+            address: this.address,
+            phone_number: this.phone_number,
+            person_status: this.status,
+            workplace_name: this.workPlace
+          })
 
-        this.$emit('save')
-      } catch (e) {
-        //
+          this.$emit('save')
+        } catch (e) {
+          throw new Error(e)
+        }
       }
     },
 

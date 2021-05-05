@@ -12,7 +12,7 @@
       :placeholder="placeholder"
       :type="type"
       :rows="rows"
-      clearable
+      :clearable="clearable"
       outlined
       dense
     >
@@ -66,6 +66,10 @@ export default {
     rows: {
       type: Number,
       default: 3
+    },
+    clearable: {
+      type: Boolean,
+      default: true
     }
   },
   data() {
