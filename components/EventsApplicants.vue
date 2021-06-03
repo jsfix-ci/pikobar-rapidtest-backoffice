@@ -95,16 +95,47 @@
       }"
     >
       <template slot="top">
-        <div class="d-flex">
-          <v-col cols="6">
+        <div class="d-flex flex-wrap">
+          <v-col lg="6" md="12" sm="12">
             <v-text-field
-              v-model="searchKey"
+              v-model="listQuery.searchKey"
               label="Nama Peserta / No. Pendaftaran / Kode Sampel / Instansi Tempat Kerja"
+              placeholder="Nama Peserta / No. Pendaftaran / Kode Sampel / Instansi Tempat Kerja"
               clearable
               outlined
               dense
               hide-details
             />
+          </v-col>
+          <v-col lg="2" md="12" sm="12">
+            <ValidationObserver ref="startDate">
+              <pkbr-input-date
+                v-model="listQuery.startDate"
+                label="Tanggal Mulai"
+                name="Tanggal Mulai"
+                placeholder="Tanggal Mulai"
+                :rules="ruleValidationStartDate"
+              />
+            </ValidationObserver>
+          </v-col>
+          <v-col lg="2" md="12" sm="12">
+            <ValidationObserver ref="endDate">
+              <pkbr-input-date
+                v-model="listQuery.endDate"
+                label="Tanggal Berakhir"
+                name="Tanggal Berakhir"
+                placeholder="Tanggal Berakhir"
+                :rules="ruleValidationEndDate"
+              />
+            </ValidationObserver>
+          </v-col>
+          <v-col lg="2" md="12" sm="12">
+            <v-btn color="primary" @click="searchFilter">
+              Cari
+            </v-btn>
+            <v-btn color="primary" @click="doFilterReset">
+              Reset
+            </v-btn>
           </v-col>
         </div>
       </template>
@@ -406,7 +437,7 @@
 </template>
 
 <script>
-import { isEqual } from 'lodash'
+import { ValidationObserver } from 'vee-validate'
 import { getChipColor } from '@/utilities/formater'
 import {
   EVENT_BLAST_SUCCESS,
@@ -496,7 +527,8 @@ export default {
     EventApplicantUncheckDialog,
     EventApplicantUncheckWarningDialog,
     DialogIntegratingData,
-    ApplicantEditDialog
+    ApplicantEditDialog,
+    ValidationObserver
   },
   filters: {
     getChipColor
@@ -538,7 +570,14 @@ export default {
       integratingLoading: false,
       incompleteResultTest: [],
       editApplicant: false,
-      idApplicant: null
+      idApplicant: null,
+      ruleValidationStartDate: '',
+      ruleValidationEndDate: '',
+      listQuery: {
+        searchKey: null,
+        startDate: null,
+        endDate: null
+      }
     }
   },
 
@@ -565,26 +604,15 @@ export default {
     },
     totalItems() {
       return this.$store.getters['eventParticipants/getTotalData']
-    },
-    searchKey: {
-      async set(value) {
-        await this.$store.dispatch('eventParticipants/resetOptions')
-        this.options = {
-          ...this.options,
-          keyWords: value
-        }
-      },
-      get() {
-        return this.$route.query.keyWords
-      }
     }
   },
 
   watch: {
-    options(value, oldValue) {
-      if (!isEqual(oldValue, value)) {
-        this.$emit('optionChanged', value)
-      }
+    'listQuery.startDate'(value) {
+      this.ruleValidationEndDate = value ? 'required' : ''
+    },
+    'listQuery.endDate'(value) {
+      this.ruleValidationStartDate = value ? 'required' : ''
     }
   },
 
@@ -596,9 +624,6 @@ export default {
     options.itemsPerPage = this.$route.query.perPage
       ? parseInt(this.$route.query.perPage)
       : DEFAULT_PAGINATION.itemsPerPage
-    options.sortBy = this.$route.query.sortBy
-      ? [this.$route.query.sortBy]
-      : DEFAULT_FILTER.sortBy
     options.sortDesc = this.$route.query.sortOrder
       ? [this.$route.query.sortOrder === 'desc']
       : DEFAULT_FILTER.sortDesc
@@ -610,6 +635,31 @@ export default {
   },
 
   methods: {
+    async searchFilter() {
+      const validStartDate = await this.$refs.startDate.validate()
+      const validEndDate = await this.$refs.endDate.validate()
+      if (validStartDate && validEndDate) {
+        await this.$store.dispatch('eventParticipants/resetOptions')
+        this.options = {
+          ...this.options,
+          keyWords: this.listQuery.searchKey,
+          startDate: this.listQuery.startDate,
+          endDate: this.listQuery.endDate
+        }
+        this.$emit('optionChanged', this.options)
+      }
+    },
+    async doFilterReset() {
+      Object.assign(this.$data.listQuery, this.$options.data().listQuery)
+      await this.$store.dispatch('eventParticipants/resetOptions')
+      this.options = {
+        ...this.options,
+        keyWords: null,
+        startDate: null,
+        endDate: null
+      }
+      this.$emit('optionChanged', this.options)
+    },
     async resetDataCheckin(payload) {
       try {
         await this.$store.dispatch(
