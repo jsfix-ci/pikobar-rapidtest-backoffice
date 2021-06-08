@@ -88,7 +88,7 @@
               />
             </ValidationObserver>
           </v-col>
-          <v-col sm="12" md="12" lg="2" class="mt-n8">
+          <v-col sm="12" md="12" lg="3" class="mt-n8">
             <v-btn color="primary" @click="searchFilter">
               Cari
             </v-btn>
@@ -143,11 +143,13 @@
 
 <script>
 import { mapGetters } from 'vuex'
+import { isEqual } from 'lodash'
 import {
   SUCCESS_DELETE,
   FAILED_DELETE,
   CONFIRM_DELETE,
-  DEFAULT_FILTER
+  DEFAULT_FILTER,
+  DEFAULT_PAGINATION
 } from '@/utilities/constant'
 import { ValidationObserver } from 'vee-validate'
 import { getChipColor } from '@/utilities/formater'
@@ -231,6 +233,11 @@ export default {
   },
 
   watch: {
+    options(value, oldValue) {
+      if (!isEqual(oldValue, value)) {
+        this.$emit('optionChanged', value)
+      }
+    },
     'listQuery.startDate'(value) {
       this.ruleValidationEndDate = value ? 'required' : ''
     },
@@ -241,26 +248,24 @@ export default {
 
   mounted() {
     const options = { ...this.options }
-    if (this.$route.query.page) {
-      options.page = parseInt(this.$route.query.page)
-    }
-    if (this.$route.query.perPage) {
-      options.perPage = parseInt(this.$route.query.perPage)
-    }
-    if (this.$route.query.sortBy) {
-      options.sortBy = [this.$route.query.sortBy]
-    }
-    if (this.$route.query.sortOrder) {
-      options.sortDesc = [this.$route.query.sortOrder === 'desc']
-    }
-    if (this.$route.query.keyWords) {
-      options.keyWords = this.$route.query.keyWords
-    }
-    if (this.$route.query.status) {
-      options.status = this.$route.query.status
-    }
+    options.page = this.$route.query.page
+      ? parseInt(this.$route.query.page)
+      : DEFAULT_PAGINATION.page
+    options.itemsPerPage = this.$route.query.perPage
+      ? parseInt(this.$route.query.perPage)
+      : DEFAULT_PAGINATION.itemsPerPage
+    options.sortDesc = this.$route.query.sortOrder
+      ? [this.$route.query.sortOrder === 'desc']
+      : DEFAULT_FILTER.sortDesc
+    options.keyWords = this.$route.query.keyWords
+      ? this.$route.query.keyWords
+      : DEFAULT_FILTER.keyWords
+    options.status = this.$route.query.status
+      ? this.$route.query.status
+      : DEFAULT_FILTER.status
     this.options = options
     this.$emit('optionChanged', options)
+    console.log(this.options)
   },
 
   methods: {
@@ -280,9 +285,8 @@ export default {
         this.$emit('optionChanged', this.options)
       }
     },
-    async doFilterReset() {
+    doFilterReset() {
       Object.assign(this.$data.listQuery, this.$options.data().listQuery)
-      await this.$store.dispatch('events/resetOptions')
       this.options = {
         ...this.options,
         keyWords: null,
