@@ -51,7 +51,10 @@ export const mutations = {
       sortBy: payload.sortBy,
       sortDesc: payload.sortDesc,
       status: payload.status,
-      keyWords: payload.keyWords
+      keyWords: payload.keyWords,
+      city: payload.city,
+      startDate: payload.startDate,
+      endDate: payload.endDate
     }
     s.pagination = {
       itemsPerPage: payload.itemsPerPage - 0,
@@ -144,15 +147,26 @@ export const actions = {
     try {
       const { pagination, filter } = state
       const { page, itemsPerPage } = pagination
-      const { sortBy, sortDesc, status, keyWords } = filter
+      const {
+        sortBy,
+        sortDesc,
+        status,
+        keyWords,
+        city,
+        startDate,
+        endDate
+      } = filter
       const query = mapKeys(
         {
           page,
           perPage: itemsPerPage,
           search: keyWords,
+          cityCode: city,
           sortBy: sortBy[0] || null,
           sortOrder: sortDesc[0] ? 'desc' : 'asc',
-          status
+          status,
+          startDate,
+          endDate
         },
         (value, key) => snakeCase(key)
       )

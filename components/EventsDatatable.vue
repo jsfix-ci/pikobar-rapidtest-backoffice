@@ -1,6 +1,18 @@
 /* eslint-disable vue/valid-v-bind */
 <template>
   <div style="width: 100%;">
+    <v-col sm="12" md="12" lg="12" class="d-flex justify-end mt-n12">
+      <v-btn
+        v-if="allow.includes('create-events')"
+        color="primary"
+        to="/events/create"
+      >
+        <v-icon class="mr-1">
+          mdi-plus-circle
+        </v-icon>
+        Tambah Kegiatan
+      </v-btn>
+    </v-col>
     <v-data-table
       class="v-card v-sheet pkbr-table sticky-last"
       :headers="headers"
@@ -17,20 +29,20 @@
       }"
     >
       <template slot="top">
-        <div class="d-flex">
-          <v-col cols="auto">
+        <div class="d-flex flex-wrap">
+          <v-col sm="12" md="12" lg="3">
             <v-text-field
-              v-model="searchKey"
+              v-model="listQuery.searchKey"
               label="Nama Kegiatan"
-              clearable
+              placeholder="Nama Kegiatan"
               outlined
               dense
               hide-details
             />
           </v-col>
-          <v-col cols="auto">
+          <v-col sm="12" md="12" lg="2">
             <pkbr-select
-              v-model="stat"
+              v-model="listQuery.status"
               :items="[
                 { text: 'Semua', value: 'all' },
                 { text: 'Draft', value: 'draft' },
@@ -41,17 +53,47 @@
               hide-details
             />
           </v-col>
-          <v-spacer></v-spacer>
-          <v-col cols="auto">
-            <v-btn
-              v-if="allow.includes('create-events')"
-              color="primary"
-              to="/events/create"
-            >
-              <v-icon class="mr-1">
-                mdi-plus-circle
-              </v-icon>
-              Tambah Kegiatan
+          <v-col sm="12" md="12" lg="3">
+            <pkbr-select
+              v-model="listQuery.city"
+              :items="getKabkot"
+              label="Kab./Kota"
+              name="Kab./Kota"
+              placeholder="Semua Kab./Kota"
+              item-text="name"
+              item-value="code"
+              hide-details
+              allow-null
+            />
+          </v-col>
+          <v-col sm="12" md="12" lg="2">
+            <ValidationObserver ref="startDate">
+              <pkbr-input-date
+                v-model="listQuery.startDate"
+                label="Tanggal Mulai"
+                name="Tanggal Mulai"
+                placeholder="Tanggal Mulai"
+                :rules="ruleValidationStartDate"
+              />
+            </ValidationObserver>
+          </v-col>
+          <v-col sm="12" md="12" lg="2">
+            <ValidationObserver ref="endDate">
+              <pkbr-input-date
+                v-model="listQuery.endDate"
+                label="Tanggal Berakhir"
+                name="Tanggal Berakhir"
+                placeholder="Tanggal Berakhir"
+                :rules="ruleValidationEndDate"
+              />
+            </ValidationObserver>
+          </v-col>
+          <v-col sm="12" md="12" lg="3" class="mt-n8">
+            <v-btn color="primary" @click="searchFilter">
+              Cari
+            </v-btn>
+            <v-btn color="primary" @click="doFilterReset">
+              Reset
             </v-btn>
           </v-col>
         </div>
@@ -100,12 +142,16 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 import { isEqual } from 'lodash'
 import {
   SUCCESS_DELETE,
   FAILED_DELETE,
-  CONFIRM_DELETE
+  CONFIRM_DELETE,
+  DEFAULT_FILTER,
+  DEFAULT_PAGINATION
 } from '@/utilities/constant'
+import { ValidationObserver } from 'vee-validate'
 import { getChipColor } from '@/utilities/formater'
 import EventDeleteDialog from '@/components/EventDeleteDialog'
 
@@ -123,7 +169,8 @@ const headers = [
 
 export default {
   components: {
-    EventDeleteDialog
+    EventDeleteDialog,
+    ValidationObserver
   },
   filters: {
     getChipColor
@@ -144,15 +191,25 @@ export default {
   data() {
     return {
       headers,
+      deleteModal: false,
+      ruleValidationStartDate: '',
+      ruleValidationEndDate: '',
       selectedEvent: {
         id: null,
         name: null
       },
-      deleteModal: false
+      listQuery: {
+        searchKey: null,
+        status: DEFAULT_FILTER.status,
+        city: null,
+        startDate: null,
+        endDate: null
+      }
     }
   },
 
   computed: {
+    ...mapGetters('area', ['getKabkot']),
     confirmDeleteMsg() {
       return CONFIRM_DELETE + this.selectedEvent.id
     },
@@ -172,32 +229,6 @@ export default {
     },
     totalItems() {
       return this.$store.getters['events/getTotalData']
-    },
-    stat: {
-      async set(value) {
-        await this.$store.dispatch('events/resetOptions')
-        this.options = {
-          ...this.options,
-          keyWords: this.searchKey,
-          status: value
-        }
-      },
-      get() {
-        return this.$route.query.status
-      }
-    },
-    searchKey: {
-      async set(value) {
-        await this.$store.dispatch('events/resetOptions')
-        this.options = {
-          ...this.options,
-          status: this.stat,
-          keyWords: value
-        }
-      },
-      get() {
-        return this.$route.query.keyWords
-      }
     }
   },
 
@@ -206,34 +237,65 @@ export default {
       if (!isEqual(oldValue, value)) {
         this.$emit('optionChanged', value)
       }
+    },
+    'listQuery.startDate'(value) {
+      this.ruleValidationEndDate = value ? 'required' : ''
+    },
+    'listQuery.endDate'(value) {
+      this.ruleValidationStartDate = value ? 'required' : ''
     }
   },
 
-  mounted() {
+  async mounted() {
     const options = { ...this.options }
-    if (this.$route.query.page) {
-      options.page = parseInt(this.$route.query.page)
-    }
-    if (this.$route.query.perPage) {
-      options.perPage = parseInt(this.$route.query.perPage)
-    }
-    if (this.$route.query.sortBy) {
-      options.sortBy = [this.$route.query.sortBy]
-    }
-    if (this.$route.query.sortOrder) {
-      options.sortDesc = [this.$route.query.sortOrder === 'desc']
-    }
-    if (this.$route.query.keyWords) {
-      options.keyWords = this.$route.query.keyWords
-    }
-    if (this.$route.query.status) {
-      options.status = this.$route.query.status
-    }
+    options.page = this.$route.query.page
+      ? parseInt(this.$route.query.page)
+      : DEFAULT_PAGINATION.page
+    options.itemsPerPage = this.$route.query.perPage
+      ? parseInt(this.$route.query.perPage)
+      : DEFAULT_PAGINATION.itemsPerPage
+    options.sortDesc = this.$route.query.sortOrder
+      ? [this.$route.query.sortOrder === 'desc']
+      : DEFAULT_FILTER.sortDesc
+    options.keyWords = this.$route.query.keyWords
+      ? this.$route.query.keyWords
+      : DEFAULT_FILTER.keyWords
+    options.status = this.$route.query.status
+      ? this.$route.query.status
+      : DEFAULT_FILTER.status
     this.options = options
     this.$emit('optionChanged', options)
+    await this.doFilterReset()
   },
 
   methods: {
+    async searchFilter() {
+      const validStartDate = await this.$refs.startDate.validate()
+      const validEndDate = await this.$refs.endDate.validate()
+      if (validStartDate && validEndDate) {
+        await this.$store.dispatch('events/resetOptions')
+        this.options = {
+          ...this.options,
+          status: this.listQuery.status,
+          keyWords: this.listQuery.searchKey,
+          city: this.listQuery.city,
+          startDate: this.listQuery.startDate,
+          endDate: this.listQuery.endDate
+        }
+        this.$emit('optionChanged', this.options)
+      }
+    },
+    doFilterReset() {
+      Object.assign(this.$data.listQuery, this.$options.data().listQuery)
+      this.options = {
+        ...this.options,
+        keyWords: null,
+        city: null,
+        startDate: null,
+        endDate: null
+      }
+      this.$emit('optionChanged', this.options)
+    },
     formatTanggal(startTanggal, endTanggal) {
       const start = this.$dateFns.format(new Date(startTanggal), 'dd MMM yyyy')
       const end = this.$dateFns.format(new Date(endTanggal), 'dd MMM yyyy')

@@ -18,6 +18,7 @@
         <v-btn
           v-if="allow.includes('notify-participants')"
           color="primary"
+          outlined
           @click="openModalNotif('Undangan')"
         >
           <v-icon class="mr-1">mdi-email-send</v-icon>
@@ -25,18 +26,20 @@
         </v-btn>
         <v-btn
           v-if="allow.includes('notify-participants')"
-          color="success"
+          color="primary"
+          outlined
           @click="openModalNotif('Hasil Test')"
         >
-          <v-icon class="mr-1">mdi-file-send-outline</v-icon>
+          <v-icon class="mr-1">mdi-email-send-outline</v-icon>
           Kirim Hasil Test
         </v-btn>
         <v-btn
           v-if="configIntegration === 'true'"
-          color="warning"
+          color="primary"
+          outlined
           @click="openModalIntegratingData"
         >
-          <v-icon class="mr-1">mdi-file-send-outline</v-icon>
+          <v-icon class="mr-1">mdi-email-sync-outline</v-icon>
           Kirim data
         </v-btn>
       </v-col>
@@ -44,15 +47,23 @@
       <v-col cols="auto">
         <v-btn
           v-if="allow.includes('manage-events')"
-          color="success"
+          color="primary"
+          outlined
           @click="openModalImportHasil"
         >
-          <v-icon class="mr-1">mdi-file-import-outline</v-icon>
+          <v-icon class="mr-1">mdi-download</v-icon>
           Import Hasil Test
         </v-btn>
         <v-menu bottom offset-y>
           <template v-slot:activator="{ on, attrs }">
-            <v-btn class="pr-1" v-bind="attrs" color="error" v-on="on">
+            <v-btn
+              class="pr-1"
+              v-bind="attrs"
+              outlined
+              color="primary"
+              v-on="on"
+            >
+              <v-icon class="ml-1">mdi-upload</v-icon>
               Export
               <v-icon class="ml-1">mdi-menu-down</v-icon>
             </v-btn>
@@ -95,16 +106,47 @@
       }"
     >
       <template slot="top">
-        <div class="d-flex">
-          <v-col cols="6">
+        <div class="d-flex flex-wrap">
+          <v-col lg="5" md="12" sm="12">
             <v-text-field
-              v-model="searchKey"
+              v-model="listQuery.searchKey"
               label="Nama Peserta / No. Pendaftaran / Kode Sampel / Instansi Tempat Kerja"
+              placeholder="Nama Peserta / No. Pendaftaran / Kode Sampel / Instansi Tempat Kerja"
               clearable
               outlined
               dense
               hide-details
             />
+          </v-col>
+          <v-col lg="2" md="12" sm="12">
+            <ValidationObserver ref="startDate">
+              <pkbr-input-date
+                v-model="listQuery.startDate"
+                label="Tanggal Mulai"
+                name="Tanggal Mulai"
+                placeholder="Tanggal Mulai"
+                :rules="ruleValidationStartDate"
+              />
+            </ValidationObserver>
+          </v-col>
+          <v-col lg="2" md="12" sm="12">
+            <ValidationObserver ref="endDate">
+              <pkbr-input-date
+                v-model="listQuery.endDate"
+                label="Tanggal Berakhir"
+                name="Tanggal Berakhir"
+                placeholder="Tanggal Berakhir"
+                :rules="ruleValidationEndDate"
+              />
+            </ValidationObserver>
+          </v-col>
+          <v-col lg="3" md="12" sm="12">
+            <v-btn color="primary" @click="searchFilter">
+              Cari
+            </v-btn>
+            <v-btn color="primary" @click="doFilterReset">
+              Reset
+            </v-btn>
           </v-col>
         </div>
       </template>
@@ -407,11 +449,10 @@
 
 <script>
 import { isEqual } from 'lodash'
+import { ValidationObserver } from 'vee-validate'
 import { getChipColor } from '@/utilities/formater'
 import {
-  EVENT_BLAST_EMPTY,
   EVENT_BLAST_SUCCESS,
-  EVENT_PARTICIPANTS_EMPTY,
   SUCCESS_IMPORT,
   FAILED_IMPORT,
   SET_LABCODE_SUCCESS,
@@ -498,7 +539,8 @@ export default {
     EventApplicantUncheckDialog,
     EventApplicantUncheckWarningDialog,
     DialogIntegratingData,
-    ApplicantEditDialog
+    ApplicantEditDialog,
+    ValidationObserver
   },
   filters: {
     getChipColor
@@ -540,7 +582,14 @@ export default {
       integratingLoading: false,
       incompleteResultTest: [],
       editApplicant: false,
-      idApplicant: null
+      idApplicant: null,
+      ruleValidationStartDate: '',
+      ruleValidationEndDate: '',
+      listQuery: {
+        searchKey: null,
+        startDate: null,
+        endDate: null
+      }
     }
   },
 
@@ -567,18 +616,6 @@ export default {
     },
     totalItems() {
       return this.$store.getters['eventParticipants/getTotalData']
-    },
-    searchKey: {
-      async set(value) {
-        await this.$store.dispatch('eventParticipants/resetOptions')
-        this.options = {
-          ...this.options,
-          keyWords: value
-        }
-      },
-      get() {
-        return this.$route.query.keyWords
-      }
     }
   },
 
@@ -587,10 +624,16 @@ export default {
       if (!isEqual(oldValue, value)) {
         this.$emit('optionChanged', value)
       }
+    },
+    'listQuery.startDate'(value) {
+      this.ruleValidationEndDate = value ? 'required' : ''
+    },
+    'listQuery.endDate'(value) {
+      this.ruleValidationStartDate = value ? 'required' : ''
     }
   },
 
-  mounted() {
+  async mounted() {
     const options = { ...this.options }
     options.page = this.$route.query.page
       ? parseInt(this.$route.query.page)
@@ -598,9 +641,6 @@ export default {
     options.itemsPerPage = this.$route.query.perPage
       ? parseInt(this.$route.query.perPage)
       : DEFAULT_PAGINATION.itemsPerPage
-    options.sortBy = this.$route.query.sortBy
-      ? [this.$route.query.sortBy]
-      : DEFAULT_FILTER.sortBy
     options.sortDesc = this.$route.query.sortOrder
       ? [this.$route.query.sortOrder === 'desc']
       : DEFAULT_FILTER.sortDesc
@@ -609,9 +649,34 @@ export default {
       : DEFAULT_FILTER.keyWords
     this.options = options
     this.$emit('optionChanged', options)
+    await this.doFilterReset()
   },
 
   methods: {
+    async searchFilter() {
+      const validStartDate = await this.$refs.startDate.validate()
+      const validEndDate = await this.$refs.endDate.validate()
+      if (validStartDate && validEndDate) {
+        await this.$store.dispatch('eventParticipants/resetOptions')
+        this.options = {
+          ...this.options,
+          keyWords: this.listQuery.searchKey,
+          startDate: this.listQuery.startDate,
+          endDate: this.listQuery.endDate
+        }
+        this.$emit('optionChanged', this.options)
+      }
+    },
+    doFilterReset() {
+      Object.assign(this.$data.listQuery, this.$options.data().listQuery)
+      this.options = {
+        ...this.options,
+        keyWords: null,
+        startDate: null,
+        endDate: null
+      }
+      this.$emit('optionChanged', this.options)
+    },
     async resetDataCheckin(payload) {
       try {
         await this.$store.dispatch(
@@ -826,14 +891,10 @@ export default {
       this.ImportModalTest = true
     },
     sendNotif(data) {
-      if (data.length === 0) {
-        this.blastNotify(null, `send${data.type.split(' ').join('')}`)
-      } else {
-        this.blastNotify(
-          this.pesertaSelected,
-          `send${data.type.split(' ').join('')}`
-        )
-      }
+      this.blastNotify(
+        this.pesertaSelected,
+        `send${data.type.split(' ').join('')}`
+      )
     },
     closeDialogImport() {
       this.ImportModalTest = false
@@ -864,45 +925,40 @@ export default {
       }
     },
     async blastNotify(invitationsIds, type) {
-      if (this.records.length === 0) {
-        this.$toast.show({
-          message: EVENT_PARTICIPANTS_EMPTY,
-          type: 'error'
+      try {
+        const typeBlast = type || 'sendUndangan'
+        const target =
+          !!invitationsIds && invitationsIds.length > 0 ? 'SELECTED' : 'ALL'
+        // eslint-disable-next-line camelcase
+        const invitations_ids =
+          !!invitationsIds && invitationsIds.length > 0
+            ? invitationsIds.map((inv) => inv.id)
+            : []
+        await this.$store.dispatch(`blastNotif/${typeBlast}`, {
+          idEvent: this.idEvent,
+          target,
+          invitations_ids
         })
-      } else if (!!invitationsIds && invitationsIds.length === 0) {
         this.$toast.show({
-          message: EVENT_BLAST_EMPTY,
-          type: 'error'
+          message: EVENT_BLAST_SUCCESS,
+          type: 'success'
         })
-      } else {
-        try {
-          const typeBlast = type || 'sendUndangan'
-          const target =
-            !!invitationsIds && invitationsIds.length > 0 ? 'SELECTED' : 'ALL'
-          // eslint-disable-next-line camelcase
-          const invitations_ids =
-            !!invitationsIds && invitationsIds.length > 0
-              ? invitationsIds.map((inv) => inv.id)
-              : null
-          await this.$store.dispatch(`blastNotif/${typeBlast}`, {
-            idEvent: this.idEvent,
-            target,
-            invitations_ids
-          })
+      } catch (error) {
+        if (error.response.status === 422) {
           this.$toast.show({
-            message: EVENT_BLAST_SUCCESS,
-            type: 'success'
+            message: error.response.data.errors.blast_failed[0],
+            type: 'error'
           })
-          this.blastNotifModal = false
-        } catch (error) {
+        } else {
           this.$toast.show({
             message: error.message,
             type: 'error'
           })
-        } finally {
-          this.$store.dispatch('events/getCurrent', this.$route.params.eventId)
-          this.pesertaSelected = []
         }
+      } finally {
+        this.blastNotifModal = false
+        this.$store.dispatch('events/getCurrent', this.$route.params.eventId)
+        this.pesertaSelected = []
       }
     },
     modalEditLabCodeOpen(id) {
@@ -941,57 +997,58 @@ export default {
       const sample = await this.$axios.$get(`/rdt/invitation/${id}`)
       this.labCodeSample = sample.data.lab_code_sample
     },
-    downloadExport(param) {
-      this.modalLoader = true
-      const exportFormatF1 = `/rdt/events/${this.idEvent}/participants-export-f1?format=${param.format}`
-      const exportFormatF2 = `/rdt/events/${this.idEvent}/participants-export-f2?format=${param.format}`
-      const exportFormatRaw = `/rdt/events/${this.idEvent}/participants-export?format=${param.format}`
-      const exportType =
-        param.text === 'Excel F1'
-          ? exportFormatF1
-          : param.text === 'Excel F2'
-          ? exportFormatF2
-          : exportFormatRaw
+    async downloadExport(param) {
+      try {
+        this.modalLoader = true
+        const exportFormatF1 = `/rdt/events/${this.idEvent}/participants-export-f1?format=${param.format}`
+        const exportFormatF2 = `/rdt/events/${this.idEvent}/participants-export-f2?format=${param.format}`
+        const exportFormatRaw = `/rdt/events/${this.idEvent}/participants-export?format=${param.format}`
+        const exportType =
+          param.text === 'Excel F1'
+            ? exportFormatF1
+            : param.text === 'Excel F2'
+            ? exportFormatF2
+            : exportFormatRaw
 
-      this.$axios
-        .get(exportType, {
+        const response = await this.$axios.get(exportType, {
           responseType: 'blob'
         })
-        .then((response) => {
-          // @TODO hacky solution
-          // eslint-disable-next-line no-new
-          const blob = new Blob([response.data], { type: response.data.type })
+        const blob = new Blob([response.data], { type: response.data.type })
 
-          const url = window.URL.createObjectURL(blob)
-          const link = document.createElement('a')
+        const url = window.URL.createObjectURL(blob)
+        const link = document.createElement('a')
 
-          link.href = url
+        link.href = url
 
-          const contentDisposition = response.headers['content-disposition']
-          let fileName = 'unknown'
+        const contentDisposition = response.headers['content-disposition']
+        let fileName = 'unknown'
 
-          if (contentDisposition) {
-            const fileNameMatch = contentDisposition.match(/filename=(.+)/)
-            if (fileNameMatch.length === 2) {
-              const data = fileNameMatch[1].includes('"')
-                ? fileNameMatch[1].slice(1, -2)
-                : fileNameMatch[1]
-              fileName = data
-            }
+        if (contentDisposition) {
+          const fileNameMatch = contentDisposition.match(/filename=(.+)/)
+          if (fileNameMatch.length === 2) {
+            const data = fileNameMatch[1].includes('"')
+              ? fileNameMatch[1].slice(1, -2)
+              : fileNameMatch[1]
+            fileName = data
           }
+        }
 
-          link.setAttribute('download', fileName)
-          document.body.appendChild(link)
-          link.click()
-          link.remove()
-          window.URL.revokeObjectURL(url)
+        link.setAttribute('download', fileName)
+        document.body.appendChild(link)
+        link.click()
+        link.remove()
+        window.URL.revokeObjectURL(url)
 
-          this.modalLoader = false
+        this.modalLoader = false
+      } catch (error) {
+        this.$toast.show({
+          message:
+            error.response.message ||
+            'Export gagal, silahkan lengkapi Kode Sample untuk dapat melakukan Export.',
+          type: 'error'
         })
-        .catch(() => {
-          alert('Telah terjadi sebuah kesalahan. Silahkan coba ulangi kembali.')
-          this.modalLoader = false
-        })
+        this.modalLoader = false
+      }
     }
   }
 }
