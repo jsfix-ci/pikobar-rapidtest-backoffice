@@ -462,8 +462,8 @@
     />
     <event-import-test-result-dialog
       :open="ImportModalTest"
+      :event="idEvent"
       @close="closeDialogImport"
-      @doImport="doImport"
     />
     <event-applicant-uncheck-dialog
       :open="uncheckDialog"
@@ -491,8 +491,6 @@ import { ValidationObserver } from 'vee-validate'
 import { toCapitalizeCase } from '@/utilities/formater'
 import {
   EVENT_BLAST_SUCCESS,
-  SUCCESS_IMPORT,
-  FAILED_IMPORT,
   SET_LABCODE_SUCCESS,
   SET_LABCODE_FAILED,
   DEFAULT_PAGINATION,
@@ -946,31 +944,6 @@ export default {
     },
     closeDialogImport() {
       this.ImportModalTest = false
-    },
-    async doImport(data) {
-      const formData = new FormData()
-      formData.append('file', data)
-      try {
-        await this.$store.dispatch('eventParticipants/importTestResult', {
-          idEvent: this.idEvent,
-          formData
-        })
-        this.$toast.show({
-          message: SUCCESS_IMPORT,
-          type: 'success'
-        })
-        this.$store.dispatch(
-          'eventParticipants/getList',
-          this.$route.params.eventId
-        )
-      } catch (error) {
-        this.$toast.show({
-          message: error.message || FAILED_IMPORT,
-          type: 'error'
-        })
-      } finally {
-        this.ImportModalTest = false
-      }
     },
     async blastNotify(invitationsIds, type) {
       try {
