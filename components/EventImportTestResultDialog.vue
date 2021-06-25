@@ -8,7 +8,9 @@
       >
         <v-card>
           <v-card-title>
-            <span class="col">Import Data Hasil Test</span>
+            <span class="col text-subtitle-1 font-weight-bold my-n5">
+              Import Data Hasil Test
+            </span>
             <v-btn icon @click="close">
               <v-icon>mdi-close</v-icon>
             </v-btn>
@@ -45,7 +47,7 @@
                 </div>
                 <div class="text-right">
                   <v-btn color="primary" :disabled="!valid" type="submit">
-                    Import
+                    Impor
                   </v-btn>
                 </div>
               </div>
