@@ -1,6 +1,6 @@
 <template>
   <div style="width: 100%;">
-    <h3 class="mb-1">{{ event_name }}</h3>
+    <h3 class="mb-3 text-subtitle-1 font-weight-bold">{{ event_name }}</h3>
     <v-card class="rounded-b-0">
       <v-card-text>
         <v-row no-gutters>
@@ -16,7 +16,7 @@
                 </label>
                 <p class="font-weight-medium mt-2 mb-0">
                   {{ invitations_count }} / {{ attendees_count }} /
-                  {{ data.applicants_notified_result_count }}
+                  {{ applicants_notified_result_count }}
                 </p>
               </v-col>
               <v-col cols="4">
@@ -28,7 +28,7 @@
                     class="ma-0"
                     :color="status | getChipColor"
                   >
-                    {{ status }}
+                    {{ toCapitalizeCase(status) }}
                   </v-chip>
                 </p>
               </v-col>
@@ -74,7 +74,7 @@
                   Jenis Pendaftaran
                 </label>
                 <p class="font-weight-medium mt-2 mb-0 text-capitalize">
-                  {{ data.registration_type }}
+                  {{ registration_type }}
                 </p>
               </v-col>
             </v-row>
@@ -99,6 +99,9 @@
           class="white--text"
           :to="`/events/${$route.params.eventId}/edit`"
         >
+          <v-icon small class="pr-2">
+            mdi-pencil-outline
+          </v-icon>
           Ubah
         </v-btn>
       </v-card-actions>
@@ -108,7 +111,7 @@
 
 <script>
 /* eslint-disable camelcase */
-import { getChipColor } from '@/utilities/formater'
+import { getChipColor, toCapitalizeCase } from '@/utilities/formater'
 
 export default {
   filters: {
@@ -128,46 +131,59 @@ export default {
 
   data() {
     return {
+      kloter: [],
+      status: 'DRAFT',
+      city: null,
+      end_at: null,
+      start_at: null,
+      host_name: null,
       event_code: null,
       event_name: null,
-      start_at: null,
-      end_at: null,
-      host_name: null,
-      event_location: null,
-      city: null,
-      invitations_count: null,
-      attendees_count: null,
-      attendees_result_count: null,
       event_reg_url: null,
-      status: 'DRAFT',
-      kloter: []
+      event_location: null,
+      attendees_count: null,
+      invitations_count: null,
+      registration_type: null,
+      attendees_result_count: null,
+      applicants_notified_result_count: null
     }
   },
 
   watch: {
     data(val) {
-      this.event_code = val ? val.event_code : null
-      this.event_name = val ? val.event_name : null
+      this.city = val ? val.city : null
       this.status = val ? val.status : null
       this.host_name = val ? val.host_name : null
-      this.event_location = val ? val.event_location : null
+      this.event_code = val ? val.event_code : null
+      this.event_name = val ? val.event_name : null
       this.event_reg_url = val ? val.event_reg_url : null
-      this.city = val ? val.city : null
+      this.event_location = val ? val.event_location : null
+      this.attendees_count = val ? val.attendees_count : null
+      this.invitations_count = val ? val.invitations_count : null
+      this.registration_type = val ? val.registration_type : null
+      this.attendees_result_count = val ? val.attendees_result_count : null
+
       this.start_at = val
         ? this.$dateFns.format(new Date(val.start_at), 'dd-MM-yyyy HH:mm')
         : null
+
       this.end_at = val
         ? this.$dateFns.format(new Date(val.end_at), 'dd-MM-yyyy HH:mm')
         : null
-      this.invitations_count = val ? val.invitations_count : null
-      this.attendees_count = val ? val.attendees_count : null
-      this.attendees_result_count = val ? val.attendees_result_count : null
+
+      this.applicants_notified_result_count = val
+        ? val.applicants_notified_result_count
+        : null
+
       this.kloter = val.schedules.map((sch) => ({
         ...sch,
         start_at: this.$dateFns.format(new Date(sch.start_at), 'HH:mm'),
         end_at: this.$dateFns.format(new Date(sch.end_at), 'HH:mm')
       }))
     }
+  },
+  methods: {
+    toCapitalizeCase
   }
 }
 </script>
