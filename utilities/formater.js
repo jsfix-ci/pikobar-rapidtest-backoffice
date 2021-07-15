@@ -5,6 +5,9 @@ export function getChipColor(status) {
 }
 
 export function toCapitalizeCase(word) {
+  if (typeof word !== 'string' || !word.length) {
+    return null
+  }
   return word
     .split(' ')
     .map((text) => text.charAt(0).toUpperCase() + text.slice(1).toLowerCase())
