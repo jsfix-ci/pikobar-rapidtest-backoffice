@@ -142,6 +142,7 @@ export default {
     },
     send() {
       this.$emit('send')
+      this.closeWarning()
     }
   }
 }
