@@ -305,10 +305,10 @@
 </template>
 
 <script>
-import { getPersonStatusText } from '@/utilities/personStatus'
 import {
   SYMPTOMS_OPTIONS,
-  CONGENITAL_DESEASE_OPTIONS
+  CONGENITAL_DESEASE_OPTIONS,
+  STATUS_OPTIONS
 } from '@/utilities/constant'
 export default {
   props: {
@@ -359,6 +359,9 @@ export default {
     },
     congenitalDiseaseOptions() {
       return CONGENITAL_DESEASE_OPTIONS
+    },
+    statusOptions() {
+      return STATUS_OPTIONS
     }
   },
 
@@ -371,7 +374,6 @@ export default {
   },
 
   methods: {
-    getPersonStatusText,
     async fetchRecord() {
       const id = this.recordId
       let data = null
@@ -396,7 +398,9 @@ export default {
       this.phoneNumber = data.phone_number
       this.birthDate = data.birth_date
       this.invitations = data.invitations
-      this.personStatus = this.getPersonStatusText(data.person_status)
+      this.personStatus = this.statusOptions.find(
+        (x) => x.value === data.person_status
+      ).text
       this.symptomsActivity = data.symptoms_activity
       this.symptomsInteraction = data.symptoms_interaction
       this.symptomsNotes = data.symptoms_notes
