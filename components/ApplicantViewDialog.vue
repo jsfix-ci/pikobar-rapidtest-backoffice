@@ -308,7 +308,8 @@
 import { getPersonStatusText } from '@/utilities/personStatus'
 import {
   SYMPTOMS_OPTIONS,
-  CONGENITAL_DESEASE_OPTIONS
+  CONGENITAL_DESEASE_OPTIONS,
+  STATUS_OPTIONS
 } from '@/utilities/constant'
 export default {
   props: {
@@ -330,6 +331,7 @@ export default {
 
   data() {
     return {
+      STATUS_OPTIONS,
       registrationCode: null,
       nik: null,
       name: null,
@@ -396,7 +398,9 @@ export default {
       this.phoneNumber = data.phone_number
       this.birthDate = data.birth_date
       this.invitations = data.invitations
-      this.personStatus = this.getPersonStatusText(data.person_status)
+      this.personStatus = this.STATUS_OPTIONS.find(
+        (x) => x.value === data.person_status
+      ).text
       this.symptomsActivity = data.symptoms_activity
       this.symptomsInteraction = data.symptoms_interaction
       this.symptomsNotes = data.symptoms_notes
