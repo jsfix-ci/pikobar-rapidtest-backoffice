@@ -190,7 +190,6 @@ export default {
     async fetchRecord() {
       const id = this.recordId
       const { data } = await this.$axios.$get(`/rdt/applicants/${id}`)
-      console.log(data)
 
       this.registrationCode = data.registration_code
       this.name = data.name
