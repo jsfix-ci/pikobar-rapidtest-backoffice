@@ -24,7 +24,7 @@
                   v-model="nik"
                   name="NIK"
                   label="NIK Baru"
-                  placeholder="Masukan NIK"
+                  placeholder="Masukkan NIK"
                   :clearable="false"
                   rules="required|nik"
                 />
@@ -33,7 +33,7 @@
                   v-model="nik"
                   name="Passport"
                   label="Passport"
-                  placeholder="Masukan Passport"
+                  placeholder="Masukkan Passport"
                   :clearable="false"
                   rules="required|passport"
                 />
@@ -41,7 +41,7 @@
                   v-model="name"
                   name="Nama Peserta"
                   label="Nama Peserta"
-                  placeholder="Masukan Nama Peserta"
+                  placeholder="Masukkan Nama Peserta"
                   :clearable="false"
                   rules="required"
                 />
@@ -62,7 +62,7 @@
                   v-model="workPlace"
                   name="Instansi Tempat Bekerja"
                   label="Instansi Tempat Bekerja"
-                  placeholder="Masukan Instansi Tempat Bekerja"
+                  placeholder="Masukkan Instansi Tempat Bekerja"
                   :clearable="false"
                   rules="required"
                 />
@@ -71,7 +71,7 @@
                   v-model="phone_number"
                   name="Nomor Telepon"
                   label="Nomor Telepon"
-                  placeholder="Masukan Nomor Telepon"
+                  placeholder="Masukkan Nomor Telepon"
                   :clearable="false"
                   rules="required|phone_number"
                 />
@@ -91,7 +91,7 @@
                   v-model="address"
                   name="Alamat Tempat Tinggal Sekarang"
                   label="Alamat Tempat Tinggal Sekarang"
-                  placeholder="Masukan Alamat Tempat Tinggal Sekarang"
+                  placeholder="Masukkan Alamat Tempat Tinggal Sekarang"
                   :clearable="false"
                   rules="required|max:150"
                 />
