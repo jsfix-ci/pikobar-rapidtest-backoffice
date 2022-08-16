@@ -93,7 +93,7 @@
                   label="Alamat Tempat Tinggal Sekarang"
                   placeholder="Masukan Alamat Tempat Tinggal Sekarang"
                   :clearable="false"
-                  rules="required"
+                  rules="required|max:150"
                 />
                 <pkbr-select
                   v-if="isEditApplicant"

@@ -279,7 +279,7 @@ import {
 } from '@/utilities/constant'
 
 const headers = [
-  { text: 'NIK', value: 'nik', width: 200 },
+  { text: 'NIK/Passport', value: 'nik', width: 200 },
   { text: 'Nama Peserta', value: 'name', width: 200 },
   { text: 'Jenis Kelamin', value: 'gender', width: 130 },
   {
