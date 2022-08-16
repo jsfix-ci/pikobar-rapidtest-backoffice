@@ -85,3 +85,10 @@ extend('nik', {
   },
   message: 'Format NIK tidak benar'
 })
+
+extend('passport', {
+  validate: (value) => {
+    return value.match(/^[A-Z0-9]{7,9}$/)
+  },
+  message: 'Format Passport tidak benar'
+})

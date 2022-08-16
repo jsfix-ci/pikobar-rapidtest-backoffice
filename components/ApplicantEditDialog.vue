@@ -20,13 +20,22 @@
                   dense
                 />
                 <pkbr-input
-                  v-if="isEditApplicant"
+                  v-if="isEditApplicant && nationality === 'WNI'"
                   v-model="nik"
                   name="NIK"
                   label="NIK Baru"
                   placeholder="Masukan NIK"
                   :clearable="false"
                   rules="required|nik"
+                />
+                <pkbr-input
+                  v-if="isEditApplicant && nationality === 'WNA'"
+                  v-model="nik"
+                  name="Passport"
+                  label="Passport"
+                  placeholder="Masukan Passport"
+                  :clearable="false"
+                  rules="required|passport"
                 />
                 <pkbr-input
                   v-model="name"
@@ -153,7 +162,12 @@ export default {
       address: null,
       phone_number: null,
       status: null,
-      workPlace: null
+      workPlace: null,
+      nationality: null,
+      district_code: null,
+      symptoms: null,
+      village_code: null,
+      birth_date: null
     }
   },
 
@@ -176,6 +190,7 @@ export default {
     async fetchRecord() {
       const id = this.recordId
       const { data } = await this.$axios.$get(`/rdt/applicants/${id}`)
+      console.log(data)
 
       this.registrationCode = data.registration_code
       this.name = data.name
@@ -186,6 +201,11 @@ export default {
       this.phone_number = data.phone_number
       this.status = data.person_status
       this.workPlace = data.workplace_name
+      this.nationality = data.nationality
+      this.district_code = data.district_code
+      this.symptoms = data.symptoms
+      this.village_code = data.village_code
+      this.birth_date = data.birth_date
     },
 
     async save() {
@@ -202,7 +222,12 @@ export default {
             address: this.address,
             phone_number: this.phone_number,
             person_status: this.status,
-            workplace_name: this.workPlace
+            workplace_name: this.workPlace,
+            nationality: this.nationality,
+            district_code: this.district_code,
+            symptoms: this.symptoms,
+            village_code: this.village_code,
+            birth_date: this.birth_date
           })
 
           this.$emit('save')
