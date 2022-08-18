@@ -20,19 +20,28 @@
                   dense
                 />
                 <pkbr-input
-                  v-if="isEditApplicant"
+                  v-if="isEditApplicant && nationality === 'WNI'"
                   v-model="nik"
                   name="NIK"
                   label="NIK Baru"
-                  placeholder="Masukan NIK"
+                  placeholder="Masukkan NIK"
                   :clearable="false"
                   rules="required|nik"
+                />
+                <pkbr-input
+                  v-if="isEditApplicant && nationality === 'WNA'"
+                  v-model="nik"
+                  name="Passport"
+                  label="Passport"
+                  placeholder="Masukkan Passport"
+                  :clearable="false"
+                  rules="required|passport"
                 />
                 <pkbr-input
                   v-model="name"
                   name="Nama Peserta"
                   label="Nama Peserta"
-                  placeholder="Masukan Nama Peserta"
+                  placeholder="Masukkan Nama Peserta"
                   :clearable="false"
                   rules="required"
                 />
@@ -53,7 +62,7 @@
                   v-model="workPlace"
                   name="Instansi Tempat Bekerja"
                   label="Instansi Tempat Bekerja"
-                  placeholder="Masukan Instansi Tempat Bekerja"
+                  placeholder="Masukkan Instansi Tempat Bekerja"
                   :clearable="false"
                   rules="required"
                 />
@@ -62,7 +71,7 @@
                   v-model="phone_number"
                   name="Nomor Telepon"
                   label="Nomor Telepon"
-                  placeholder="Masukan Nomor Telepon"
+                  placeholder="Masukkan Nomor Telepon"
                   :clearable="false"
                   rules="required|phone_number"
                 />
@@ -82,9 +91,9 @@
                   v-model="address"
                   name="Alamat Tempat Tinggal Sekarang"
                   label="Alamat Tempat Tinggal Sekarang"
-                  placeholder="Masukan Alamat Tempat Tinggal Sekarang"
+                  placeholder="Masukkan Alamat Tempat Tinggal Sekarang"
                   :clearable="false"
-                  rules="required"
+                  rules="required|max:150"
                 />
                 <pkbr-select
                   v-if="isEditApplicant"
@@ -153,7 +162,12 @@ export default {
       address: null,
       phone_number: null,
       status: null,
-      workPlace: null
+      workPlace: null,
+      nationality: null,
+      district_code: null,
+      symptoms: null,
+      village_code: null,
+      birth_date: null
     }
   },
 
@@ -186,6 +200,11 @@ export default {
       this.phone_number = data.phone_number
       this.status = data.person_status
       this.workPlace = data.workplace_name
+      this.nationality = data.nationality
+      this.district_code = data.district_code
+      this.symptoms = data.symptoms
+      this.village_code = data.village_code
+      this.birth_date = data.birth_date
     },
 
     async save() {
@@ -202,7 +221,12 @@ export default {
             address: this.address,
             phone_number: this.phone_number,
             person_status: this.status,
-            workplace_name: this.workPlace
+            workplace_name: this.workPlace,
+            nationality: this.nationality,
+            district_code: this.district_code,
+            symptoms: this.symptoms,
+            village_code: this.village_code,
+            birth_date: this.birth_date
           })
 
           this.$emit('save')

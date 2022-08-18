@@ -5,7 +5,7 @@ import {
   extend,
   setInteractionMode
 } from 'vee-validate'
-import { required, email } from 'vee-validate/dist/rules'
+import { required, email, max } from 'vee-validate/dist/rules'
 import { messages } from 'vee-validate/dist/locale/id.json'
 
 Vue.component('ValidationObserver', ValidationObserver)
@@ -84,4 +84,16 @@ extend('nik', {
     )
   },
   message: 'Format NIK tidak benar'
+})
+
+extend('passport', {
+  validate: (value) => {
+    return value.match(/^[A-Z0-9]{7,9}$/)
+  },
+  message: 'Format Passport tidak benar'
+})
+
+extend('max', {
+  ...max,
+  message: (_, values) => `${values._field_} maksimal ${values.length} karakter`
 })

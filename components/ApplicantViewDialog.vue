@@ -11,7 +11,7 @@
             <v-col cols="6">
               <v-list-item two-line>
                 <v-list-item-content>
-                  <v-list-item-title>NIK</v-list-item-title>
+                  <v-list-item-title>NIK/Passport</v-list-item-title>
                   <v-list-item-subtitle>
                     {{ nik }}
                   </v-list-item-subtitle>
