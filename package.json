@@ -20,7 +20,7 @@
     "@nuxtjs/sentry": "^5.1.0",
     "@sentry/tracing": "6.6.0",
     "@sentry/vue": "6.6.0",
-    "js-cookie": "^2.2.1",
+    "js-cookie": "^3.0.1",
     "keycloak-js": "^11.0.0",
     "nuxt": "^2.14.1",
     "rimraf": "^3.0.2",
